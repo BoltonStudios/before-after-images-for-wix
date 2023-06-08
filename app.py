@@ -2,14 +2,12 @@
 A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
-# pylint: disable=line-too-long
 
 # imports
 import os
 import json
 import logging
 import urllib.parse
-import jwt
 import constants
 from controllers import csv_controller
 from controllers import wix_auth_controller
@@ -29,17 +27,14 @@ logger = logging.getLogger()
 @app.route('/')
 def root():
 
-    """Return a friendly HTTP greeting."""
-    message = "It's running! Another Test"
+    """Return a friendly greeting."""
 
-    # Get Cloud Run environment variables.
-    service = os.environ.get('K_SERVICE', 'Unknown service')
-    revision = os.environ.get('K_REVISION', 'Unknown revision')
+    # Initialize variables.
+    message = "The app is running."
 
     return render_template('index.html',
-        message=message,
-        Service=service,
-        Revision=revision)
+        message=message
+    )
 
 # App URL (Installation) page.
 @app.route( '/app-wix', methods=[ 'POST', 'GET' ] )
@@ -145,12 +140,17 @@ def redirect_wix():
         print( "Error getting token from Wix" )
         print( err )
         return Response("{'error':'wixError'}", status=500, mimetype='application/json')
-    
+
 # App Settings Pabel
 @app.route('/settings', methods=['POST','GET'])
 def settings():
 
-    """Return a friendly HTTP greeting."""
+    """
+    Build the App Settings panel allowing users to customize the app iframe component.
+    
+    Find recommended App Settings panel features here:
+    https://devforum.wix.com/kb/en/article/build-an-app-settings-panel-for-website-iframe-components
+    """
 
     # Initialize variables.
     message = "It's running! Another Test"
@@ -167,136 +167,108 @@ def settings():
         component_id = component_id
     )
 
-# Webhooks page.
-@app.route('/widget-slider', methods=['POST','GET'])
-def widget_slider():
+# Widget Component: Slider
+@app.route('/widget-component-slider', methods=['POST','GET'])
+def widget_component_slider():
 
-    """Handle webhooks."""
+    """
+    Build the widget iframe component containing a before-and-after slider.
+    """
 
-    # Initialize variables.
-    preview_text = "No preview text."
-    component_id = 0
-    text_variable = "Change this."
-    secret = constants.WEBHOOK_PUBLIC_KEY
-    encoded_jwt = "eyJraWQiOiI5NklwcXhGOSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiZGF0YVwiOlwie1xcbiAgXFxcImlkXFxcIiA6IFxcXCI5NWMyZjg3ZC1hZTc4LTRkZjktYWEyMS05NTE4OTIzMWQ2ZjdcXFwiLFxcbiAgXFxcImVudGl0eUZxZG5cXFwiIDogXFxcIndpeC5jcm0uaW5ib3gudjIubWVzc2FnZVxcXCIsXFxuICBcXFwic2x1Z1xcXCIgOiBcXFwibWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXFxcIixcXG4gIFxcXCJlbnRpdHlJZFxcXCIgOiBcXFwiMTY0MDc3MTY2NzA5MTIxM1xcXCIsXFxuICBcXFwiYWN0aW9uRXZlbnRcXFwiIDoge1xcbiAgICBcXFwiYm9keVxcXCIgOiB7XFxuICAgICAgXFxcImNvbnZlcnNhdGlvbklkXFxcIiA6IFxcXCI1ZjY1MTY0Zi1iMzczLTNjYjktYmUyZS1mMWZkYzAwYzg2YTlcXFwiLFxcbiAgICAgIFxcXCJtZXNzYWdlXFxcIiA6IHtcXG4gICAgICAgIFxcXCJ0YXJnZXRDaGFubmVsc1xcXCIgOiBbIF0sXFxuICAgICAgICBcXFwiZGlyZWN0aW9uXFxcIiA6IFxcXCJQQVJUSUNJUEFOVF9UT19CVVNJTkVTU1xcXCIsXFxuICAgICAgICBcXFwiaWRcXFwiIDogXFxcIjE2NDA3NzE2NjcwOTEyMTNcXFwiLFxcbiAgICAgICAgXFxcInNlcXVlbmNlXFxcIiA6IFxcXCIxNjQwNzcxNjY3MDkxMjEzXFxcIixcXG4gICAgICAgIFxcXCJjb250ZW50XFxcIiA6IHtcXG4gICAgICAgICAgXFxcInByZXZpZXdUZXh0XFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgXFxcImZvcm1cXFwiIDoge1xcbiAgICAgICAgICAgIFxcXCJ0aXRsZVxcXCIgOiBcXFwiTmV3IFNwYSBBcHBvaW50bWVudFxcXCIsXFxuICAgICAgICAgICAgXFxcImRlc2NyaXB0aW9uXFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgICBcXFwiZmllbGRzXFxcIiA6IFsge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIkZpcnN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJKb0pvXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJMYXN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJEb2VcXFwiXFxuICAgICAgICAgICAgfSwge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIlRyZWF0bWVudHNcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJNYXNzYWdlLCBNdWQgQmF0aCwgRmFjaWFsXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJBcHBvaW50bWVudCBEYXRlXFxcIixcXG4gICAgICAgICAgICAgIFxcXCJ2YWx1ZVxcXCIgOiBcXFwiTWF5IDksIDIwMjFcXFwiXFxuICAgICAgICAgICAgfSBdLFxcbiAgICAgICAgICAgIFxcXCJtZWRpYVxcXCIgOiBbIHtcXG4gICAgICAgICAgICAgIFxcXCJpbWFnZVxcXCIgOiB7XFxuICAgICAgICAgICAgICAgIFxcXCJ1cmxcXFwiIDogXFxcImh0dHBzOi8vc3RhdGljLndpeHN0YXRpYy5jb20vbWVkaWEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkuanBnL3YxL2ZpbGwvd18xMjAwLGhfNzk4LGFsX2MscV84NSx1c21fMC42Nl8xLjAwXzAuMDEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkud2VicFxcXCIsXFxuICAgICAgICAgICAgICAgIFxcXCJ3aWR0aFxcXCIgOiAxMjAwLjAsXFxuICAgICAgICAgICAgICAgIFxcXCJoZWlnaHRcXFwiIDogNzk4LjBcXG4gICAgICAgICAgICAgIH1cXG4gICAgICAgICAgICB9IF1cXG4gICAgICAgICAgfVxcbiAgICAgICAgfSxcXG4gICAgICAgIFxcXCJzZW5kZXJcXFwiIDoge1xcbiAgICAgICAgICBcXFwiY29udGFjdElkXFxcIiA6IFxcXCI4OTBhMzgxNi04NWI0LTQ0YWItOTA4NS01MjQ5NzJhODUwZWZcXFwiXFxuICAgICAgICB9LFxcbiAgICAgICAgXFxcImFwcElkXFxcIiA6IFxcXCJhMGMzODY3MC02ODQ1LTQxZTAtOGY0MS04NWE2MDU0Y2NkOThcXFwiLFxcbiAgICAgICAgXFxcInZpc2liaWxpdHlcXFwiIDogXFxcIkJVU0lORVNTXFxcIixcXG4gICAgICAgIFxcXCJzb3VyY2VDaGFubmVsXFxcIiA6IFxcXCJVTktOT1dOX0NIQU5ORUxfVFlQRVxcXCIsXFxuICAgICAgICBcXFwiYmFkZ2VzXFxcIiA6IFsgXSxcXG4gICAgICAgIFxcXCJjcmVhdGVkRGF0ZVxcXCIgOiBcXFwiMjAyMS0xMi0yOVQwOTo1NDoyNy4wOTFaXFxcIlxcbiAgICAgIH1cXG4gICAgfVxcbiAgfSxcXG4gIFxcXCJldmVudFRpbWVcXFwiIDogXFxcIjIwMjEtMTItMjlUMDk6NTQ6MjcuMjcyODIzWlxcXCIsXFxuICBcXFwidHJpZ2dlcmVkQnlBbm9ueW1pemVSZXF1ZXN0XFxcIiA6IGZhbHNlXFxufSBcIixcImluc3RhbmNlSWRcIjpcIjcxNTFhMDRkLWFkZGMtNDZiYi1hNTZkLTU5YzkxNjJiNTZjNlwiLFwiZXZlbnRUeXBlXCI6XCJ3aXguY3JtLmluYm94LnYyLm1lc3NhZ2VfbWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXCJ9IiwiaWF0IjoxNjg1Mjg2NjIyLCJleHAiOjE2ODg4ODY2MjJ9.ngR_fgybMhg_u2FnAyEziHNVdtfEIl1SYKy1E2L1LGimDCgkRldHetvr9vbK16emIW1_M7lFMyDC6VMt-MWwn45VY2zipT22ueB_ZFZ3hvOa2dEgyLjzBwmBM837eInEiHzarsApiMpimxFEiq_xm14hWbkXZ6lEbnb_PzixYEGAVH4tLWDbWa8bXdhOW6fenhk1OR-lBMAcfDFY4adAT1ZxKLJY21H0WbJcFAD0pt1E4HMiCzcEaZ66WyeQQZcJxa9ch44665Bf4hkNrp44qopsF89cKDXDxPfZVMrcn9QRMsWRD4M8z2tXGYyAyKo6kgP_K4nAuN8rGcdn4DmoXA"
-
-    widget_component_sliders = csv_controller.read_csv( 'components.csv' )
-    found_component = False
-    selected_widget_component = []
+    # Initialize variables.=
+    components = csv_controller.read_csv( 'components.csv' )
+    did_find_component = False
+    matched_component = []
+    requested_component_id = None
+    slider_offset = 0.5
 
     # If the user submitted a POST request...
     if request.method == 'POST':
 
+        # Get the data received.
         print( request.data )
         data = json.loads( request.data )
 
+        # If the received data contains a componentID key...
         if data[ 'componentID' ] :
 
-            # Edit existing componenents
-            for component in widget_component_sliders :
+            # Search through existing components and
+            # edit a matched component.
+            # Iterate over the saved sliders.
+            for component in components :
 
+                # If the ID for the saved slider in this iteration
+                # matches the value of the received data's componentID...
                 if component[0] == data[ 'componentID' ] :
 
-                    found_component = True
+                    # Update the did_find_component flag.
+                    did_find_component = True
 
-                    component_id = data[ 'componentID' ]
+                    # Extract more values from the received data.
+                    requested_component_id = data[ 'componentID' ]
                     component_text = data[ 'title' ]
                     component_slider_offset = data[ 'sliderOffset' ]
-                    
-                    component[0] = component_id
+
+                    # Update the the saved slider in this iteration.
+                    component[0] = requested_component_id
                     component[1] = component_text
                     component[2] = component_slider_offset
 
-            csv_controller.write_csv( 'components.csv' , widget_component_sliders )
+            # Saved changes to the data store.
+            csv_controller.write_csv( 'components.csv' , components )
 
-            # Handle new component.
-            if not found_component :
+            # If the search through saved components did not find a match...
+            if not did_find_component :
 
-                component_id = data[ 'componentID' ]
+                # Construct a new component.
+                requested_component_id = data[ 'componentID' ]
                 component_text = data[ 'title' ]
                 component_slider_offset = data[ 'sliderOffset' ]
 
-                widget_component_sliders.append([component_id, component_text, component_slider_offset])
+                # Add the new component to the saved components list.
+                components.append([
+                    requested_component_id,
+                    component_text,
+                    component_slider_offset
+                ])
 
-            csv_controller.write_csv( 'components.csv' , widget_component_sliders )
-
-        # If the 'list_name' key is in the request...
-        if 'button_pressed' in request.form :
-
-            print( "Aaron - Button Pressed ...")
-            encoded_jwt = "eyJraWQiOiI5NklwcXhGOSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiZGF0YVwiOlwie1xcbiAgXFxcImlkXFxcIiA6IFxcXCI5NWMyZjg3ZC1hZTc4LTRkZjktYWEyMS05NTE4OTIzMWQ2ZjdcXFwiLFxcbiAgXFxcImVudGl0eUZxZG5cXFwiIDogXFxcIndpeC5jcm0uaW5ib3gudjIubWVzc2FnZVxcXCIsXFxuICBcXFwic2x1Z1xcXCIgOiBcXFwibWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXFxcIixcXG4gIFxcXCJlbnRpdHlJZFxcXCIgOiBcXFwiMTY0MDc3MTY2NzA5MTIxM1xcXCIsXFxuICBcXFwiYWN0aW9uRXZlbnRcXFwiIDoge1xcbiAgICBcXFwiYm9keVxcXCIgOiB7XFxuICAgICAgXFxcImNvbnZlcnNhdGlvbklkXFxcIiA6IFxcXCI1ZjY1MTY0Zi1iMzczLTNjYjktYmUyZS1mMWZkYzAwYzg2YTlcXFwiLFxcbiAgICAgIFxcXCJtZXNzYWdlXFxcIiA6IHtcXG4gICAgICAgIFxcXCJ0YXJnZXRDaGFubmVsc1xcXCIgOiBbIF0sXFxuICAgICAgICBcXFwiZGlyZWN0aW9uXFxcIiA6IFxcXCJQQVJUSUNJUEFOVF9UT19CVVNJTkVTU1xcXCIsXFxuICAgICAgICBcXFwiaWRcXFwiIDogXFxcIjE2NDA3NzE2NjcwOTEyMTNcXFwiLFxcbiAgICAgICAgXFxcInNlcXVlbmNlXFxcIiA6IFxcXCIxNjQwNzcxNjY3MDkxMjEzXFxcIixcXG4gICAgICAgIFxcXCJjb250ZW50XFxcIiA6IHtcXG4gICAgICAgICAgXFxcInByZXZpZXdUZXh0XFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgXFxcImZvcm1cXFwiIDoge1xcbiAgICAgICAgICAgIFxcXCJ0aXRsZVxcXCIgOiBcXFwiTmV3IFNwYSBBcHBvaW50bWVudFxcXCIsXFxuICAgICAgICAgICAgXFxcImRlc2NyaXB0aW9uXFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgICBcXFwiZmllbGRzXFxcIiA6IFsge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIkZpcnN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJKb0pvXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJMYXN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJEb2VcXFwiXFxuICAgICAgICAgICAgfSwge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIlRyZWF0bWVudHNcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJNYXNzYWdlLCBNdWQgQmF0aCwgRmFjaWFsXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJBcHBvaW50bWVudCBEYXRlXFxcIixcXG4gICAgICAgICAgICAgIFxcXCJ2YWx1ZVxcXCIgOiBcXFwiTWF5IDksIDIwMjFcXFwiXFxuICAgICAgICAgICAgfSBdLFxcbiAgICAgICAgICAgIFxcXCJtZWRpYVxcXCIgOiBbIHtcXG4gICAgICAgICAgICAgIFxcXCJpbWFnZVxcXCIgOiB7XFxuICAgICAgICAgICAgICAgIFxcXCJ1cmxcXFwiIDogXFxcImh0dHBzOi8vc3RhdGljLndpeHN0YXRpYy5jb20vbWVkaWEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkuanBnL3YxL2ZpbGwvd18xMjAwLGhfNzk4LGFsX2MscV84NSx1c21fMC42Nl8xLjAwXzAuMDEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkud2VicFxcXCIsXFxuICAgICAgICAgICAgICAgIFxcXCJ3aWR0aFxcXCIgOiAxMjAwLjAsXFxuICAgICAgICAgICAgICAgIFxcXCJoZWlnaHRcXFwiIDogNzk4LjBcXG4gICAgICAgICAgICAgIH1cXG4gICAgICAgICAgICB9IF1cXG4gICAgICAgICAgfVxcbiAgICAgICAgfSxcXG4gICAgICAgIFxcXCJzZW5kZXJcXFwiIDoge1xcbiAgICAgICAgICBcXFwiY29udGFjdElkXFxcIiA6IFxcXCI4OTBhMzgxNi04NWI0LTQ0YWItOTA4NS01MjQ5NzJhODUwZWZcXFwiXFxuICAgICAgICB9LFxcbiAgICAgICAgXFxcImFwcElkXFxcIiA6IFxcXCJhMGMzODY3MC02ODQ1LTQxZTAtOGY0MS04NWE2MDU0Y2NkOThcXFwiLFxcbiAgICAgICAgXFxcInZpc2liaWxpdHlcXFwiIDogXFxcIkJVU0lORVNTXFxcIixcXG4gICAgICAgIFxcXCJzb3VyY2VDaGFubmVsXFxcIiA6IFxcXCJVTktOT1dOX0NIQU5ORUxfVFlQRVxcXCIsXFxuICAgICAgICBcXFwiYmFkZ2VzXFxcIiA6IFsgXSxcXG4gICAgICAgIFxcXCJjcmVhdGVkRGF0ZVxcXCIgOiBcXFwiMjAyMS0xMi0yOVQwOTo1NDoyNy4wOTFaXFxcIlxcbiAgICAgIH1cXG4gICAgfVxcbiAgfSxcXG4gIFxcXCJldmVudFRpbWVcXFwiIDogXFxcIjIwMjEtMTItMjlUMDk6NTQ6MjcuMjcyODIzWlxcXCIsXFxuICBcXFwidHJpZ2dlcmVkQnlBbm9ueW1pemVSZXF1ZXN0XFxcIiA6IGZhbHNlXFxufSBcIixcImluc3RhbmNlSWRcIjpcIjcxNTFhMDRkLWFkZGMtNDZiYi1hNTZkLTU5YzkxNjJiNTZjNlwiLFwiZXZlbnRUeXBlXCI6XCJ3aXguY3JtLmluYm94LnYyLm1lc3NhZ2VfbWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXCJ9IiwiaWF0IjoxNjg1Mjg2NjIyLCJleHAiOjE2ODg4ODY2MjJ9.ngR_fgybMhg_u2FnAyEziHNVdtfEIl1SYKy1E2L1LGimDCgkRldHetvr9vbK16emIW1_M7lFMyDC6VMt-MWwn45VY2zipT22ueB_ZFZ3hvOa2dEgyLjzBwmBM837eInEiHzarsApiMpimxFEiq_xm14hWbkXZ6lEbnb_PzixYEGAVH4tLWDbWa8bXdhOW6fenhk1OR-lBMAcfDFY4adAT1ZxKLJY21H0WbJcFAD0pt1E4HMiCzcEaZ66WyeQQZcJxa9ch44665Bf4hkNrp44qopsF89cKDXDxPfZVMrcn9QRMsWRD4M8z2tXGYyAyKo6kgP_K4nAuN8rGcdn4DmoXA"
-
-        #else :
-            #
-            print( "Aaron - Request Data is ...")
-            print( request.data )
-
-            encoded_jwt=request.data
-            #encoded_jwt = "eyJraWQiOiI5NklwcXhGOSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiZGF0YVwiOlwie1xcbiAgXFxcImlkXFxcIiA6IFxcXCI5NWMyZjg3ZC1hZTc4LTRkZjktYWEyMS05NTE4OTIzMWQ2ZjdcXFwiLFxcbiAgXFxcImVudGl0eUZxZG5cXFwiIDogXFxcIndpeC5jcm0uaW5ib3gudjIubWVzc2FnZVxcXCIsXFxuICBcXFwic2x1Z1xcXCIgOiBcXFwibWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXFxcIixcXG4gIFxcXCJlbnRpdHlJZFxcXCIgOiBcXFwiMTY0MDc3MTY2NzA5MTIxM1xcXCIsXFxuICBcXFwiYWN0aW9uRXZlbnRcXFwiIDoge1xcbiAgICBcXFwiYm9keVxcXCIgOiB7XFxuICAgICAgXFxcImNvbnZlcnNhdGlvbklkXFxcIiA6IFxcXCI1ZjY1MTY0Zi1iMzczLTNjYjktYmUyZS1mMWZkYzAwYzg2YTlcXFwiLFxcbiAgICAgIFxcXCJtZXNzYWdlXFxcIiA6IHtcXG4gICAgICAgIFxcXCJ0YXJnZXRDaGFubmVsc1xcXCIgOiBbIF0sXFxuICAgICAgICBcXFwiZGlyZWN0aW9uXFxcIiA6IFxcXCJQQVJUSUNJUEFOVF9UT19CVVNJTkVTU1xcXCIsXFxuICAgICAgICBcXFwiaWRcXFwiIDogXFxcIjE2NDA3NzE2NjcwOTEyMTNcXFwiLFxcbiAgICAgICAgXFxcInNlcXVlbmNlXFxcIiA6IFxcXCIxNjQwNzcxNjY3MDkxMjEzXFxcIixcXG4gICAgICAgIFxcXCJjb250ZW50XFxcIiA6IHtcXG4gICAgICAgICAgXFxcInByZXZpZXdUZXh0XFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgXFxcImZvcm1cXFwiIDoge1xcbiAgICAgICAgICAgIFxcXCJ0aXRsZVxcXCIgOiBcXFwiTmV3IFNwYSBBcHBvaW50bWVudFxcXCIsXFxuICAgICAgICAgICAgXFxcImRlc2NyaXB0aW9uXFxcIiA6IFxcXCJKb0pvIERvZSBtYWRlIGFuIGFwcG9pbnRtZW50XFxcIixcXG4gICAgICAgICAgICBcXFwiZmllbGRzXFxcIiA6IFsge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIkZpcnN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJKb0pvXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJMYXN0IE5hbWVcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJEb2VcXFwiXFxuICAgICAgICAgICAgfSwge1xcbiAgICAgICAgICAgICAgXFxcIm5hbWVcXFwiIDogXFxcIlRyZWF0bWVudHNcXFwiLFxcbiAgICAgICAgICAgICAgXFxcInZhbHVlXFxcIiA6IFxcXCJNYXNzYWdlLCBNdWQgQmF0aCwgRmFjaWFsXFxcIlxcbiAgICAgICAgICAgIH0sIHtcXG4gICAgICAgICAgICAgIFxcXCJuYW1lXFxcIiA6IFxcXCJBcHBvaW50bWVudCBEYXRlXFxcIixcXG4gICAgICAgICAgICAgIFxcXCJ2YWx1ZVxcXCIgOiBcXFwiTWF5IDksIDIwMjFcXFwiXFxuICAgICAgICAgICAgfSBdLFxcbiAgICAgICAgICAgIFxcXCJtZWRpYVxcXCIgOiBbIHtcXG4gICAgICAgICAgICAgIFxcXCJpbWFnZVxcXCIgOiB7XFxuICAgICAgICAgICAgICAgIFxcXCJ1cmxcXFwiIDogXFxcImh0dHBzOi8vc3RhdGljLndpeHN0YXRpYy5jb20vbWVkaWEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkuanBnL3YxL2ZpbGwvd18xMjAwLGhfNzk4LGFsX2MscV84NSx1c21fMC42Nl8xLjAwXzAuMDEvZjkzZTNkNjMzZTc5OTIxZjE0MzMwZjE5MTFmYzExMzkud2VicFxcXCIsXFxuICAgICAgICAgICAgICAgIFxcXCJ3aWR0aFxcXCIgOiAxMjAwLjAsXFxuICAgICAgICAgICAgICAgIFxcXCJoZWlnaHRcXFwiIDogNzk4LjBcXG4gICAgICAgICAgICAgIH1cXG4gICAgICAgICAgICB9IF1cXG4gICAgICAgICAgfVxcbiAgICAgICAgfSxcXG4gICAgICAgIFxcXCJzZW5kZXJcXFwiIDoge1xcbiAgICAgICAgICBcXFwiY29udGFjdElkXFxcIiA6IFxcXCI4OTBhMzgxNi04NWI0LTQ0YWItOTA4NS01MjQ5NzJhODUwZWZcXFwiXFxuICAgICAgICB9LFxcbiAgICAgICAgXFxcImFwcElkXFxcIiA6IFxcXCJhMGMzODY3MC02ODQ1LTQxZTAtOGY0MS04NWE2MDU0Y2NkOThcXFwiLFxcbiAgICAgICAgXFxcInZpc2liaWxpdHlcXFwiIDogXFxcIkJVU0lORVNTXFxcIixcXG4gICAgICAgIFxcXCJzb3VyY2VDaGFubmVsXFxcIiA6IFxcXCJVTktOT1dOX0NIQU5ORUxfVFlQRVxcXCIsXFxuICAgICAgICBcXFwiYmFkZ2VzXFxcIiA6IFsgXSxcXG4gICAgICAgIFxcXCJjcmVhdGVkRGF0ZVxcXCIgOiBcXFwiMjAyMS0xMi0yOVQwOTo1NDoyNy4wOTFaXFxcIlxcbiAgICAgIH1cXG4gICAgfVxcbiAgfSxcXG4gIFxcXCJldmVudFRpbWVcXFwiIDogXFxcIjIwMjEtMTItMjlUMDk6NTQ6MjcuMjcyODIzWlxcXCIsXFxuICBcXFwidHJpZ2dlcmVkQnlBbm9ueW1pemVSZXF1ZXN0XFxcIiA6IGZhbHNlXFxufSBcIixcImluc3RhbmNlSWRcIjpcIjcxNTFhMDRkLWFkZGMtNDZiYi1hNTZkLTU5YzkxNjJiNTZjNlwiLFwiZXZlbnRUeXBlXCI6XCJ3aXguY3JtLmluYm94LnYyLm1lc3NhZ2VfbWVzc2FnZV9zZW50X3RvX2J1c2luZXNzXCJ9IiwiaWF0IjoxNjg1Mjg2NjIyLCJleHAiOjE2ODg4ODY2MjJ9.ngR_fgybMhg_u2FnAyEziHNVdtfEIl1SYKy1E2L1LGimDCgkRldHetvr9vbK16emIW1_M7lFMyDC6VMt-MWwn45VY2zipT22ueB_ZFZ3hvOa2dEgyLjzBwmBM837eInEiHzarsApiMpimxFEiq_xm14hWbkXZ6lEbnb_PzixYEGAVH4tLWDbWa8bXdhOW6fenhk1OR-lBMAcfDFY4adAT1ZxKLJY21H0WbJcFAD0pt1E4HMiCzcEaZ66WyeQQZcJxa9ch44665Bf4hkNrp44qopsF89cKDXDxPfZVMrcn9QRMsWRD4M8z2tXGYyAyKo6kgP_K4nAuN8rGcdn4DmoXA"
-
-             #decoded_jwt = jwt.decode(encoded_jwt, secret, algorithms=["RS256"])
-            #decoded_jwt.dump()
-
-
-            # console.log('webhook event data after verification:', prettyData);
-            #print( 'webhook event data after verification:' + prettyData )
-            # incomingWebhooks.push({body: prettyData, headers: req.headers});
-            # res.send(req.body);
-
-            # console.log('got webhook event from Wix!', req.body);
-            print( 'got webhook event from Wix!' )
-
-            # console.log("===========================");
-            print( '===========================' )
-
-            # const data = jwt.verify(req.body, PUBLIC_KEY);
-            data = jwt.decode(encoded_jwt, secret, algorithms=["RS256"])
-
-            # const parsedData =  JSON.parse(data.data);
-            parsed_data = json.loads( data['data'] )
-
-            # const prettyData = {...data, data: {...parsedData, data: JSON.parse(parsedData.data)}};
-            pretty_data = json.loads( parsed_data['data'] )
-
-            print( pretty_data )
-
-            if pretty_data[ 'actionEvent' ]['body']["message"]["content"]["previewText"] :
-
-                preview_text = pretty_data[ 'actionEvent' ]['body']["message"]["content"]["previewText"]
-
-                requests_list.append( preview_text )
-
-                print( "preview_text is " + preview_text )
-                # save_message( database, preview_text )
-
-            # Update the lists CSV file.
-            csv_controller.write_csv( 'requests.csv', requests_list )
-            # requests_list = get_message( database )
+            # Saved changes to the data store.
+            csv_controller.write_csv( 'components.csv' , components )
 
     # If the user submitted a GET request...
     if request.method == 'GET':
 
-        # Assign the value to the component_id variable if the GET request provided either the 'origCompId' (editor) or 
-        # the 'viewerCompId' (front-end) component ID.
-        component_id = request.args.get( 'origCompId' ) if request.args.get( 'origCompId' ) else request.args.get( 'viewerCompId' )
+        # If the GET request provided the 'origCompId'...
+        if request.args.get( 'origCompId' ) :
 
-    # Edit existing componenents
-    for component in widget_component_sliders :
+            # Assign its value to component_id...
+            requested_component_id = request.args.get( 'origCompId' )
 
-        if component[0] == component_id :
+        elif request.args.get( 'viewerCompId' ):
 
-            selected_widget_component = component
+            # Or use the 'viewerCompId' (front-end) component ID, if available.
+            request.args.get( 'viewerCompId' )
 
+    # Iterate over the saved sliders.
+    for component in components :
 
-    slider_offset = int( selected_widget_component[2] )/100
+        # If the ID for this saved slider matches the current slider...
+        if component[0] == requested_component_id :
+
+            # This component is selected.
+            matched_component = component
+
+    # If the matched component has a slider offset (index 2)...
+    if len( matched_component ) >= 2 :
+
+        # Assign its value to the local slider_offset variable.
+        slider_offset = int( matched_component[2] )/100
+
     #
     return render_template( 'widget-slider.html',
-        text_variable = text_variable,
-        ejtext = preview_text,
-        requests_list = requests_list,
-        component_id = component_id,
-        components = widget_component_sliders,
-        component = selected_widget_component,
+        component_id = requested_component_id,
+        components = components,
+        component = matched_component,
         slider_offset = slider_offset
     )
 

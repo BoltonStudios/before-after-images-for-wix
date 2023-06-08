@@ -8,22 +8,18 @@
 		<div class="hero">
 			<div style="text-align:center;">
 				<picture>
-					<source srcset="/static/images/celebration-dark.svg" media="(prefers-color-scheme: dark)">
-					<img src="/static/images/celebration.svg" alt="A group celebrating" width="427" height="231">
+					<source srcset="{{ url_for('static', filename='images/celebration-dark.svg') }}" media="(prefers-color-scheme: dark)">
+					<img src="{{ url_for('static', filename='images/celebration.svg') }}" alt="A group celebrating" width="427" height="231">
 				</picture>
 			</div>
 
 			<div class="message">
 				<h1>{{message}}</h1>
-				<h2>Congratulations, you successfully deployed to App Engine</h2>
 			</div>
 		</div>
 
 		<div class="details">
-            <p>Go to <a href="{{ url_for('widget_slider') }}">/widget-slider</a></p>
-			<p>
-                This created the revision <code>{{Revision}}</code> of the App Engine service <code>{{Service}}</code>.
-            </p>
+            <p style="text-align: center;">Go to <a href="{{ url_for('widget_component_slider') }}">/widget-component-slider</a></p>
 		</div>
 	</div>
 {% endblock %}

@@ -157,6 +157,7 @@ cython_debug/
 /static-old
 .azure/
 constants.py
+old-webhooks-functions.txt
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
