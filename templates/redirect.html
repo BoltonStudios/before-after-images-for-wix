@@ -1,0 +1,23 @@
+{% extends 'site-layout.html' %}
+
+{% block content %}
+    <!-- start content -->
+    <div class="page-content">
+        <div class="content">
+            <div class="container">
+
+                <div class="message">
+                    <ul>
+                        <li>title: {{title}}</li>,
+                        <li>app_id: {{app_id}}</li># app_id: APP_ID,
+                        <li>site_display_name: {{site_display_name}}</li>
+                        <li>instance_id: {{instance_id}}</li>
+                        <li>permissions: {{permissions}}</li>
+                        <li>token: {{token}}</li>
+                        <li>response: {{response}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

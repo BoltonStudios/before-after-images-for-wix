@@ -1,0 +1,93 @@
+{% extends 'site-layout.html' %}
+
+{% block content %}
+    <!-- start content -->
+    <div class="content">
+
+        <div id="twentytwenty-{{component_id}}" class="twentytwenty-container">
+            <!-- The before image is first -->
+            <img src="http://placehold.it/400x200&amp;text=1" width="400" height="200" />
+            <!-- The after image is last -->
+            <img src="http://placehold.it/400x200&amp;text=2" width="400" height="200" />
+        </div>
+        {% if components %}
+            {% for component in components %}
+                {% if component[0] == component_id %}
+                    <p>Component ID: {{ component[0] }}</p>
+                    <p>Slider Offset: <span id="slider-offset-{{component_id}}" class="slider-offset">{{ component[2] }}</span></p>
+                    <p>Component Text: {{ component[1] }}</p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <p>{{ej_text}}</p>
+
+        <form action="/widget-slider" id="action-button-generate-request" class="request-button-form" method="POST">
+            <input type="submit" value="Generate Request" />
+            <input type="hidden" id="button_pressed" name="button_pressed" value="1">
+        </form>
+        <p>Go to <a href="/">/index</a></p>
+
+       <p id="target-text">Then</p>
+       {% if requests_list %}
+       <h3>Requests</h3>
+
+       <ol>
+           {% for request in requests_list %}
+
+           <li>{{ request }}</li>
+           
+           {% endfor %}
+       </ol>
+       {% endif %}
+
+       <script>
+        //
+        Wix.addEventListener( Wix.Events.SETTINGS_UPDATED, updateWidgetComponentSlider );
+        Wix.addEventListener( Wix.Events.SITE_SAVED, publishWidgetComponentSlider );
+
+        //
+        function updateWidgetComponentSlider( e ){
+
+            console.log( "updateWidgetComponentSlider called.");
+            console.log( e );
+
+            document.getElementById( "slider-offset-{{component_id}}" ).innerHTML = e.sliderOffset;
+        }
+        
+        //
+        function publishWidgetComponentSlider( e ){
+
+            console.log( "publishWidgetComponentSlider called.");
+            console.log( e );
+
+            var changedText = document.getElementById( "target-text" ).innerText;
+            var sliderOffset =  document.getElementById( "slider-offset-{{component_id}}" ).innerHTML
+            console.log(" =")
+            console.log(sliderOffset)
+
+            fetch( "{{ url_for('widget_slider') }}", {
+                method: "POST",
+                body: JSON.stringify({
+                    componentID: "{{component_id}}",
+                    title: "Fix bugs in {{component_id}}" + changedText,
+                    sliderOffset: sliderOffset
+                }),
+                headers: {
+                "Content-type": "application/json; charset=UTF-8"
+                }
+            });
+        }
+       </script>
+
+       <script>
+
+        var sliderOffset = Number( "{{slider_offset}}" )
+        $(function(){
+            $("#twentytwenty-{{component_id}}").twentytwenty({
+                default_offset_pct: sliderOffset, // How much of the before image is visible when the page loads
+            });
+        });
+       </script>
+    </div>
+{% endblock %}

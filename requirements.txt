@@ -1,0 +1,10 @@
+Flask
+requests
+Flask_BasicAuth
+urllib3
+cryptography
+PyJWT
+python-dotenv
+SQLAlchemy
+PyMySQL
+gunicorn
