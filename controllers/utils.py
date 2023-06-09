@@ -5,6 +5,14 @@ Miscellaneous helper functions.
 import sys
 import json
 
+def dump( item, name ):
+    '''
+    Print the item contents to the terminal.
+    '''
+    print( name + "=" )
+    print( item )
+    print( "===========================" )
+
 def write_json( file_name, data ):
     '''
     Helper function to write to JSON file.

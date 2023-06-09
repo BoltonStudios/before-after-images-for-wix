@@ -1,6 +1,44 @@
 {
     "components": [
-        "{\"component_id\": \"comp-lin1ldzo\", \"offset\": \"64\", \"offset_float\": 0.5}",
-        "{\"component_id\": \"comp-linsdntr\", \"offset\": \"0.5\", \"offset_float\": 0.5}"
+        {
+            "component_id": "comp-lin1ldzo",
+            "offset": "64",
+            "offset_float": 0.5
+        },
+        {
+            "component_id": "comp-linsdntr",
+            "offset": "75",
+            "offset_float": 0.75
+        },
+        {
+            "component_id": "comp-liooyymx",
+            "offset": "17",
+            "offset_float": 0.17
+        },
+        {
+            "component_id": "comp-liopjl3z",
+            "offset": "98",
+            "offset_float": 0.5
+        },
+        {
+            "component_id": "comp-liopl8dk",
+            "offset": "85",
+            "offset_float": 0.5
+        },
+        {
+            "component_id": "comp-liopohdl",
+            "offset": "34",
+            "offset_float": 0.34
+        },
+        {
+            "component_id": "comp-lior1f7a",
+            "offset": "0.5",
+            "offset_float": 0.5
+        },
+        {
+            "component_id": "comp-lior5wq0",
+            "offset": "5",
+            "offset_float": 0.05
+        }
     ]
 }

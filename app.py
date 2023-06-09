@@ -8,13 +8,15 @@ import os
 import json
 import logging
 import urllib.parse
-import constants
-from model.WidgetComponentSlider import WidgetComponentSlider
-from controllers import utils
-from controllers import wix_auth_controller
 
 # flask imports
 from flask import Flask, Response, redirect, render_template, request
+
+from . import constants
+from .model.WidgetComponentSlider import WidgetComponentSlider
+from .controllers import utils
+from .controllers import wix_auth_controller
+from .controllers import slider_controller
 
 # Define globals
 app = Flask(__name__)
@@ -177,9 +179,8 @@ def widget_component_slider():
     """
 
     # Initialize variables.
-    components = utils.read_json( 'components.json' )
+    components_db = utils.read_json( 'components.json' )
     did_find_component = False
-    matched_component = []
     requested_component_id = None
     slider_offset = 0.5
 
@@ -187,61 +188,38 @@ def widget_component_slider():
     if request.method == 'POST':
 
         # Get the data received.
-        print( "request data =" )
-        print( request.data )
+        utils.dump( request.data, "request.data" )
         request_data = json.loads( request.data )
+        requested_component_id = request_data[ "componentID" ]
 
-        # If the received data contains a componentID key...
-        if request_data[ 'componentID' ]:
+        #
+        did_find_component = slider_controller.has_component(
+            request_data,
+            _in = components_db
+        )
 
-            # Search through existing components and
-            # edit a matched component.
-            # Iterate over the saved sliders.
-            for component in components["components"]:
+        #
+        if did_find_component is True:
 
-                # Convert string to JSON.
-                component_json = json.loads( component )
+            #
+            slider_controller.edit_component(
+                request_data,
+                _in = components_db
+            )
 
-                # If the ID for the saved slider in this iteration
-                # matches the value of the received data's componentID...
-                requested_id = request_data[ 'componentID' ]
-                
-                if component_json['component_id'] == requested_id:
+        else:
 
-                    # Update the did_find_component flag.
-                    did_find_component = True
+            # Construct a new component.
+            new_slider = WidgetComponentSlider(
+                component_id = requested_component_id,
+                offset = request_data[ 'sliderOffset' ]
+            )
 
-                    print( 'did_find_component' )
-                    print( "==============================" )
-
-                    # Update the the saved slider in this iteration.
-                    component_json['component_id'] = request_data[ 'componentID' ]
-                    component_json['offset'] = request_data[ 'sliderOffset' ]
-                    component_json['offset_float'] = float(component_json['offset'])/100
-
-                # Pass the updated component data back to the array item.
-                component = component_json
-
-            # Saved changes to the data store.
-            utils.write_json( 'components.json' , components )
-
-            # If the search through saved components did not find a match...
-            if not did_find_component:
-
-                # Extract data from request.
-                requested_component_id = request_data[ 'componentID' ]
-
-                # Construct a new component.
-                component = WidgetComponentSlider(
-                    component_id = requested_component_id,
-                    offset = request_data[ 'sliderOffset' ]
-                )
-
-                # Add the new component to the saved components list as JSON.
-                components["components"].append( json.dumps( component, default=vars ) )
-
-            # Saved changes to the data store.
-            utils.write_json( 'components.json' , components )
+            #
+            slider_controller.add_component(
+                new_slider,
+                _in = components_db
+            )
 
         # Return a success message.
         return "", 201
@@ -260,20 +238,16 @@ def widget_component_slider():
             # Or use the 'viewerCompId' (front-end) component ID, if available.
             requested_component_id = request.args.get( 'viewerCompId' )
 
-    # Iterate over the saved components.
-    for component in components["components"]:
+        # Get the requested component.
+        requested_component = slider_controller.get_component(
+            requested_component_id,
+            _in = components_db
+        )
 
-        # Convert string to JSON.
-        component = json.loads( component )
-
-        # If the ID for this saved component matches the requested component...
-        if component["component_id" ] == requested_component_id:
-
-            # This component is the requested component.
-            matched_component = component
+        if requested_component != "":
 
             # Update the local variables.
-            slider_offset = matched_component[ "offset_float" ]
+            slider_offset = requested_component[ "offset_float" ]
 
     #
     return render_template( 'widget-component-slider.html',

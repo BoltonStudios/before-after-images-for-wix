@@ -11,6 +11,6 @@ class WidgetComponentSlider:
     Class for a Slider Widget Component.
     """
 
-    component_id: str
+    component_id: str = None
     offset: int = 50
     offset_float: float = offset / 100
