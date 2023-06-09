@@ -10,18 +10,32 @@ def read_csv( file_name ):
     '''
     Helper function to read items from CSV
     '''
-    tasks = []
+
+    # Initialize an array to return to the caller.
+    rows = []
+
+    # Get the file.
     with open( file_name, 'r', encoding='utf8') as file:
-        reader = csv.reader(file)
+
+        # Pass the file contents to the reader function.
+        reader = csv.reader( file )
+
+        # Iterate over the rows in the file.
         for row in reader:
-            tasks.append(row)
-    return tasks
+
+            # Append each row with modified items to the array.
+            rows.append( row )
+
+    # Return the array.
+    return rows
 
 def write_csv( file_name, content ):
     '''
     Helper function to write tasks to CSV
     '''
-    with open( file_name, 'w', newline='', encoding='utf8') as file:
+
+    # Write to CSV file.
+    with open( file_name, 'w', encoding='utf8') as file:
 
         writer = csv.writer( file )
         writer.writerows( content )
