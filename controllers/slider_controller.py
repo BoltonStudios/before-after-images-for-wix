@@ -22,17 +22,16 @@ def has_component( target, _in ):
         # Search through existing components and
         # edit a matched component.
         # Iterate over the saved sliders.
-        for component in components_db["components"]:
-            
+        for component in components_db[ 'components' ]:
+
             # If the ID for the saved slider in this iteration
             # matches the value of the received data's componentID...
-            if component['component_id'] == target[ 'componentID' ]:
+            if component[ 'component_id' ] == target[ 'componentID' ]:
 
                 # Update the did_find_component flag.
                 did_find_component = True
 
-                print( 'did_find_component' )
-                print( "==============================" )
+                utils.dump( did_find_component, 'did_find_component' )
 
     # Return result.
     return did_find_component
@@ -46,10 +45,10 @@ def get_component( _id, _in ):
     matched_component = ''
 
     # Iterate over the saved components.
-    for component in components_db["components"]:
+    for component in components_db[ 'components' ]:
 
         # If the ID for this saved component matches the requested component...
-        if component["component_id" ] == _id:
+        if component[ 'component_id' ] == _id:
 
             # This component is the requested component.
             matched_component = component
@@ -73,22 +72,26 @@ def edit_component( target, _in ):
         # Search through existing components and
         # edit a matched component.
         # Iterate over the saved sliders.
-        for component_json in components_db["components"]:
+        for component_json in components_db[ 'components' ]:
 
             # If the ID for the saved slider in this iteration
             # matches the value of the received data's componentID...
-            if component_json['component_id'] == target[ 'componentID' ]:
+            if component_json[ 'component_id' ] == target[ 'componentID' ]:
 
                 # Update the the saved slider in this iteration.
-                component_json['component_id'] = target[ 'componentID' ]
-                component_json['offset'] = target[ 'sliderOffset' ]
-                component_json['offset_float'] = float(target[ 'sliderOffset' ])/100
+                component_json[ 'component_id' ]  = target[ 'componentID' ]
+                component_json[ 'before_image' ]  = target[ 'beforeImage' ]
+                component_json[ 'after_image' ]   = target[ 'afterImage' ]
+                component_json[ 'offset' ]        = target[ 'sliderOffset' ]
+                component_json[ 'offset_float' ]  = target[ 'sliderOffsetFloat' ]
 
             # Add the updated component data to temp array.
             temp_components_db.append( component_json )
 
     # Replace the components array with the temparay.
-    components_db["components"] = temp_components_db
+    components_db[ 'components' ] = temp_components_db
+
+    utils.dump( components_db, 'components_db' )
 
     # Saved changes to the database.
     utils.write_json( 'components.json' , components_db )
@@ -106,14 +109,46 @@ def add_component( new_component, _in ):
     #
     new_component_json = {
         'component_id': new_component.component_id,
+        'before_image': new_component.before_image,
+        'after_image': new_component.after_image,
         'offset': new_component.offset,
         'offset_float': new_component.offset_float
     }
 
     # Add the new component to the saved components list as JSON.
-    components_db["components"].append( new_component_json )
+    components_db[ 'components' ].append( new_component_json )
 
-    utils.dump( components_db, "components_db" )
+    # Saved changes to the database.
+    utils.write_json( 'components.json' , components_db )
+
+# Delete a component.
+def delete_component( target, _in ):
+    '''
+    Search the component database for a matching component ID and delete the component.
+    '''
+
+    # Initialize variables.
+    components_db = _in
+    temp_components_db = []
+
+    # If the received data contains a componentID key...
+    if target[ 'componentID' ]:
+
+        # Search through existing components and
+        # edit a matched component.
+        # Iterate over the saved sliders.
+        for component_json in components_db[ 'components' ]:
+
+            # If the ID for the saved slider in this iteration
+            # DOES NOT match the value of the received data's componentID...
+            # (we want to skip the deletion target)
+            if component_json[ 'component_id' ] != target[ 'componentID' ]:
+
+                # Add the updated component data to temp array.
+                temp_components_db.append( component_json )
+
+    # Replace the components array with the temparay.
+    components_db[ 'components' ] = temp_components_db
 
     # Saved changes to the database.
     utils.write_json( 'components.json' , components_db )

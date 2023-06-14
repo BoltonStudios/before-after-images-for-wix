@@ -4,16 +4,33 @@
     <!-- start content -->
     <div class="content">
 
-        <div id="twentytwenty-{{component_id}}" class="twentytwenty-container">
+        <div id="{{component_id}}-twentytwenty" class="twentytwenty-container" 
+            data-slider-id="{{component_id}}"
+            data-before-image="{{before_image}}"
+            data-after-image="{{after_image}}"
+            data-slider-offset="{{slider_offset}}"
+            data-slider-offset-float="{{slider_offset_float}}"
+        >
             <!-- The before image is first -->
-            <img src="http://placehold.it/400x200&amp;text=1" width="400" height="200" />
+            {% if before_image != '' %}
+                <img id="{{component_id}}-before-image" src="{{ before_image }}" width="637" height="328" />
+            {% else %}
+                <img id="{{component_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" width="637" height="328" />
+            {% endif %}
             <!-- The after image is last -->
-            <img src="http://placehold.it/400x200&amp;text=2" width="400" height="200" />
+            {% if after_image != '' %}
+                <img id="{{component_id}}-after-image" src="{{ after_image }}" width="637" height="328" />
+            {% else %}
+                <img id="{{component_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" width="637" height="328" />
+            {% endif %}
         </div>
 
         <ul>
             <li>Component ID: {{component_id}}</li>
-            <li>Slider Offset: <span id="slider-offset-{{component_id}}" class="slider-offset">{{slider_offset}}</span></li>
+            <li>Before Image: <span id="{{component_id}}-before-image" class="slider-image">{{before_image}}</span></li>
+            <li>After Image: <span id="{{component_id}}-after-image" class="slider-image">{{after_image}}</span></li>
+            <li>Slider Offset: <span id="{{component_id}}-slider-offset" class="slider-offset">{{slider_offset}}</span></li>
+            <li>Slider Offset Float: <span id="{{component_id}}-slider-offset-float" class="slider-offset-float">{{slider_offset_float}}</span></li>
         </ul>
 
         <p>Go to <a href="/">/index</a></p>
@@ -32,34 +49,96 @@
        {% endif %}
 
        <script>
-        //
+
+        // Add event listeners as shown here:
+        // https://dev.wix.com/api/iframe-sdk/sdk/wix#sdk_wix_addeventlistener
         Wix.addEventListener( Wix.Events.SETTINGS_UPDATED, updateWidgetComponentSlider );
         Wix.addEventListener( Wix.Events.SITE_SAVED, publishWidgetComponentSlider );
-
-        //
+        Wix.addEventListener( Wix.Events.COMPONENT_DELETED, deleteWidgetComponentSlider );
+        
+        // Do something when the user applies new settings.
         function updateWidgetComponentSlider( e ){
 
+            // Print status to the console.
             console.log( "updateWidgetComponentSlider called.");
             console.log( e );
+            
+            // Initialize variables.
+            var slider = document.getElementById( "{{component_id}}-twentytwenty" );
+            var beforeImage = document.getElementById( "{{component_id}}-before-image" );
+            var afterImage = document.getElementById( "{{component_id}}-after-image" );
 
-            document.getElementById( "slider-offset-{{component_id}}" ).innerHTML = e.sliderOffset;
+            // Update data attributes.
+            slider.dataset.beforeImage = e.beforeImage;
+            slider.dataset.afterImage = e.afterImage;
+            slider.dataset.sliderOffset = e.sliderOffset;
+            slider.dataset.sliderOffsetFloat = e.sliderOffsetFloat;
+
+            // Update labels.
+            document.getElementById( "{{component_id}}-before-image" ).innerHTML = e.beforeImage;
+            document.getElementById( "{{component_id}}-after-image" ).innerHTML = e.afterImage;
+            document.getElementById( "{{component_id}}-slider-offset" ).innerHTML = e.sliderOffset;
+            document.getElementById( "{{component_id}}-slider-offset-float" ).innerHTML = e.sliderOffsetFloat;
+
+            // Update image source attributes.
+            beforeImage.src = e.beforeImage;
+            afterImage.src  = e.afterImage;
+
+            // Reinitialize TwentyTwenty.
+            jQuery("#{{component_id}}-twentytwenty").twentytwenty({
+                default_offset_pct: e.sliderOffsetFloat // How much of the before image is visible when the page loads
+            });
         }
         
-        //
-        function publishWidgetComponentSlider( e ){
-
-            console.log( "publishWidgetComponentSlider called.");
+        // Do something when the user deletes a site component.
+        function deleteWidgetComponentSlider( e ){
+            
+            // Print status to the console.
+            console.log( "deleteWidgetComponentSlider called.");
             console.log( e );
 
-            var sliderOffset =  document.getElementById( "slider-offset-{{component_id}}" ).innerHTML
-            console.log(" =")
-            console.log(sliderOffset)
-
+            // Send an asynchronous POST request with the "delete" action.
             fetch( "{{ url_for('widget_component_slider') }}", {
                 method: "POST",
                 body: JSON.stringify({
                     componentID: "{{component_id}}",
-                    sliderOffset: sliderOffset
+                    action: "delete",
+                    sliderOffset: 0,
+                    sliderOffsetFloat: 0.0
+                }),
+                headers: {
+                "Content-type": "application/json; charset=UTF-8"
+                }
+            });
+        }
+        
+        // Do something when the user saves the website.
+        function publishWidgetComponentSlider( e ){
+
+            // Print status to the console.
+            console.log( "publishWidgetComponentSlider called.");
+            console.log( e );
+            console.log("sliderOffset =");
+            console.log(sliderOffset);
+            
+            // Get the slider components current attribute data.
+            var slider =  document.getElementById( "{{component_id}}-twentytwenty" );
+            var sliderId = slider.dataset.sliderId;
+            var beforeImage = slider.dataset.beforeImage;
+            var afterImage = slider.dataset.afterImage;
+            var sliderOffset = slider.dataset.sliderOffset;
+            var sliderOffsetFloat = slider.dataset.sliderOffsetFloat;
+
+            // Send the attribute data to the app in an asynchronous POST request.
+            fetch( "{{ url_for('widget_component_slider') }}", {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "publish",
+                    componentID: sliderId,
+                    beforeImage: beforeImage,
+                    afterImage: afterImage,
+                    sliderOffset: sliderOffset,
+                    sliderOffsetFloat: sliderOffsetFloat
                 }),
                 headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -69,11 +148,13 @@
        </script>
 
        <script>
+        // Initialize variables.
+        var sliderOffsetFloat = Number( "{{slider_offset_float}}" )
 
-        var sliderOffset = Number( "{{slider_offset}}" )
+        // Initialize TwentyTwenty
         $(function(){
-            $("#twentytwenty-{{component_id}}").twentytwenty({
-                default_offset_pct: sliderOffset, // How much of the before image is visible when the page loads
+            $("#{{component_id}}-twentytwenty").twentytwenty({
+                default_offset_pct: sliderOffsetFloat, // How much of the before image is visible when the page loads
             });
         });
        </script>

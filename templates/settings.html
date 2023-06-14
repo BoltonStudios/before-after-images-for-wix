@@ -2,46 +2,127 @@
 
 {% block content %}
     <!-- start content -->
-    <div class="page-content">
-        <div class="content">
-            <div class="container">
+    <div class="container">
 
-                <p>Settings here.</p>
-                <p>{{message}}</p>
-                <p>Component ID: {{component_id}}</p>
-                <button id="favorite-button" class="favorite styled" type="button" onclick="updateBaieComponent()">Add to favorites</button>
-
+        <div class="row">
+            <div class="tabs col col-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Main</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    </li>
+                    </ul>
+            </div>
+            <div class="col col-9">
                 <p>&nbsp;</p>
-                <form action="/webhooks" id="action-button-generate-request" class="request-button-form" method="POST">
-                    <div class="mb-3">
-                        <label for="formFileBefore" class="form-label">Before Image</label>
-                        <input class="form-control" type="file" id="formFileBefore">
-                      </div>
-                      <div class="mb-3">
-                        <label for="formFileAfter" class="form-label">After Image</label>
-                        <input class="form-control" type="file" id="formFileAFter">
-                      </div>
-                        <label for="sliderOffsetRange" class="form-label">Slider Offset</label>
-                        <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieComponent()">
-                    <input type="submit" value="Generate Request" />
-                    <input type="hidden" id="button_pressed" name="button_pressed" value="1">
-                </form>
+                <p>Component ID: {{component_id}}</p>
+                <!--Before Image-->
+                <div id="baie-before-image" class="baie-image-select" data-baie-image-type="before" data-baie-image="{{ before_image }}">
+                    <button class="btn btn-primary" type="button">Select Before Image</button>
 
-                <script>
-                    function updateBaieComponent(){
+                    {% if before_image != '' %}
+                        <p>{{ before_image }}</p>
+                    {% else %}
+                        <p>None Selected.</p>
+                    {% endif %}
 
-                        var message = {
-                            sliderOffset: document.getElementById( "sliderOffsetRange" ).value
-                        };
+                </div>
 
-                        Wix.Settings.triggerSettingsUpdatedEvent( message, '{{component_id}}' );
+                <!--After Image-->
+                <div id="baie-after-image" class="baie-image-select" data-baie-image-type="after" data-baie-image="{{ after_image }}">
+                    <button class="btn btn-primary" type="button">Select After Image</button>
 
-                        console.log( "updateBaieComponent() called." );
-                        console.log( "message = " );
-                        console.log( message )
-                    }
-                </script>
+                    {% if after_image != '' %}
+                        <p>{{ after_image }}</p>
+                    {% else %}
+                        <p>None Selected.</p>
+                    {% endif %}
+                </div>
+
+                <!--Slider Offset-->
+                <label for="sliderOffsetRange" class="form-label">Slider Offset</label>
+                <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieComponent()" value="{{ slider_offset }}">
+
             </div>
         </div>
+        
+        <script>
+            
+            function updateBaieImages( event, element ){
+
+                    // Declare variables.
+                var imageURL = '';
+                var imageType = element.dataset.baieImageType;
+                var beforeStatus = document.querySelector( "#baie-before-image p" );
+                var afterStatus = document.querySelector( "#baie-after-image p" );
+
+                // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
+                // https://dev.wix.com/api/iframe-sdk/sdk/wix.settings#sdk_wix.settings_openmediadialog
+                Wix.Settings.openMediaDialog(
+                    Wix.Settings.MediaType.IMAGE, // mediaType
+                    false, // multiSelect
+                    function( data ){
+                        // onSuccess
+                        imageURL = Wix.Utils.Media.getImageUrl( data.relativeUri );
+                        
+                        // Add the image URL to the data attribute.
+                        element.dataset.baieImage = imageURL;
+
+                        // Update the labels in the settings panel.
+                        if( imageType == "before" ) {
+                            
+                            beforeStatus.innerHTML = imageURL;
+                        }
+
+                        if( imageType == "after" ) {
+                            
+                            afterStatus.innerHTML = imageURL;
+                        }
+
+                        // Update the component to reflect the settings changes.
+                        updateBaieComponent()
+                    }
+                );
+            }
+            document.getElementById( "baie-before-image" ).addEventListener( "click", function( event ){
+                updateBaieImages( event, this )
+            });
+            document.getElementById( "baie-after-image" ).addEventListener( "click", function( event ){
+                updateBaieImages( event, this )
+            });
+
+            function updateBaieComponent(){
+                
+                // Initialize variables.
+                var beforeImage = document.getElementById( "baie-before-image" ).dataset.baieImage;
+                var afterImage = document.getElementById( "baie-after-image" ).dataset.baieImage;
+                var sliderOffset = document.getElementById( "sliderOffsetRange" ).value;
+                var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
+
+                // Prepare message.
+                var message = {
+                    beforeImage: beforeImage,
+                    afterImage: afterImage,
+                    sliderOffset: sliderOffset,
+                    sliderOffsetFloat: sliderOffsetFloat
+                };
+
+                // Print status update to the console.
+                console.log( "updateBaieComponent() called." );
+                console.log( "message = " );
+                console.log( message );
+                
+                // Send event.
+                Wix.Settings.triggerSettingsUpdatedEvent( message, '{{component_id}}' );
+            }
+        </script>
     </div>
 {% endblock %}

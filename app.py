@@ -36,6 +36,7 @@ def root():
     message = "The app is running."
 
     return render_template('index.html',
+        page_id = 'home',
         message=message
     )
 
@@ -156,8 +157,13 @@ def settings():
     """
 
     # Initialize variables.
+    components_db = utils.read_json( 'components.json' )
     message = "It's running! Another Test"
     component_id = 0
+    before_image = ''
+    after_image = ''
+    slider_offset = 50
+    slider_offset_float = 0.5
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -165,9 +171,28 @@ def settings():
         #
         component_id = request.args.get( 'origCompId' )
 
+        # Get the requested component.
+        requested_component = slider_controller.get_component(
+            component_id,
+            _in = components_db
+        )
+
+        if requested_component != "":
+
+            # Update the local variables.
+            before_image = requested_component[ "before_image" ]
+            after_image = requested_component[ "after_image" ]
+            slider_offset = requested_component[ "offset" ]
+            slider_offset_float = requested_component[ "offset_float" ]
+
     return render_template('settings.html',
+        page_id = 'settings',
         message = message,
-        component_id = component_id
+        component_id = component_id,
+        before_image = before_image,
+        after_image = after_image,
+        slider_offset = slider_offset,
+        slider_offset_float = slider_offset_float
     )
 
 # Widget Component: Slider
@@ -182,7 +207,10 @@ def widget_component_slider():
     components_db = utils.read_json( 'components.json' )
     did_find_component = False
     requested_component_id = None
-    slider_offset = 0.5
+    before_image = ''
+    after_image = ''
+    slider_offset = 50
+    slider_offset_float = 0.5
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -202,17 +230,31 @@ def widget_component_slider():
         if did_find_component is True:
 
             #
-            slider_controller.edit_component(
-                request_data,
-                _in = components_db
-            )
+            if request_data[ "action" ] == "delete" :
+
+                #
+                slider_controller.delete_component(
+                    request_data,
+                    _in = components_db
+                )
+
+            else:
+
+                #
+                slider_controller.edit_component(
+                    request_data,
+                    _in = components_db
+                )
 
         else:
 
             # Construct a new component.
             new_slider = WidgetComponentSlider(
                 component_id = requested_component_id,
-                offset = request_data[ 'sliderOffset' ]
+                before_image = request_data[ 'beforeImage' ],
+                after_image = request_data[ 'afterImage' ],
+                offset = request_data[ 'sliderOffset' ],
+                offset_float = request_data[ 'sliderOffsetFloat' ]
             )
 
             #
@@ -247,12 +289,19 @@ def widget_component_slider():
         if requested_component != "":
 
             # Update the local variables.
-            slider_offset = requested_component[ "offset_float" ]
+            before_image = requested_component[ "before_image" ]
+            after_image = requested_component[ "after_image" ]
+            slider_offset = requested_component[ "offset" ]
+            slider_offset_float = requested_component[ "offset_float" ]
 
     #
     return render_template( 'widget-component-slider.html',
+        page_id = 'baie-slider',
         component_id = requested_component_id,
-        slider_offset = slider_offset
+        before_image = before_image,
+        after_image = after_image,
+        slider_offset = slider_offset,
+        slider_offset_float = slider_offset_float
     )
 
 # Run the app.

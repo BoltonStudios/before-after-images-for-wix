@@ -4,6 +4,9 @@ Miscellaneous helper functions.
 
 import sys
 import json
+from threading import Lock
+
+lock = Lock()
 
 def dump( item, name ):
     '''
@@ -17,9 +20,13 @@ def write_json( file_name, data ):
     '''
     Helper function to write to JSON file.
     '''
-    with open( file_name, 'w', encoding='utf-8' ) as file:
+    # acquire the lock
+    with lock:
 
-        json.dump( data, file, ensure_ascii=False, indent=4 )
+        # critical section
+        with open( file_name, 'w', encoding='utf-8' ) as file:
+
+            json.dump( data, file, ensure_ascii=False, indent=4 )
 
 # Read JSON file
 def read_json( file_name ):
