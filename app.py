@@ -3,15 +3,16 @@ A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
 
-# imports
+# Python imports
 import os
 import json
 import logging
 import urllib.parse
 
-# flask imports
+# Flask imports
 from flask import Flask, Response, redirect, render_template, request
 
+# Local imports
 from . import constants
 from .model.WidgetComponentSlider import WidgetComponentSlider
 from .controllers import utils
@@ -25,7 +26,7 @@ requests_list = []
 component_list = []
 logger = logging.getLogger()
 
-# Define routes.
+# Define Flask routes.
 # Homepage.
 @app.route('/')
 def root():
@@ -145,7 +146,7 @@ def redirect_wix():
         print( err )
         return Response("{'error':'wixError'}", status=500, mimetype='application/json')
 
-# App Settings Pabel
+# App Settings Panel
 @app.route('/settings', methods=['POST','GET'])
 def settings():
 
@@ -168,23 +169,25 @@ def settings():
     # If the user submitted a GET request...
     if request.method == 'GET':
 
-        #
+        # Assign the value of 'origCompId' from the GET request to the component_id variable.
         component_id = request.args.get( 'origCompId' )
 
-        # Get the requested component.
+        # Get the requested component by its ID and assign it to the requested_component variable.
         requested_component = slider_controller.get_component(
             component_id,
             _in = components_db
         )
 
+        # If the requested_component variable is not empty...
         if requested_component != "":
 
-            # Update the local variables.
+            # Update the local variables with the requested_component values.
             before_image = requested_component[ "before_image" ]
             after_image = requested_component[ "after_image" ]
             slider_offset = requested_component[ "offset" ]
             slider_offset_float = requested_component[ "offset_float" ]
 
+    # Pass local variables to Flask and render the template.
     return render_template('settings.html',
         page_id = 'settings',
         message = message,
@@ -232,7 +235,7 @@ def widget_component_slider():
             #
             if request_data[ "action" ] == "delete" :
 
-                #
+                # Delete the component by its ID.
                 slider_controller.delete_component(
                     request_data,
                     _in = components_db
@@ -240,7 +243,7 @@ def widget_component_slider():
 
             else:
 
-                #
+                # Edit the component by its ID.
                 slider_controller.edit_component(
                     request_data,
                     _in = components_db
@@ -257,7 +260,7 @@ def widget_component_slider():
                 offset_float = request_data[ 'sliderOffsetFloat' ]
             )
 
-            #
+            # Add a new component to the database.
             slider_controller.add_component(
                 new_slider,
                 _in = components_db
@@ -280,12 +283,13 @@ def widget_component_slider():
             # Or use the 'viewerCompId' (front-end) component ID, if available.
             requested_component_id = request.args.get( 'viewerCompId' )
 
-        # Get the requested component.
+        # Get the requested component by its ID.
         requested_component = slider_controller.get_component(
             requested_component_id,
             _in = components_db
         )
 
+        # If the requested_component variable is not empty...
         if requested_component != "":
 
             # Update the local variables.
@@ -294,7 +298,7 @@ def widget_component_slider():
             slider_offset = requested_component[ "offset" ]
             slider_offset_float = requested_component[ "offset_float" ]
 
-    #
+    # Pass local variables to Flask and render the template.
     return render_template( 'widget-component-slider.html',
         page_id = 'baie-slider',
         component_id = requested_component_id,

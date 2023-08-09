@@ -96,7 +96,6 @@ def edit_component( target, _in ):
     # Saved changes to the database.
     utils.write_json( 'components.json' , components_db )
 
-
 # Add a new component.
 def add_component( new_component, _in ):
     '''
@@ -106,7 +105,7 @@ def add_component( new_component, _in ):
     # Initialize variables.
     components_db = _in
 
-    #
+    # Translate the values of the new_component variable to JSON.
     new_component_json = {
         'component_id': new_component.component_id,
         'before_image': new_component.before_image,
@@ -118,7 +117,7 @@ def add_component( new_component, _in ):
     # Add the new component to the saved components list as JSON.
     components_db[ 'components' ].append( new_component_json )
 
-    # Saved changes to the database.
+    # Save changes to the database.
     utils.write_json( 'components.json' , components_db )
 
 # Delete a component.

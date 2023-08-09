@@ -35,9 +35,12 @@ def write_csv( file_name, content ):
     '''
 
     # Write to CSV file.
-    with open( file_name, 'w', encoding='utf8') as file:
+    with open( file_name, 'w', encoding='utf8' ) as file:
 
+        # Pass a file object to csv.writer and assign its value to the writer variable.
         writer = csv.writer( file )
+
+        # Write data to the file object.
         writer.writerows( content )
 
         # writer = csv.writer(file, delimiter=",")

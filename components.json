@@ -2,17 +2,24 @@
     "components": [
         {
             "component_id": "comp-lirgj2v5",
-            "offset": "28",
-            "offset_float": "0.28",
+            "offset": "30",
+            "offset_float": "0.3",
             "before_image": "https://static.wixstatic.com/media/f81f49_f7d68f4b31a04817bdab922009b5b121~mv2.jpeg",
             "after_image": "https://static.wixstatic.com/media/f81f49_8d594cb85ce64d1ab01f58e2aed6a4d8~mv2.jpg"
         },
         {
             "component_id": "comp-liril21h",
-            "before_image": "https://static.wixstatic.com/media/f81f49_8f8d80403767407aade31e42c9f8275d~mv2.jpg",
+            "before_image": "https://static.wixstatic.com/media/f81f49_82e76e02f10343bca0b4fb5be741e474~mv2.jpg/v1/fill/w_637,h_328,q_85,usm_0.66_1.00_0.01/f81f49_82e76e02f10343bca0b4fb5be741e474~mv2.jpg",
             "after_image": "https://static.wixstatic.com/media/f81f49_f7d68f4b31a04817bdab922009b5b121~mv2.jpeg",
             "offset": "73",
             "offset_float": "0.73"
+        },
+        {
+            "component_id": "comp-ll1kqdll",
+            "before_image": "https://static.wixstatic.com/media/f81f49_c26440c4ba604b2ba0630b620a67494a~mv2.jpg/v1/fill/w_637,h_328,q_85,usm_0.66_1.00_0.01/f81f49_c26440c4ba604b2ba0630b620a67494a~mv2.jpg",
+            "after_image": "https://static.wixstatic.com/media/f81f49_8f8d80403767407aade31e42c9f8275d~mv2.jpg/v1/fill/w_637,h_328,q_85,usm_0.66_1.00_0.01/f81f49_8f8d80403767407aade31e42c9f8275d~mv2.jpg",
+            "offset": "70",
+            "offset_float": "0.7"
         }
     ]
 }
