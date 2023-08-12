@@ -156,8 +156,12 @@ cython_debug/
 .DS_Store
 /static-old
 .azure/
+.vscode/
 constants.py
 old-webhooks-functions.txt
+components.csv
+components.json
+requests.csv
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
