@@ -11,6 +11,10 @@ import urllib.parse
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request
+from flask_sqlalchemy import SQLAlchemy
+
+# Other imports
+# from sqlalchemy.sql import func
 
 # Local imports
 from . import constants
@@ -20,7 +24,12 @@ from .controllers import wix_auth_controller
 from .controllers import slider_controller
 
 # Define globals
+basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] =\
+        'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 temp_requests_list = []
 requests_list = []
 component_list = []
