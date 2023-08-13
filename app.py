@@ -2,19 +2,20 @@
 A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
+# pylint: disable=not-callable
+# pylint: disable=not-callable
 
 # Python imports
 import os
 import json
 import logging
 import urllib.parse
+from dataclasses import dataclass
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
-
-# Other imports
-# from sqlalchemy.sql import func
+from sqlalchemy.sql import func
 
 # Local imports
 from . import constants
@@ -23,17 +24,73 @@ from .controllers import utils
 from .controllers import wix_auth_controller
 from .controllers import slider_controller
 
-# Define globals
-basedir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-        'sqlite:///' + os.path.join(basedir, 'database.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+# Define a base directory as the current directory.
+basedir = os.path.abspath( os.path.dirname( __file__ ) )
+
+# Create a Flask application instance.
+app = Flask( __name__ )
+
+# Define the database URI to specify the database with which to connect.
+# Format for SQL Lite: sqlite:///path/to/database.db
+# Format for MySQL mysql://username:password@host:port/database_name
+# Format for PostgreSQL: postgresql://username:password@host:port/database_name
+db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
+
+# Configure Flask-SQLAlchemy configuration keys.
+# Set the database URI to specify the database with which to connect.
+app.config[ 'SQLALCHEMY_DATABASE_URI'] = db_uri
+
+# Disable tracking modifications of objects to use less memory.
+app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
+
+# Create a database object.
+db = SQLAlchemy( app )
+
+# Define other globals.
 temp_requests_list = []
 requests_list = []
 component_list = []
 logger = logging.getLogger()
+
+# Define the slider component class.
+@dataclass
+class BaieComponentSlider( db.Model ):
+
+    # pylint: disable=too-many-instance-attributes
+    # Eight is reasonable in this case.
+
+    """
+    Class for a Slider Component.
+    """
+    id: db.Column           = db.Column( db.Integer, primary_key = True )
+    site_id: db.Column      = db.Column( db.String( 80 ) )
+    component_id: db.Column = db.Column( db.String( 80 ), unique = True )
+    before_image: db.Column = db.Column( db.String( 1000 ) )
+    after_image: db.Column  = db.Column( db.String( 1000 ) )
+    offset: db.Column       = db.Column( db.Integer )
+    offset_float: db.Column = db.Column( db.Float )
+    created_at: db.Column   = db.Column( db.DateTime( timezone = True ),
+                                        server_default = func.now() )
+
+    def __repr__( self ):
+        return f'<slider { self.created_at }>'
+
+@dataclass
+class Student( db.Model ):
+
+    """
+    Class for a Slider Component.
+    """
+    id          = db.Column( db.Integer, primary_key = True )
+    firstname   = db.Column( db.String( 100 ), nullable = False )
+    lastname    = db.Column( db.String( 100 ), nullable = False )
+    email       = db.Column( db.String( 80 ), unique = True, nullable = False )
+    age         = db.Column( db.Integer)
+    created_at  = db.Column( db.DateTime( timezone = True ), server_default=func.now() )
+    bio         = db.Column( db.Text )
+
+    def __repr__( self ):
+        return f'<Student {self.firstname}>'
 
 # Define Flask routes.
 # Homepage.
@@ -224,6 +281,8 @@ def widget_component_slider():
     slider_offset = 50
     slider_offset_float = 0.5
 
+    #component_in_db = None
+
     # If the user submitted a POST request...
     if request.method == 'POST':
 
@@ -237,6 +296,8 @@ def widget_component_slider():
             request_data,
             _in = components_db
         )
+
+        #component_in_db = BaieComponentSlider.query.get( requested_component_id )
 
         #
         if did_find_component is True:
@@ -269,11 +330,25 @@ def widget_component_slider():
                 offset_float = request_data[ 'sliderOffsetFloat' ]
             )
 
-            # Add a new component to the database.
+            # Add a new component to the JSON file.
             slider_controller.add_component(
                 new_slider,
                 _in = components_db
             )
+
+            # Construct a new BaieComponentSlider.
+            component = BaieComponentSlider(
+                site_id='12345john',
+                component_id = requested_component_id,
+                before_image = request_data[ 'beforeImage' ],
+                after_image = request_data[ 'afterImage' ],
+                offset = request_data[ 'sliderOffset' ],
+                offset_float = request_data[ 'sliderOffsetFloat' ]
+            )
+
+            # Add a new component to the database.
+            db.session.add( component )
+            db.session.commit()
 
         # Return a success message.
         return "", 201
@@ -315,6 +390,29 @@ def widget_component_slider():
         after_image = after_image,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float
+    )
+
+# Database
+@app.route( '/db-test' )
+def db_test():
+
+    """Return database contents."""
+
+    # Initialize variables.
+    students = Student.query.all()
+
+    return render_template( 'db-test.html',
+        students = students
+    )
+
+#
+@app.route( '/<int:student_id>/' )
+def student( student_id ):
+
+    """Return database contents."""
+    student_record = Student.query.get_or_404( student_id )
+    return render_template( 'student.html',
+        student = student_record
     )
 
 # Run the app.

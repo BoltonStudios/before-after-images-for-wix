@@ -162,6 +162,10 @@ old-webhooks-functions.txt
 components.csv
 components.json
 requests.csv
+student.html
+db-test.html
+baie-component-slider.html
+model/BaieComponentSlider.py
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
