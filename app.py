@@ -3,7 +3,6 @@ A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
 # pylint: disable=not-callable
-# pylint: disable=not-callable
 
 # Python imports
 import os
@@ -19,7 +18,6 @@ from sqlalchemy.sql import func
 
 # Local imports
 from . import constants
-from .model.WidgetComponentSlider import WidgetComponentSlider
 from .controllers import utils
 from .controllers import wix_auth_controller
 from .controllers import slider_controller
@@ -73,23 +71,6 @@ class BaieComponentSlider( db.Model ):
 
     def __repr__( self ):
         return f'<slider { self.created_at }>'
-
-@dataclass
-class Student( db.Model ):
-
-    """
-    Class for a Slider Component.
-    """
-    id          = db.Column( db.Integer, primary_key = True )
-    firstname   = db.Column( db.String( 100 ), nullable = False )
-    lastname    = db.Column( db.String( 100 ), nullable = False )
-    email       = db.Column( db.String( 80 ), unique = True, nullable = False )
-    age         = db.Column( db.Integer)
-    created_at  = db.Column( db.DateTime( timezone = True ), server_default=func.now() )
-    bio         = db.Column( db.Text )
-
-    def __repr__( self ):
-        return f'<Student {self.firstname}>'
 
 # Define Flask routes.
 # Homepage.
@@ -186,26 +167,6 @@ def redirect_wix():
         # with the user's access token.
         return redirect( redirect_url )
 
-        # Get the app instance.
-        # instance = wix_auth_controller.get_app_instance(
-        #    refresh_token,
-        #    instance_api_url = constants.INSTANCE_API_URL,
-        #    auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
-        #    app_secret = constants.APP_SECRET,
-        #    app_id = constants.APP_ID
-        # )
-
-        # return render_template(
-        #    'redirect-wix.html',
-        #    title = 'Wix Application',
-        #    app_id = constants.APP_ID,
-        #    site_display_name = instance[ 'site' ][ 'siteDisplayName' ],
-        #    instance_id = instance[ 'instance' ][ 'instanceId' ],
-        #    permissions = instance[ 'instance' ][ 'permissions' ],
-        #    token = refresh_token,
-        #    response = json.dumps( instance )
-        # )
-
     except Exception as err:
         print( "Error getting token from Wix" )
         print( err )
@@ -272,8 +233,6 @@ def widget_component_slider():
     """
 
     # Initialize variables.
-    components_db = utils.read_json( 'components.json' )
-    did_find_component = False
     requested_component_id = None
     before_image = ''
     after_image = ''
@@ -290,36 +249,20 @@ def widget_component_slider():
         request_data = json.loads( request.data )
         requested_component_id = request_data[ "componentID" ]
 
-        #
-        did_find_component = slider_controller.has_component(
-            request_data,
-            _in = components_db
-        )
-
+        # Search the database for the component by its component ID (primary key).
         component_in_db = BaieComponentSlider.query.get( requested_component_id )
 
         #
-        if did_find_component is True:
+        if component_in_db is not None:
 
             #
             if request_data[ "action" ] == "delete" :
 
                 # Delete the component by its ID.
-                slider_controller.delete_component(
-                    request_data,
-                    _in = components_db
-                )
-
                 db.session.delete( component_in_db )
                 db.session.commit()
 
             else:
-
-                # Edit the component by its ID.
-                slider_controller.edit_component(
-                    request_data,
-                    _in = components_db
-                )
 
                 # Edit the BaieComponentSlider.
                 component_in_db.before_image = request_data[ 'beforeImage' ]
@@ -333,36 +276,19 @@ def widget_component_slider():
 
         else:
 
-            # Construct a new component.
-            new_slider = WidgetComponentSlider(
+            # Construct a new BaieComponentSlider.
+            component = BaieComponentSlider(
                 component_id = requested_component_id,
+                site_id='12345john',
                 before_image = request_data[ 'beforeImage' ],
                 after_image = request_data[ 'afterImage' ],
                 offset = request_data[ 'sliderOffset' ],
                 offset_float = request_data[ 'sliderOffsetFloat' ]
             )
 
-            # Add a new component to the JSON file.
-            slider_controller.add_component(
-                new_slider,
-                _in = components_db
-            )
-
-            if component_in_db is None:
-
-                # Construct a new BaieComponentSlider.
-                component = BaieComponentSlider(
-                    component_id = requested_component_id,
-                    site_id='12345john',
-                    before_image = request_data[ 'beforeImage' ],
-                    after_image = request_data[ 'afterImage' ],
-                    offset = request_data[ 'sliderOffset' ],
-                    offset_float = request_data[ 'sliderOffsetFloat' ]
-                )
-
-                # Add a new component to the database.
-                db.session.add( component )
-                db.session.commit()
+            # Add a new component to the database.
+            db.session.add( component )
+            db.session.commit()
 
         # Return a success message.
         return "", 201
@@ -378,23 +304,19 @@ def widget_component_slider():
 
         elif request.args.get( 'viewerCompId' ):
 
-            # Or use the 'viewerCompId' (front-end) component ID, if available.
+            # Otherwise, use the 'viewerCompId' (front-end) component ID.
             requested_component_id = request.args.get( 'viewerCompId' )
 
-        # Get the requested component by its ID.
-        requested_component = slider_controller.get_component(
-            requested_component_id,
-            _in = components_db
-        )
+        # Search the database and get the component by the requested component ID (primary key).
+        component_in_db = BaieComponentSlider.query.get( requested_component_id )
 
-        # If the requested_component variable is not empty...
-        if requested_component != "":
+        if component_in_db is not None:
 
-            # Update the local variables.
-            before_image = requested_component[ "before_image" ]
-            after_image = requested_component[ "after_image" ]
-            slider_offset = requested_component[ "offset" ]
-            slider_offset_float = requested_component[ "offset_float" ]
+            # Edit the BaieComponentSlider.
+            before_image = component_in_db.before_image
+            after_image = component_in_db.after_image
+            slider_offset = component_in_db.offset
+            slider_offset_float = component_in_db.offset_float
 
     # Pass local variables to Flask and render the template.
     return render_template( 'widget-component-slider.html',
@@ -413,20 +335,20 @@ def db_test():
     """Return database contents."""
 
     # Initialize variables.
-    students = Student.query.all()
+    components = BaieComponentSlider.query.all()
 
     return render_template( 'db-test.html',
-        students = students
+        components = components
     )
 
 #
-@app.route( '/<int:student_id>/' )
-def student( student_id ):
+@app.route( '/<int:component_id>/' )
+def user_component( component_id ):
 
     """Return database contents."""
-    student_record = Student.query.get_or_404( student_id )
-    return render_template( 'student.html',
-        student = student_record
+    component_record = BaieComponentSlider.query.get_or_404( component_id )
+    return render_template( 'component.html',
+        component = component_record
     )
 
 # Run the app.
