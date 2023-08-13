@@ -166,6 +166,7 @@ student.html
 db-test.html
 baie-component-slider.html
 model/BaieComponentSlider.py
+database.db
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
