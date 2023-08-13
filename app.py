@@ -62,9 +62,8 @@ class BaieComponentSlider( db.Model ):
     """
     Class for a Slider Component.
     """
-    id: db.Column           = db.Column( db.Integer, primary_key = True )
+    component_id: db.Column = db.Column( db.String( 80 ), primary_key = True, unique = True )
     site_id: db.Column      = db.Column( db.String( 80 ) )
-    component_id: db.Column = db.Column( db.String( 80 ), unique = True )
     before_image: db.Column = db.Column( db.String( 1000 ) )
     after_image: db.Column  = db.Column( db.String( 1000 ) )
     offset: db.Column       = db.Column( db.Integer )
@@ -281,7 +280,7 @@ def widget_component_slider():
     slider_offset = 50
     slider_offset_float = 0.5
 
-    #component_in_db = None
+    component_in_db = None
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -297,7 +296,7 @@ def widget_component_slider():
             _in = components_db
         )
 
-        #component_in_db = BaieComponentSlider.query.get( requested_component_id )
+        component_in_db = BaieComponentSlider.query.get( requested_component_id )
 
         #
         if did_find_component is True:
@@ -311,6 +310,9 @@ def widget_component_slider():
                     _in = components_db
                 )
 
+                db.session.delete( component_in_db )
+                db.session.commit()
+
             else:
 
                 # Edit the component by its ID.
@@ -318,6 +320,16 @@ def widget_component_slider():
                     request_data,
                     _in = components_db
                 )
+
+                # Edit the BaieComponentSlider.
+                component_in_db.before_image = request_data[ 'beforeImage' ]
+                component_in_db.after_image = request_data[ 'afterImage' ]
+                component_in_db.offset = request_data[ 'sliderOffset' ]
+                component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
+
+                # Add a new component to the database.
+                db.session.add( component_in_db )
+                db.session.commit()
 
         else:
 
@@ -336,19 +348,21 @@ def widget_component_slider():
                 _in = components_db
             )
 
-            # Construct a new BaieComponentSlider.
-            component = BaieComponentSlider(
-                site_id='12345john',
-                component_id = requested_component_id,
-                before_image = request_data[ 'beforeImage' ],
-                after_image = request_data[ 'afterImage' ],
-                offset = request_data[ 'sliderOffset' ],
-                offset_float = request_data[ 'sliderOffsetFloat' ]
-            )
+            if component_in_db is None:
 
-            # Add a new component to the database.
-            db.session.add( component )
-            db.session.commit()
+                # Construct a new BaieComponentSlider.
+                component = BaieComponentSlider(
+                    component_id = requested_component_id,
+                    site_id='12345john',
+                    before_image = request_data[ 'beforeImage' ],
+                    after_image = request_data[ 'afterImage' ],
+                    offset = request_data[ 'sliderOffset' ],
+                    offset_float = request_data[ 'sliderOffsetFloat' ]
+                )
+
+                # Add a new component to the database.
+                db.session.add( component )
+                db.session.commit()
 
         # Return a success message.
         return "", 201
