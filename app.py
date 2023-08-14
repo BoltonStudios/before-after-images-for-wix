@@ -72,6 +72,17 @@ class BaieComponentSlider( db.Model ):
     def __repr__( self ):
         return f'<slider { self.created_at }>'
 
+# Define the function to create a database.
+def init_db():
+
+    """Initialze the application's database."""
+
+    # Issue CREATE statements for our tables and their related constructs.
+    db.create_all()
+
+    # Return feedback to the console.
+    print( "Initialized the database." )
+
 # Define Flask routes.
 # Homepage.
 @app.route('/')
@@ -361,5 +372,8 @@ if __name__ == '__main__':
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
     server_port = os.environ.get( 'PORT', '3000' )
+
+    init_db()
+
     app.run( host='127.0.0.1', port=server_port, debug=True )
     
