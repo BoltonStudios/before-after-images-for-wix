@@ -50,15 +50,32 @@ requests_list = []
 component_list = []
 logger = logging.getLogger()
 
-# Define the slider component class.
+# Define the user table class.
 @dataclass
-class BaieComponentSlider( db.Model ):
+class User( db.Model ):
 
     # pylint: disable=too-many-instance-attributes
     # Eight is reasonable in this case.
 
     """
-    Class for a Slider Component.
+    Class to define the User table.
+    """
+    site_id: db.Column      = db.Column( db.String( 80 ), primary_key = True, unique = True )
+    created_at: db.Column   = db.Column( db.DateTime( timezone = True ),
+                                        server_default = func.now() )
+
+    def __repr__( self ):
+        return f'<slider { self.created_at }>'
+
+# Define the slider component table class.
+@dataclass
+class ComponentSlider( db.Model ):
+
+    # pylint: disable=too-many-instance-attributes
+    # Eight is reasonable in this case.
+
+    """
+    Class to define the Slider Component table.
     """
     component_id: db.Column = db.Column( db.String( 80 ), primary_key = True, unique = True )
     site_id: db.Column      = db.Column( db.String( 80 ) )
@@ -82,6 +99,12 @@ def init_db():
 
     # Return feedback to the console.
     print( "Initialized the database." )
+
+# Ensure we are working within the application context...
+with app.app_context():
+
+    # Then create the tables if they do not already exist. 
+    init_db()
 
 # Define Flask routes.
 # Homepage.
@@ -261,7 +284,7 @@ def widget_component_slider():
         requested_component_id = request_data[ "componentID" ]
 
         # Search the database for the component by its component ID (primary key).
-        component_in_db = BaieComponentSlider.query.get( requested_component_id )
+        component_in_db = ComponentSlider.query.get( requested_component_id )
 
         #
         if component_in_db is not None:
@@ -275,7 +298,7 @@ def widget_component_slider():
 
             else:
 
-                # Edit the BaieComponentSlider.
+                # Edit the ComponentSlider record.
                 component_in_db.before_image = request_data[ 'beforeImage' ]
                 component_in_db.after_image = request_data[ 'afterImage' ]
                 component_in_db.offset = request_data[ 'sliderOffset' ]
@@ -287,8 +310,8 @@ def widget_component_slider():
 
         else:
 
-            # Construct a new BaieComponentSlider.
-            component = BaieComponentSlider(
+            # Construct a new ComponentSlider record.
+            component = ComponentSlider(
                 component_id = requested_component_id,
                 site_id='12345john',
                 before_image = request_data[ 'beforeImage' ],
@@ -319,11 +342,11 @@ def widget_component_slider():
             requested_component_id = request.args.get( 'viewerCompId' )
 
         # Search the database and get the component by the requested component ID (primary key).
-        component_in_db = BaieComponentSlider.query.get( requested_component_id )
+        component_in_db = ComponentSlider.query.get( requested_component_id )
 
         if component_in_db is not None:
 
-            # Edit the BaieComponentSlider.
+            # Edit the ComponentSlider record.
             before_image = component_in_db.before_image
             after_image = component_in_db.after_image
             slider_offset = component_in_db.offset
@@ -346,7 +369,7 @@ def db_test():
     """Return database contents."""
 
     # Initialize variables.
-    components = BaieComponentSlider.query.all()
+    components = ComponentSlider.query.all()
 
     return render_template( 'db-test.html',
         components = components
@@ -357,7 +380,7 @@ def db_test():
 def user_component( component_id ):
 
     """Return database contents."""
-    component_record = BaieComponentSlider.query.get_or_404( component_id )
+    component_record = ComponentSlider.query.get_or_404( component_id )
     return render_template( 'component.html',
         component = component_record
     )
@@ -373,7 +396,4 @@ if __name__ == '__main__':
     # App Engine itself will serve those files as configured in app.yaml.
     server_port = os.environ.get( 'PORT', '3000' )
 
-    init_db()
-
     app.run( host='127.0.0.1', port=server_port, debug=True )
-    
