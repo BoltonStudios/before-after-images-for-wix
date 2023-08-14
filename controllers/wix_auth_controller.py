@@ -1,5 +1,5 @@
 '''
-Helper functions to read and write items from CSV.
+Helper functions to handle Wix authorization.
 '''
 # pylint: disable=broad-exception-caught
 

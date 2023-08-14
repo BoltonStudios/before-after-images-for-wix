@@ -102,9 +102,7 @@
                 method: "POST",
                 body: JSON.stringify({
                     componentID: "{{component_id}}",
-                    action: "delete",
-                    sliderOffset: 0,
-                    sliderOffsetFloat: 0.0
+                    action: "delete"
                 }),
                 headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -135,6 +133,9 @@
                 body: JSON.stringify({
                     action: "publish",
                     componentID: sliderId,
+                    siteID: Wix.Utils.getSiteOwnerId(),
+                    userID: Wix.Utils.getUid(),
+                    instanceID: Wix.Utils.getInstanceId(),
                     beforeImage: beforeImage,
                     afterImage: afterImage,
                     sliderOffset: sliderOffset,

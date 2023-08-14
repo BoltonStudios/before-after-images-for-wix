@@ -60,12 +60,15 @@ class User( db.Model ):
     """
     Class to define the User table.
     """
-    site_id: db.Column      = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    created_at: db.Column   = db.Column( db.DateTime( timezone = True ),
+    instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
+    site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
+    user_id: db.Column          = db.Column( db.String( 200 ), unique = True )
+    refresh_token: db.Column    = db.Column( db.String( 200 ) )
+    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
     def __repr__( self ):
-        return f'<slider { self.created_at }>'
+        return f'<user { self.instance_id }>'
 
 # Define the slider component table class.
 @dataclass
@@ -78,7 +81,7 @@ class ComponentSlider( db.Model ):
     Class to define the Slider Component table.
     """
     component_id: db.Column = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    site_id: db.Column      = db.Column( db.String( 80 ) )
+    instance_id: db.Column      = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
     before_image: db.Column = db.Column( db.String( 1000 ) )
     after_image: db.Column  = db.Column( db.String( 1000 ) )
     offset: db.Column       = db.Column( db.Integer )
@@ -87,7 +90,7 @@ class ComponentSlider( db.Model ):
                                         server_default = func.now() )
 
     def __repr__( self ):
-        return f'<slider { self.created_at }>'
+        return f'<slider { self.component_id } in { self.instance_id }>'
 
 # Define the function to create a database.
 def init_db():
@@ -103,7 +106,7 @@ def init_db():
 # Ensure we are working within the application context...
 with app.app_context():
 
-    # Then create the tables if they do not already exist. 
+    # Then create the tables if they do not already exist.
     init_db()
 
 # Define Flask routes.
@@ -187,15 +190,38 @@ def redirect_wix():
             )
         )[ 'refresh_token' ]
 
-        # Construct the URL to Completes the OAuth flow.
-        # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
-        redirect_url = "https://www.wix.com/installer/close-window?access_token="
-        redirect_url += wix_auth_controller.get_access_token(
+        # Get an access token from Wix.
+        access_token = wix_auth_controller.get_access_token(
             refresh_token,
             auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
             app_secret = constants.APP_SECRET,
             app_id = constants.APP_ID
         )
+
+        # Get data about the installation of this app on the user's website.
+        app_instance = wix_auth_controller.get_app_instance(
+            refresh_token,
+            'https://www.wixapis.com/apps/v1/instance',
+            auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
+            app_secret = constants.APP_SECRET,
+            app_id = constants.APP_ID
+        )
+
+        # Construct the URL to Completes the OAuth flow.
+        # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
+        redirect_url = "https://www.wix.com/installer/close-window?access_token="
+        redirect_url += access_token
+
+        # Construct a User record.
+        user = User(
+            instance_id = app_instance[ 'instance' ][ 'instanceId' ],
+            site_id = app_instance[ 'site' ][ 'siteId' ],
+            refresh_token = refresh_token
+        )
+
+        # Add a new user to the User table.
+        db.session.add( user )
+        db.session.commit()
 
         # Close the consent window by redirecting the user to the following URL
         # with the user's access token.
@@ -272,7 +298,6 @@ def widget_component_slider():
     after_image = ''
     slider_offset = 50
     slider_offset_float = 0.5
-
     component_in_db = None
 
     # If the user submitted a POST request...
@@ -283,7 +308,7 @@ def widget_component_slider():
         request_data = json.loads( request.data )
         requested_component_id = request_data[ "componentID" ]
 
-        # Search the database for the component by its component ID (primary key).
+        # Search the ComponentSlider table for the component by its component ID (primary key).
         component_in_db = ComponentSlider.query.get( requested_component_id )
 
         #
@@ -304,7 +329,7 @@ def widget_component_slider():
                 component_in_db.offset = request_data[ 'sliderOffset' ]
                 component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
 
-                # Add a new component to the database.
+                # Add a new component to the ComponentSlider table.
                 db.session.add( component_in_db )
                 db.session.commit()
 
@@ -313,14 +338,14 @@ def widget_component_slider():
             # Construct a new ComponentSlider record.
             component = ComponentSlider(
                 component_id = requested_component_id,
-                site_id='12345john',
+                instance_id = request_data[ 'instanceID' ],
                 before_image = request_data[ 'beforeImage' ],
                 after_image = request_data[ 'afterImage' ],
                 offset = request_data[ 'sliderOffset' ],
                 offset_float = request_data[ 'sliderOffsetFloat' ]
             )
 
-            # Add a new component to the database.
+            # Add a new component to the ComponentSlider table.
             db.session.add( component )
             db.session.commit()
 
