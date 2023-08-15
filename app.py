@@ -8,6 +8,7 @@ A Flask app for Wix.
 import os
 import json
 import logging
+import jwt
 import urllib.parse
 from dataclasses import dataclass
 
@@ -232,6 +233,69 @@ def redirect_wix():
         print( err )
         return Response("{'error':'wixError'}", status=500, mimetype='application/json')
 
+
+# Remove application files and data for the user (App Uninstalled)
+@app.route( '/uninstall', methods=[ 'POST' ] )
+def uninstall():
+
+    """
+    Take action when the application recieves a POST request from the App Removed webhook.
+    
+    See documentation:
+    https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
+    """
+
+    # Initialize variables.
+    instance_id = ''
+
+    # If the user submitted a POST request...
+    if request.method == 'POST':
+
+        # Get the data received.
+        utils.dump( request.data, "request.data" )
+
+        # Check if the payload is JSON.
+        try:
+
+            request_data = json.loads( request.data )
+
+        except ValueError as error:
+
+            print( "ERROR: ")
+            print( error )
+
+            # The app must return a 200 response upon successful receipt of a webhook.
+            # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
+            return "", 200
+
+        # Check if the JSON payload contains the expected data.
+        if request_data[ 'instance' ] is not None:
+
+            # Extract the instance ID
+            instance_id = request.data[ 'instance' ][ 'instance_id' ]
+
+            # Search the tables for records, filtering by instance ID.
+            user_in_db = User.query.get( instance_id )
+            component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
+
+            # If the records matched by instance ID exist...
+            if user_in_db is not None and component_in_db is not None:
+
+                # Delete the user.
+                db.session.delete( user_in_db )
+
+                # Delete the component.
+                db.session.delete( component_in_db )
+
+                # Save changes.
+                db.session.commit()
+
+                # Return feedback to the console.
+                print( "Instance #" + instance_id + " uninstalled." )
+
+    # Return a success message.
+    return "", 200
+
 # App Settings Panel
 @app.route('/settings', methods=['POST','GET'])
 def settings():
@@ -394,9 +458,11 @@ def db_test():
     """Return database contents."""
 
     # Initialize variables.
+    users = User.query.all()
     components = ComponentSlider.query.all()
 
     return render_template( 'db-test.html',
+        users = users,
         components = components
     )
 
