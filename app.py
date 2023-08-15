@@ -8,9 +8,9 @@ A Flask app for Wix.
 import os
 import json
 import logging
-import jwt
 import urllib.parse
 from dataclasses import dataclass
+import jwt
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request
@@ -213,14 +213,31 @@ def redirect_wix():
         redirect_url = "https://www.wix.com/installer/close-window?access_token="
         redirect_url += access_token
 
-        # Construct a User record.
-        user = User(
-            instance_id = app_instance[ 'instance' ][ 'instanceId' ],
-            site_id = app_instance[ 'site' ][ 'siteId' ],
-            refresh_token = refresh_token
-        )
+        # Extract data from the app instance.
+        instance_id = app_instance[ 'instance' ][ 'instanceId' ]
+        site_id = app_instance[ 'site' ][ 'siteId' ]
 
-        # Add a new user to the User table.
+        # Search the User table for the instance ID (primary key)
+        user_in_db = User.query.get( instance_id )
+
+        # If the user does not exist in the table...
+        if user_in_db is None:
+
+            # Construct a new User record.
+            user = User(
+                instance_id = app_instance[ 'instance' ][ 'instanceId' ],
+                site_id = app_instance[ 'site' ][ 'siteId' ],
+                refresh_token = refresh_token
+            )
+
+        else:
+
+            # Update the user record.
+            user = user_in_db
+            user.site_id = site_id
+            user.refresh_token = refresh_token
+
+        # Add the new or updated user record to the User table.
         db.session.add( user )
         db.session.commit()
 
@@ -247,53 +264,47 @@ def uninstall():
 
     # Initialize variables.
     instance_id = ''
+    secret = constants.WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'POST':
 
-        # Get the data received.
-        utils.dump( request.data, "request.data" )
+        # Get the encoded data received.
+        encoded_jwt = request.data
 
-        # Check if the payload is JSON.
-        try:
+        # Decode the data using our secret.
+        data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
 
-            request_data = json.loads( request.data )
+        # Load the JSON payload.
+        request_data = json.loads( data['data'] )
 
-        except ValueError as error:
+        # Print the data received to the console for debugging.
+        utils.dump( request_data, "request_data" )
 
-            print( "ERROR: ")
-            print( error )
+        # Extract the instance ID
+        instance_id = request_data[ 'instanceId' ]
 
-            # The app must return a 200 response upon successful receipt of a webhook.
-            # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
-            return "", 200
+        # Search the tables for records, filtering by instance ID.
+        user_in_db = User.query.get( instance_id )
+        component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
 
-        # Check if the JSON payload contains the expected data.
-        if request_data[ 'instance' ] is not None:
+        # If the records matched by instance ID exist...
+        if user_in_db is not None and component_in_db is not None:
 
-            # Extract the instance ID
-            instance_id = request.data[ 'instance' ][ 'instance_id' ]
+            # Delete the user.
+            db.session.delete( user_in_db )
 
-            # Search the tables for records, filtering by instance ID.
-            user_in_db = User.query.get( instance_id )
-            component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
+            # Delete the component.
+            db.session.delete( component_in_db )
 
-            # If the records matched by instance ID exist...
-            if user_in_db is not None and component_in_db is not None:
+            # Save changes.
+            db.session.commit()
 
-                # Delete the user.
-                db.session.delete( user_in_db )
+            # Return feedback to the console.
+            print( "Instance #" + instance_id + " uninstalled." )
 
-                # Delete the component.
-                db.session.delete( component_in_db )
-
-                # Save changes.
-                db.session.commit()
-
-                # Return feedback to the console.
-                print( "Instance #" + instance_id + " uninstalled." )
-
-    # Return a success message.
+    # The app must return a 200 response upon successful receipt of a webhook.
+    # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
     return "", 200
 
 # App Settings Panel
