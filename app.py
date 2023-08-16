@@ -103,6 +103,7 @@ def init_db():
     """Initialze the application's database."""
 
     # Issue CREATE statements for our tables and their related constructs.
+    # Note: the db.create_all() function does not recreate or update a table if it already exists.
     db.create_all()
 
     # Return feedback to the console.
