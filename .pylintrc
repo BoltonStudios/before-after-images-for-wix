@@ -1,0 +1,2 @@
+ignore-paths=^app/migrations/versions/.*$,
+             ^app/tests/.*$
