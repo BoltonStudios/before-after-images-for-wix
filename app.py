@@ -16,6 +16,7 @@ import jwt
 from flask import Flask, Response, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
+from flask_migrate import Migrate
 
 # Local imports
 from . import constants
@@ -44,6 +45,9 @@ app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
 
 # Create a database object.
 db = SQLAlchemy( app )
+
+# Create a Migrate object.
+migrate = Migrate( app, db )
 
 # Define other globals.
 temp_requests_list = []
@@ -285,23 +289,33 @@ def uninstall():
         instance_id = request_data[ 'instanceId' ]
 
         # Search the tables for records, filtering by instance ID.
-        user_in_db = User.query.get( instance_id )
-        component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
+        # user_in_db = User.query.get( instance_id )
+        # component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
 
-        # If the records matched by instance ID exist...
-        if user_in_db is not None and component_in_db is not None:
+        users = User.query.filter_by( instance_id = instance_id )
+        components = ComponentSlider.query.filter_by( instance_id = instance_id )
+
+        for user in users:
 
             # Delete the user.
-            db.session.delete( user_in_db )
-
-            # Delete the component.
-            db.session.delete( component_in_db )
-
-            # Save changes.
-            db.session.commit()
+            db.session.delete( user )
 
             # Return feedback to the console.
-            print( "Instance #" + instance_id + " uninstalled." )
+            print( "Deleted user #" + instance_id )
+
+        for component in components:
+
+            # Delete the user.
+            db.session.delete( component )
+
+            # Return feedback to the console.
+            print( "Deleted component #" + component.component_id )
+
+        # Save changes.
+        db.session.commit()
+
+        # Return feedback to the console.
+        print( "Instance #" + instance_id + " uninstalled." )
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
