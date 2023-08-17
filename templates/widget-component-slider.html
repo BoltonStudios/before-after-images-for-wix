@@ -7,21 +7,23 @@
         <div id="{{component_id}}-twentytwenty" class="twentytwenty-container" 
             data-slider-id="{{component_id}}"
             data-before-image="{{before_image}}"
+            data-before-alt-text="{{before_alt_text}}"
             data-after-image="{{after_image}}"
+            data-after-alt-text="{{after_alt_text}}"
             data-slider-offset="{{slider_offset}}"
             data-slider-offset-float="{{slider_offset_float}}"
         >
             <!-- The before image is first -->
             {% if before_image != '' %}
-                <img id="{{component_id}}-before-image" src="{{ before_image }}" width="637" height="328" />
+                <img id="{{component_id}}-before-image" src="{{ before_image }}" width="637" height="328" alt="{{before_alt_text}}" />
             {% else %}
-                <img id="{{component_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" width="637" height="328" />
+                <img id="{{component_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" width="637" height="328" alt="placeholder" />
             {% endif %}
             <!-- The after image is last -->
             {% if after_image != '' %}
-                <img id="{{component_id}}-after-image" src="{{ after_image }}" width="637" height="328" />
+                <img id="{{component_id}}-after-image" src="{{ after_image }}" width="637" height="328" alt="{{after_alt_text}}" />
             {% else %}
-                <img id="{{component_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" width="637" height="328" />
+                <img id="{{component_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" width="637" height="328" alt="placeholder" />
             {% endif %}
         </div>
         
@@ -70,7 +72,9 @@
 
             // Update data attributes.
             slider.dataset.beforeImage = e.beforeImage;
+            //slider.dataset.beforeAltText = e.beforeAltText;
             slider.dataset.afterImage = e.afterImage;
+            //slider.dataset.afterAltText = e.afterAltText;
             slider.dataset.sliderOffset = e.sliderOffset;
             slider.dataset.sliderOffsetFloat = e.sliderOffsetFloat;
 
@@ -80,9 +84,11 @@
             document.getElementById( "{{component_id}}-slider-offset" ).innerHTML = e.sliderOffset;
             document.getElementById( "{{component_id}}-slider-offset-float" ).innerHTML = e.sliderOffsetFloat;
 
-            // Update image source attributes.
+            // Update image attributes.
             beforeImage.src = e.beforeImage;
             afterImage.src  = e.afterImage;
+            //beforeImage.alt = e.beforeAltText;
+            //afterImage.alt  = e.afterAltText;
 
             // Reinitialize TwentyTwenty.
             jQuery("#{{component_id}}-twentytwenty").twentytwenty({
@@ -116,14 +122,14 @@
             // Print status to the console.
             console.log( "publishWidgetComponentSlider called.");
             console.log( e );
-            console.log("sliderOffset =");
-            console.log(sliderOffset);
             
             // Get the slider components current attribute data.
             var slider =  document.getElementById( "{{component_id}}-twentytwenty" );
             var sliderId = slider.dataset.sliderId;
             var beforeImage = slider.dataset.beforeImage;
+            //var beforeAltText = slider.dataset.beforeAltText;
             var afterImage = slider.dataset.afterImage;
+            //var afterAltText = slider.dataset.afterAltText;
             var sliderOffset = slider.dataset.sliderOffset;
             var sliderOffsetFloat = slider.dataset.sliderOffsetFloat;
 
@@ -137,7 +143,9 @@
                     userID: Wix.Utils.getUid(),
                     instanceID: Wix.Utils.getInstanceId(),
                     beforeImage: beforeImage,
+                    beforeAltText: "beforeAltText",
                     afterImage: afterImage,
+                    afterAltText: "afterAltText",
                     sliderOffset: sliderOffset,
                     sliderOffsetFloat: sliderOffsetFloat
                 }),

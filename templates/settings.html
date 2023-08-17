@@ -45,7 +45,15 @@
                         aria-selected="false">
                         Support
                     </button>
+                    <hr>
+                    <a class="nav-link" 
+                        id="v-pills-upgrade"
+                        href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
+                        target="_blank">
+                        Upgrade
+                    </a>
 
+                    
                 </div>
                 <!--Tab Content-->
                 <div class="tab-content mx-auto" id="v-pills-tabContent" style="width: 100%;">
@@ -91,44 +99,74 @@
                         </div>
                         
                         <!--Before Image-->
-                        <div id="baie-before-image" class="baie-image-select container-fluid px-4 py-3" data-baie-image-type="before" data-baie-image="{{ before_image }}">
+                        <div id="baie-before-image" 
+                            class="baie-image-select container-fluid px-4 py-3" 
+                            data-baie-image-type="before" 
+                            data-baie-image="{{ before_image }}">
 
                             <div class="row mb-2">
                                 <div class="col-auto">
                                     <h6>Before</h6>
                                 </div>
-                                <div class="col">
+                                <div class="col" style="text-align: right;">
                                     <p></p>
                                     <button class="btn btn-primary btn-sm" type="button">Select Image</button>
                                 </div>
                             </div>
 
                             {% if before_image != '' %}
+                            <hr>
                             <div class="row">
-                                <div class="col">
+                                <div class="col" style="text-align: center;">
                                     <img src="{{ before_image }}" class="img-thumbnail mb-3" width="220" height="113" />
+
+                                    <div class="input-group">
+                                        <label for="before_alt_text" class="input-group-text">Alt Text:</label>
+                                        <input name="before_alt_text" 
+                                            id="before-alt-text" 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Description here." 
+                                            aria-label="Before Image Alt Text"
+                                            value="{{ before_alt_text }}">
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
                         </div>
 
                         <!--After Image-->
-                        <div id="baie-after-image" class="baie-image-select container-fluid px-4 py-3" data-baie-image-type="after" data-baie-image="{{ after_image }}">
+                        <div id="baie-after-image" 
+                            class="baie-image-select container-fluid px-4 py-3" 
+                            data-baie-image-type="after" 
+                            data-baie-image="{{ after_image }}">
 
                             <div class="row mb-2">
                                 <div class="col-auto">
                                     <h6>After</6>
                                 </div>
-                                <div class="col">
+                                <div class="col" style="text-align: right;">
                                     <p></p>
                                     <button class="btn btn-primary btn-sm" type="button">Select Image</button>
                                 </div>
                             </div>
                             
                             {% if after_image != '' %}
+                            <hr>
                             <div class="row">
-                                <div class="col">
+                                <div class="col" style="text-align: center;">
                                     <img src="{{ after_image }}" class="img-thumbnail mb-3" width="220" height="113" />
+
+                                    <div class="input-group">
+                                        <label for="after-alt-text" class="input-group-text">Alt Text:</label>
+                                        <input name="after-alt-text" 
+                                            id="after-alt-text" 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Description here." 
+                                            aria-label="After Image Alt Text"
+                                            value="{{ after_alt_text }}">
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
@@ -171,7 +209,24 @@
                         <div class="container-fluid px-4 py-3">
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light">Component ID: {{component_id}}</p></div>
+                                    <p class="fw-light"><strong>Developer</strong>: Bolton Studios LLC</p>
+                                    <p class="fw-light"><strong>Email</strong>: <a href="mailto:support@boltonstudios.com">support@boltonstudios.com</a></p>
+                                    <p class="fw-light"><strong>Website</strong>: <a href="https://boltonstudios.com" target="_blank">https://boltonstudios.com</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-top border-bottom">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="fw-light">Troubleshooting</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid px-4 py-3">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="fw-light"><strong>Component ID</strong>: {{component_id}}</p>
+                                    <p class="fw-light"><strong>Instance ID</strong>: {{instance_id}}</p>
                                 </div>
                             </div>
                         </div>
@@ -185,7 +240,7 @@
             
             function updateBaieImages( event, element ){
 
-                    // Declare variables.
+                // Declare variables.
                 var imageURL = '';
                 var imageType = element.dataset.baieImageType;
                 var beforeStatus = document.querySelector( "#baie-before-image p" );
@@ -227,19 +282,25 @@
             document.getElementById( "baie-after-image" ).addEventListener( "click", function( event ){
                 updateBaieImages( event, this )
             });
+            document.getElementById( "before-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
+            document.getElementById( "after-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
 
             function updateBaieComponent(){
                 
                 // Initialize variables.
-                var beforeImage = document.getElementById( "baie-before-image" ).dataset.baieImage;
-                var afterImage = document.getElementById( "baie-after-image" ).dataset.baieImage;
-                var sliderOffset = document.getElementById( "sliderOffsetRange" ).value;
+                var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
+                var beforeAltText   = document.getElementById( "before-alt-text" ).value;
+                var afterImage      = document.getElementById( "baie-after-image" ).dataset.baieImage;
+                var afterAltText    = document.getElementById( "after-alt-text" ).value;
+                var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
                 var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
 
                 // Prepare message.
                 var message = {
                     beforeImage: beforeImage,
+                    beforeAltText: beforeAltText,
                     afterImage: afterImage,
+                    afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
                     sliderOffsetFloat: sliderOffsetFloat
                 };

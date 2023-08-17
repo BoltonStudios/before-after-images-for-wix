@@ -34,6 +34,8 @@
         }
     }
     .tab-content{
+        height: 100%;
+        overflow: scroll;
         p{
             color: #2b5672;
         }
@@ -51,11 +53,17 @@
                 &:hover{
                     background-color: #4eb7f5;
                 }
-                &.btn-sm{
-                    font-size: 14px;
-                    line-height: 14px;
-                    padding: 6px 18px;
-                }
+            }
+            &.btn-sm{
+                font-size: 14px;
+                line-height: 14px;
+                padding: 6px 18px;
+            }
+        }
+        .baie-image-select{
+            img:hover{
+                cursor: pointer;
+                opacity: .8;
             }
         }
     }

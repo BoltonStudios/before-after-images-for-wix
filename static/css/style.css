@@ -40,6 +40,10 @@
   background-color: #d3edff;
   color: #3899ec;
 }
+#settings .tab-content {
+  height: 100%;
+  overflow: scroll;
+}
 #settings .tab-content p {
   color: #2b5672;
 }
@@ -59,8 +63,12 @@
 #settings .tab-content .btn.btn-primary:hover {
   background-color: #4eb7f5;
 }
-#settings .tab-content .btn.btn-primary.btn-sm {
+#settings .tab-content .btn.btn-sm {
   font-size: 14px;
   line-height: 14px;
   padding: 6px 18px;
+}
+#settings .tab-content .baie-image-select img:hover {
+  cursor: pointer;
+  opacity: 0.8;
 }

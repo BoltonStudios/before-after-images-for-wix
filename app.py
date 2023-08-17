@@ -85,13 +85,15 @@ class ComponentSlider( db.Model ):
     """
     Class to define the Slider Component table.
     """
-    component_id: db.Column = db.Column( db.String( 80 ), primary_key = True, unique = True )
+    component_id: db.Column     = db.Column( db.String( 80 ), primary_key = True, unique = True )
     instance_id: db.Column      = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
-    before_image: db.Column = db.Column( db.String( 1000 ) )
-    after_image: db.Column  = db.Column( db.String( 1000 ) )
-    offset: db.Column       = db.Column( db.Integer )
-    offset_float: db.Column = db.Column( db.Float )
-    created_at: db.Column   = db.Column( db.DateTime( timezone = True ),
+    before_image: db.Column     = db.Column( db.String( 1000 ) )
+    before_alt_text: db.Column  = db.Column( db.String( 1000 ) )
+    after_image: db.Column      = db.Column( db.String( 1000 ) )
+    after_alt_text: db.Column   = db.Column( db.String( 1000 ) )
+    offset: db.Column           = db.Column( db.Integer )
+    offset_float: db.Column     = db.Column( db.Float )
+    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
     def __repr__( self ):
@@ -334,11 +336,14 @@ def settings():
     """
 
     # Initialize variables.
-    components_db = utils.read_json( 'components.json' )
     message = "It's running! Another Test"
-    component_id = 0
+    instance_id = None
+    requested_component_id = None
+    component_in_db = None
     before_image = ''
+    before_alt_text = ''
     after_image = ''
+    after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
 
@@ -346,30 +351,33 @@ def settings():
     if request.method == 'GET':
 
         # Assign the value of 'origCompId' from the GET request to the component_id variable.
-        component_id = request.args.get( 'origCompId' )
+        requested_component_id = request.args.get( 'origCompId' )
 
-        # Get the requested component by its ID and assign it to the requested_component variable.
-        requested_component = slider_controller.get_component(
-            component_id,
-            _in = components_db
-        )
+        # Search the ComponentSlider table for the component by its component ID (primary key).
+        component_in_db = ComponentSlider.query.get( requested_component_id )
 
         # If the requested_component variable is not empty...
-        if requested_component != "":
+        if component_in_db != None:
 
             # Update the local variables with the requested_component values.
-            before_image = requested_component[ "before_image" ]
-            after_image = requested_component[ "after_image" ]
-            slider_offset = requested_component[ "offset" ]
-            slider_offset_float = requested_component[ "offset_float" ]
+            instance_id     = component_in_db.instance_id
+            before_image    = component_in_db.before_image
+            before_alt_text = component_in_db.before_alt_text
+            after_image     = component_in_db.after_image
+            after_alt_text  = component_in_db.after_alt_text
+            slider_offset   = component_in_db.offset
+            slider_offset_float = component_in_db.offset_float
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
         page_id = 'settings',
         message = message,
-        component_id = component_id,
+        instance_id = instance_id,
+        component_id = requested_component_id,
         before_image = before_image,
+        before_alt_text = before_alt_text,
         after_image = after_image,
+        after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float
     )
@@ -384,11 +392,11 @@ def widget_component_slider():
 
     # Initialize variables.
     requested_component_id = None
+    component_in_db = None
     before_image = ''
     after_image = ''
     slider_offset = 50
     slider_offset_float = 0.5
-    component_in_db = None
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -415,7 +423,9 @@ def widget_component_slider():
 
                 # Edit the ComponentSlider record.
                 component_in_db.before_image = request_data[ 'beforeImage' ]
+                component_in_db.before_alt_text = request_data[ 'beforeAltText' ]
                 component_in_db.after_image = request_data[ 'afterImage' ]
+                component_in_db.after_alt_text = request_data[ 'afterAltText' ]
                 component_in_db.offset = request_data[ 'sliderOffset' ]
                 component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
 
@@ -430,7 +440,9 @@ def widget_component_slider():
                 component_id = requested_component_id,
                 instance_id = request_data[ 'instanceID' ],
                 before_image = request_data[ 'beforeImage' ],
+                before_alt_text = request_data[ 'beforeAltText' ],
                 after_image = request_data[ 'afterImage' ],
+                after_alt_text = request_data[ 'afterAltText' ],
                 offset = request_data[ 'sliderOffset' ],
                 offset_float = request_data[ 'sliderOffsetFloat' ]
             )
@@ -463,7 +475,9 @@ def widget_component_slider():
 
             # Edit the ComponentSlider record.
             before_image = component_in_db.before_image
+            before_alt_text = component_in_db.before_alt_text
             after_image = component_in_db.after_image
+            after_alt_text = component_in_db.after_alt_text
             slider_offset = component_in_db.offset
             slider_offset_float = component_in_db.offset_float
 
@@ -472,7 +486,9 @@ def widget_component_slider():
         page_id = 'baie-slider',
         component_id = requested_component_id,
         before_image = before_image,
+        before_alt_text = before_alt_text,
         after_image = after_image,
+        after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float
     )
