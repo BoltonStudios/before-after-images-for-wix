@@ -334,7 +334,7 @@ def settings():
     Find recommended App Settings panel features here:
     https://devforum.wix.com/kb/en/article/build-an-app-settings-panel-for-website-iframe-components
     """
-
+    print("Settings route called.")
     # Initialize variables.
     message = "It's running! Another Test"
     instance_id = None

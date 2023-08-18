@@ -109,8 +109,7 @@
                                     <h6>Before</h6>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <p></p>
-                                    <button class="btn btn-primary btn-sm" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm update-baie-images-toggle" type="button">Select Image</button>
                                 </div>
                             </div>
 
@@ -118,14 +117,14 @@
                             <hr>
                             <div class="row">
                                 <div class="col" style="text-align: center;">
-                                    <img src="{{ before_image }}" class="img-thumbnail mb-3" width="220" height="113" />
+                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
 
                                     <div class="input-group">
                                         <label for="before_alt_text" class="input-group-text">Alt Text:</label>
-                                        <input name="before_alt_text" 
-                                            id="before-alt-text" 
-                                            type="text" 
-                                            class="form-control" 
+                                        <input name="before_alt_text"
+                                            type="text"
+                                            id="before-alt-text"
+                                            class="form-control update-baie-alt-toggle"
                                             placeholder="Description here." 
                                             aria-label="Before Image Alt Text"
                                             value="{{ before_alt_text }}">
@@ -146,8 +145,7 @@
                                     <h6>After</6>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <p></p>
-                                    <button class="btn btn-primary btn-sm" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm update-baie-images-toggle" type="button">Select Image</button>
                                 </div>
                             </div>
                             
@@ -155,14 +153,14 @@
                             <hr>
                             <div class="row">
                                 <div class="col" style="text-align: center;">
-                                    <img src="{{ after_image }}" class="img-thumbnail mb-3" width="220" height="113" />
+                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
 
                                     <div class="input-group">
                                         <label for="after-alt-text" class="input-group-text">Alt Text:</label>
-                                        <input name="after-alt-text" 
-                                            id="after-alt-text" 
+                                        <input name="after-alt-text"
                                             type="text" 
-                                            class="form-control" 
+                                            id="after-alt-text" 
+                                            class="form-control update-baie-alt-toggle"
                                             placeholder="Description here." 
                                             aria-label="After Image Alt Text"
                                             value="{{ after_alt_text }}">
@@ -238,13 +236,15 @@
         
         <script>
             
+            // Define the function to update image elements with user's media selections.
             function updateBaieImages( event, element ){
+
+                console.log( "updateBaieImages() called." )
 
                 // Declare variables.
                 var imageURL = '';
                 var imageType = element.dataset.baieImageType;
-                var beforeStatus = document.querySelector( "#baie-before-image p" );
-                var afterStatus = document.querySelector( "#baie-after-image p" );
+                var thumbnailImage = element.querySelector( '.img-thumbnail' );
 
                 // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
                 // https://dev.wix.com/api/iframe-sdk/sdk/wix.settings#sdk_wix.settings_openmediadialog
@@ -260,32 +260,19 @@
                         // Add the image URL to the data attribute.
                         element.dataset.baieImage = imageURL;
 
-                        // Update the labels in the settings panel.
-                        if( imageType == "before" ) {
-                            
-                            beforeStatus.innerHTML = imageURL;
-                        }
-
-                        if( imageType == "after" ) {
-                            
-                            afterStatus.innerHTML = imageURL;
-                        }
+                        // Update the thumbnail with the selected image URL.
+                        thumbnailImage.src = thumbnailURL;
 
                         // Update the component to reflect the settings changes.
                         updateBaieComponent()
                     }
                 );
             }
-            document.getElementById( "baie-before-image" ).addEventListener( "click", function( event ){
-                updateBaieImages( event, this )
-            });
-            document.getElementById( "baie-after-image" ).addEventListener( "click", function( event ){
-                updateBaieImages( event, this )
-            });
-            document.getElementById( "before-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
-            document.getElementById( "after-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
 
+            // Contstruct a message to 
             function updateBaieComponent(){
+
+                console.log( "updateBaieComponent() called." )
                 
                 // Initialize variables.
                 var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
@@ -313,9 +300,31 @@
                 console.log( "message = " );
                 console.log( message );
                 
-                // Send event.
+                // Send message to the component iframe.
                 Wix.Settings.triggerSettingsUpdatedEvent( message, '{{component_id}}' );
             }
+
+            // Get elements to pair with event listeners.
+            var updateBaieImagesToggles = document.getElementsByClassName( "update-baie-images-toggle" );
+            
+            // Iterate over the elements found.
+            for( let i = 0; i < updateBaieImagesToggles.length; i++ ){
+
+                // Add a listener for the "click" even to each element.
+                updateBaieImagesToggles[ i ].addEventListener( "click", function( event ){
+
+                    // Get the parent element with the class .baie-image-select,
+                    // which has many data attributes used to toggle changes in the iframe(s).
+                    baieImageSelect = this.closest( ".baie-image-select" );
+
+                    // On click, run the updateBaieImages() function.
+                    updateBaieImages( event, baieImageSelect )
+                });
+            }
+
+            document.getElementById( "before-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
+            document.getElementById( "after-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
+
         </script>
     </div>
 {% endblock %}
