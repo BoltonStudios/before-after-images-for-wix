@@ -322,8 +322,19 @@
                 });
             }
 
-            document.getElementById( "before-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
-            document.getElementById( "after-alt-text" ).addEventListener( "focusout", updateBaieComponent() );
+            var updateBaieAltToggles = document.getElementsByClassName( "update-baie-alt-toggle" );
+            
+            // Iterate over the elements found.
+            for( let i = 0; i < updateBaieAltToggles.length; i++ ){
+
+                // Add a listener for the "click" even to each element.
+                updateBaieAltToggles[ i ].addEventListener(  "focusout", function( event ){
+
+                    console.log( "focusout event fired" );
+                    console.log( event.srcElement.value );
+                    updateBaieComponent()
+                });
+            }
 
         </script>
     </div>

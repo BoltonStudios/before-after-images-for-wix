@@ -72,9 +72,9 @@
 
             // Update data attributes.
             slider.dataset.beforeImage = e.beforeImage;
-            //slider.dataset.beforeAltText = e.beforeAltText;
+            slider.dataset.beforeAltText = e.beforeAltText;
             slider.dataset.afterImage = e.afterImage;
-            //slider.dataset.afterAltText = e.afterAltText;
+            slider.dataset.afterAltText = e.afterAltText;
             slider.dataset.sliderOffset = e.sliderOffset;
             slider.dataset.sliderOffsetFloat = e.sliderOffsetFloat;
 
@@ -87,13 +87,16 @@
             // Update image attributes.
             beforeImage.src = e.beforeImage;
             afterImage.src  = e.afterImage;
-            //beforeImage.alt = e.beforeAltText;
-            //afterImage.alt  = e.afterAltText;
+            beforeImage.alt = e.beforeAltText;
+            afterImage.alt  = e.afterAltText;
 
             // Reinitialize TwentyTwenty.
             jQuery("#{{component_id}}-twentytwenty").twentytwenty({
                 default_offset_pct: e.sliderOffsetFloat // How much of the before image is visible when the page loads
             });
+
+            //
+            publishWidgetComponentSlider( e )
         }
         
         // Do something when the user deletes a site component.
@@ -127,9 +130,9 @@
             var slider =  document.getElementById( "{{component_id}}-twentytwenty" );
             var sliderId = slider.dataset.sliderId;
             var beforeImage = slider.dataset.beforeImage;
-            //var beforeAltText = slider.dataset.beforeAltText;
+            var beforeAltText = slider.dataset.beforeAltText;
             var afterImage = slider.dataset.afterImage;
-            //var afterAltText = slider.dataset.afterAltText;
+            var afterAltText = slider.dataset.afterAltText;
             var sliderOffset = slider.dataset.sliderOffset;
             var sliderOffsetFloat = slider.dataset.sliderOffsetFloat;
 
@@ -143,9 +146,9 @@
                     userID: Wix.Utils.getUid(),
                     instanceID: Wix.Utils.getInstanceId(),
                     beforeImage: beforeImage,
-                    beforeAltText: "beforeAltText",
+                    beforeAltText: beforeAltText,
                     afterImage: afterImage,
-                    afterAltText: "afterAltText",
+                    afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
                     sliderOffsetFloat: sliderOffsetFloat
                 }),

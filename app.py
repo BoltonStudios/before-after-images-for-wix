@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import jwt
 
 # Flask imports
-from flask import Flask, Response, redirect, render_template, request
+from flask import Flask, Response, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from flask_migrate import Migrate
@@ -340,9 +340,9 @@ def settings():
     instance_id = None
     requested_component_id = None
     component_in_db = None
-    before_image = ''
+    before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_alt_text = ''
-    after_image = ''
+    after_image = url_for( 'static', filename='images/placeholder-3.svg' )
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
@@ -393,8 +393,10 @@ def widget_component_slider():
     # Initialize variables.
     requested_component_id = None
     component_in_db = None
-    before_image = ''
-    after_image = ''
+    before_image = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_alt_text = ''
+    after_image = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
 
