@@ -114,11 +114,25 @@
                             </div>
 
                             {% if before_image != '' %}
-                            <hr>
                             <div class="row">
                                 <div class="col" style="text-align: center;">
-                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
 
+                                    <!--Image-->
+                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
+                                    
+                                    <!--Before Label-->
+                                    <div class="input-group mb-2">
+                                        <label for="before_label_text" class="input-group-text">Label:</label>
+                                        <input name="before_label_text"
+                                            type="text"
+                                            id="before-label-text"
+                                            class="form-control update-baie-label-toggle"
+                                            placeholder="Before" 
+                                            aria-label="Before Image Label Text"
+                                            value="{{ before_label_text }}">
+                                    </div>
+                                    
+                                    <!--Alt Text-->
                                     <div class="input-group">
                                         <label for="before_alt_text" class="input-group-text">Alt Text:</label>
                                         <input name="before_alt_text"
@@ -134,6 +148,8 @@
                             {% endif %}
                         </div>
 
+                        <hr />
+                        
                         <!--After Image-->
                         <div id="baie-after-image" 
                             class="baie-image-select container-fluid px-4 py-3" 
@@ -150,11 +166,25 @@
                             </div>
                             
                             {% if after_image != '' %}
-                            <hr>
                             <div class="row">
                                 <div class="col" style="text-align: center;">
-                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
 
+                                    <!--Image-->
+                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
+                                    
+                                    <!--After Label-->
+                                    <div class="input-group mb-2">
+                                        <label for="after_label_text" class="input-group-text">Label:</label>
+                                        <input name="after_label_text"
+                                            type="text"
+                                            id="after-label-text"
+                                            class="form-control update-baie-label-toggle"
+                                            placeholder="After" 
+                                            aria-label="After Image Label Text"
+                                            value="{{ after_label_text }}">
+                                    </div>
+                                    
+                                    <!--Alt Text-->
                                     <div class="input-group">
                                         <label for="after-alt-text" class="input-group-text">Alt Text:</label>
                                         <input name="after-alt-text"
@@ -269,15 +299,17 @@
                 );
             }
 
-            // Contstruct a message to 
+            // Define the function to update the widget component with user's Settings inputs.
             function updateBaieComponent(){
 
                 console.log( "updateBaieComponent() called." )
                 
                 // Initialize variables.
                 var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
+                var beforeLabelText   = document.getElementById( "before-label-text" ).value;
                 var beforeAltText   = document.getElementById( "before-alt-text" ).value;
                 var afterImage      = document.getElementById( "baie-after-image" ).dataset.baieImage;
+                var afterLabelText    = document.getElementById( "after-label-text" ).value;
                 var afterAltText    = document.getElementById( "after-alt-text" ).value;
                 var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
                 var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
@@ -285,8 +317,10 @@
                 // Prepare message.
                 var message = {
                     beforeImage: beforeImage,
+                    beforeLabelText: beforeLabelText,
                     beforeAltText: beforeAltText,
                     afterImage: afterImage,
+                    afterLabelText: afterLabelText,
                     afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
                     sliderOffsetFloat: sliderOffsetFloat
@@ -322,12 +356,28 @@
                 });
             }
 
-            var updateBaieAltToggles = document.getElementsByClassName( "update-baie-alt-toggle" );
+            // Get elements to trigger label text changes.
+            var updateBaieLabelToggles = document.getElementsByClassName( "update-baie-label-toggle" );
             
+            // Iterate over the elements found.
+            for( let i = 0; i < updateBaieLabelToggles.length; i++ ){
+
+                // Add a listener for the "click" event to each element.
+                updateBaieLabelToggles[ i ].addEventListener(  "focusout", function( event ){
+
+                    console.log( "focusout event fired" );
+                    console.log( event.srcElement.value );
+                    updateBaieComponent()
+                });
+            }
+
+            // Get elements to trigger alt text changes.
+            var updateBaieAltToggles = document.getElementsByClassName( "update-baie-alt-toggle" );
+
             // Iterate over the elements found.
             for( let i = 0; i < updateBaieAltToggles.length; i++ ){
 
-                // Add a listener for the "click" even to each element.
+                // Add a listener for the "click" event to each element.
                 updateBaieAltToggles[ i ].addEventListener(  "focusout", function( event ){
 
                     console.log( "focusout event fired" );

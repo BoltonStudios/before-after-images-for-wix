@@ -1,28 +1,9 @@
 {% extends 'site-layout.html' %}
 
 {% block content %}
+
     <!-- start content -->
-    <div class="page-content">
-        <div class="content">
-            <div class="container">
-
-                <div class="hero">
-                    <div style="text-align:center;">
-                        <picture>
-                            <source srcset="{{ url_for('static', filename='images/celebration-dark.svg') }}" media="(prefers-color-scheme: dark)">
-                            <img src="{{ url_for('static', filename='images/celebration.svg') }}" alt="A group celebrating" width="427" height="231">
-                        </picture>
-                    </div>
-
-                    <div class="message">
-                        <h1>{{message}}</h1>
-                    </div>
-                </div>
-
-                <div class="details">
-                    <p style="text-align: center;">Go to <a href="{{ url_for('widget_component_slider') }}">/widget-component-slider</a></p>
-                </div>
-	        </div>
-        </div>
-    </div>
+    {{message}}
+    <!-- end content -->
+    
 {% endblock %}

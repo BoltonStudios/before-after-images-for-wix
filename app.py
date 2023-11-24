@@ -85,15 +85,17 @@ class ComponentSlider( db.Model ):
     """
     Class to define the Slider Component table.
     """
-    component_id: db.Column     = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    instance_id: db.Column      = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
-    before_image: db.Column     = db.Column( db.String( 1000 ) )
-    before_alt_text: db.Column  = db.Column( db.String( 1000 ) )
-    after_image: db.Column      = db.Column( db.String( 1000 ) )
-    after_alt_text: db.Column   = db.Column( db.String( 1000 ) )
-    offset: db.Column           = db.Column( db.Integer )
-    offset_float: db.Column     = db.Column( db.Float )
-    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
+    component_id: db.Column         = db.Column( db.String( 80 ), primary_key = True, unique = True )
+    instance_id: db.Column          = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
+    before_image: db.Column         = db.Column( db.String( 1000 ) )
+    before_label_text: db.Column    = db.Column( db.String( 1000 ) )
+    before_alt_text: db.Column      = db.Column( db.String( 1000 ) )
+    after_image: db.Column          = db.Column( db.String( 1000 ) )
+    after_label_text: db.Column     = db.Column( db.String( 1000 ) )
+    after_alt_text: db.Column       = db.Column( db.String( 1000 ) )
+    offset: db.Column               = db.Column( db.Integer )
+    offset_float: db.Column         = db.Column( db.Float )
+    created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
     def __repr__( self ):
@@ -341,8 +343,10 @@ def settings():
     requested_component_id = None
     component_in_db = None
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_label_text = 'Before'
     before_alt_text = ''
     after_image = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
@@ -362,8 +366,10 @@ def settings():
             # Update the local variables with the requested_component values.
             instance_id     = component_in_db.instance_id
             before_image    = component_in_db.before_image
+            before_label_text = component_in_db.before_label_text
             before_alt_text = component_in_db.before_alt_text
             after_image     = component_in_db.after_image
+            after_label_text  = component_in_db.after_label_text
             after_alt_text  = component_in_db.after_alt_text
             slider_offset   = component_in_db.offset
             slider_offset_float = component_in_db.offset_float
@@ -375,8 +381,10 @@ def settings():
         instance_id = instance_id,
         component_id = requested_component_id,
         before_image = before_image,
+        before_label_text = before_label_text,
         before_alt_text = before_alt_text,
         after_image = after_image,
+        after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float
@@ -394,8 +402,10 @@ def widget_component_slider():
     requested_component_id = None
     component_in_db = None
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_label_text = 'Before'
     before_alt_text = ''
     after_image = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
@@ -425,8 +435,10 @@ def widget_component_slider():
 
                 # Edit the ComponentSlider record.
                 component_in_db.before_image = request_data[ 'beforeImage' ]
+                component_in_db.before_label_text = request_data[ 'beforeLabelText' ]
                 component_in_db.before_alt_text = request_data[ 'beforeAltText' ]
                 component_in_db.after_image = request_data[ 'afterImage' ]
+                component_in_db.after_label_text = request_data[ 'afterLabelText' ]
                 component_in_db.after_alt_text = request_data[ 'afterAltText' ]
                 component_in_db.offset = request_data[ 'sliderOffset' ]
                 component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
@@ -442,8 +454,10 @@ def widget_component_slider():
                 component_id = requested_component_id,
                 instance_id = request_data[ 'instanceID' ],
                 before_image = request_data[ 'beforeImage' ],
+                before_label_text = request_data[ 'beforeLabelText' ],
                 before_alt_text = request_data[ 'beforeAltText' ],
                 after_image = request_data[ 'afterImage' ],
+                after_label_text = request_data[ 'afterLabelText' ],
                 after_alt_text = request_data[ 'afterAltText' ],
                 offset = request_data[ 'sliderOffset' ],
                 offset_float = request_data[ 'sliderOffsetFloat' ]
@@ -477,8 +491,10 @@ def widget_component_slider():
 
             # Edit the ComponentSlider record.
             before_image = component_in_db.before_image
+            before_label_text = component_in_db.before_label_text
             before_alt_text = component_in_db.before_alt_text
             after_image = component_in_db.after_image
+            after_label_text = component_in_db.after_label_text
             after_alt_text = component_in_db.after_alt_text
             slider_offset = component_in_db.offset
             slider_offset_float = component_in_db.offset_float
@@ -488,8 +504,10 @@ def widget_component_slider():
         page_id = 'baie-slider',
         component_id = requested_component_id,
         before_image = before_image,
+        before_label_text = before_label_text,
         before_alt_text = before_alt_text,
         after_image = after_image,
+        after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float
@@ -519,16 +537,3 @@ def user_component( component_id ):
     return render_template( 'component.html',
         component = component_record
     )
-
-# Run the app.
-if __name__ == '__main__':
-    # This is used when running locally only. When deploying to Google App
-    # Engine, a webserver process such as Gunicorn will serve the app. This
-    # can be configured by adding an `entrypoint` to app.yaml.
-    # Flask's development server will automatically serve static files in
-    # the "static" directory. See:
-    # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
-    # App Engine itself will serve those files as configured in app.yaml.
-    server_port = os.environ.get( 'PORT', '3000' )
-
-    app.run( host='127.0.0.1', port=server_port, debug=True )

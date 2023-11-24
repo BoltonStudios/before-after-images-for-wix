@@ -7,8 +7,10 @@
         <div id="{{component_id}}-twentytwenty" class="twentytwenty-container" 
             data-slider-id="{{component_id}}"
             data-before-image="{{before_image}}"
+            data-before-label-text="{{before_label_text}}"
             data-before-alt-text="{{before_alt_text}}"
             data-after-image="{{after_image}}"
+            data-after-label-text="{{after_label_text}}"
             data-after-alt-text="{{after_alt_text}}"
             data-slider-offset="{{slider_offset}}"
             data-slider-offset-float="{{slider_offset_float}}"
@@ -72,8 +74,10 @@
 
             // Update data attributes.
             slider.dataset.beforeImage = e.beforeImage;
+            slider.dataset.beforeLabelText = e.beforeLabelText;
             slider.dataset.beforeAltText = e.beforeAltText;
             slider.dataset.afterImage = e.afterImage;
+            slider.dataset.afterLabelText = e.afterLabelText;
             slider.dataset.afterAltText = e.afterAltText;
             slider.dataset.sliderOffset = e.sliderOffset;
             slider.dataset.sliderOffsetFloat = e.sliderOffsetFloat;
@@ -90,9 +94,18 @@
             beforeImage.alt = e.beforeAltText;
             afterImage.alt  = e.afterAltText;
 
+            // Reset TwentyTwenty elements.
+            jQuery("#{{component_id}}-twentytwenty").unwrap();
+            jQuery("#{{component_id}}-twentytwenty .twentytwenty-overlay").remove();
+            jQuery("#{{component_id}}-twentytwenty .twentytwenty-handle").remove();
+            jQuery("#{{component_id}}-twentytwenty .twentytwenty-before-label").remove();
+            jQuery("#{{component_id}}-twentytwenty .twentytwenty-after-label").remove();
+
             // Reinitialize TwentyTwenty.
             jQuery("#{{component_id}}-twentytwenty").twentytwenty({
-                default_offset_pct: e.sliderOffsetFloat // How much of the before image is visible when the page loads
+                before_label: e.beforeLabelText, // Set a custom before label.
+                after_label: e.afterLabelText, // Set a custom after label.
+                default_offset_pct: e.sliderOffsetFloat // How much of the before image is visible when the page loads.
             });
 
             //
@@ -130,8 +143,10 @@
             var slider =  document.getElementById( "{{component_id}}-twentytwenty" );
             var sliderId = slider.dataset.sliderId;
             var beforeImage = slider.dataset.beforeImage;
+            var beforeLabelText = slider.dataset.beforeLabelText;
             var beforeAltText = slider.dataset.beforeAltText;
             var afterImage = slider.dataset.afterImage;
+            var afterLabelText = slider.dataset.afterLabelText;
             var afterAltText = slider.dataset.afterAltText;
             var sliderOffset = slider.dataset.sliderOffset;
             var sliderOffsetFloat = slider.dataset.sliderOffsetFloat;
@@ -146,8 +161,10 @@
                     userID: Wix.Utils.getUid(),
                     instanceID: Wix.Utils.getInstanceId(),
                     beforeImage: beforeImage,
+                    beforeLabelText: beforeLabelText,
                     beforeAltText: beforeAltText,
                     afterImage: afterImage,
+                    afterLabelText: afterLabelText,
                     afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
                     sliderOffsetFloat: sliderOffsetFloat
@@ -161,11 +178,15 @@
 
        <script>
         // Initialize variables.
+        var beforeLabelText = "{{before_label_text}}"
+        var afterLabelText = "{{after_label_text}}"
         var sliderOffsetFloat = Number( "{{slider_offset_float}}" )
 
         // Initialize TwentyTwenty
         $(function(){
             $("#{{component_id}}-twentytwenty").twentytwenty({
+                before_label: beforeLabelText, // Set a custom before label.
+                after_label: afterLabelText, // Set a custom after label.
                 default_offset_pct: sliderOffsetFloat, // How much of the before image is visible when the page loads
             });
         });
