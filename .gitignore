@@ -163,7 +163,6 @@ components.csv
 components.json
 requests.csv
 student.html
-db-test.html
 baie-component-slider.html
 model/BaieComponentSlider.py
 database.db

@@ -11,6 +11,7 @@ import logging
 import urllib.parse
 from dataclasses import dataclass
 import jwt
+from datetime import datetime
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
@@ -68,7 +69,8 @@ class User( db.Model ):
     instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
     site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
     user_id: db.Column          = db.Column( db.String( 200 ), unique = True )
-    refresh_token: db.Column    = db.Column( db.String( 200 ) )
+    refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
+    is_free: db.Column          = db.Column( db.String( 200 ) )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
@@ -118,6 +120,12 @@ with app.app_context():
 
     # Then create the tables if they do not already exist.
     init_db()
+
+# Use a template context processor to pass the current date to every template
+# Source: https://stackoverflow.com/a/41231621
+@app.context_processor
+def inject_now():
+    return {'now': datetime.utcnow()}
 
 # Define Flask routes.
 # Homepage.
@@ -225,6 +233,7 @@ def redirect_wix():
         # Extract data from the app instance.
         instance_id = app_instance[ 'instance' ][ 'instanceId' ]
         site_id = app_instance[ 'site' ][ 'siteId' ]
+        is_free = app_instance[ 'instance' ][ 'isFree' ]
 
         # Search the User table for the instance ID (primary key)
         user_in_db = User.query.get( instance_id )
@@ -236,6 +245,7 @@ def redirect_wix():
             user = User(
                 instance_id = app_instance[ 'instance' ][ 'instanceId' ],
                 site_id = app_instance[ 'site' ][ 'siteId' ],
+                is_free = app_instance[ 'instance' ][ 'isFree' ],
                 refresh_token = refresh_token
             )
 
@@ -244,6 +254,7 @@ def redirect_wix():
             # Update the user record.
             user = user_in_db
             user.site_id = site_id
+            user.is_free = is_free
             user.refresh_token = refresh_token
 
         # Add the new or updated user record to the User table.
@@ -514,18 +525,32 @@ def widget_component_slider():
     )
 
 # Database
-@app.route( '/db-test' )
-def db_test():
+@app.route( '/browse-db' )
+@app.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
+def browse_db( instance_id = None ):
 
     """Return database contents."""
 
     # Initialize variables.
+    admin = True
     users = User.query.all()
     components = ComponentSlider.query.all()
 
-    return render_template( 'db-test.html',
+    # If the user posted data...
+    if request.method == 'POST':
+
+        # Update the instance_id variable.
+        instance_id = request.form['instance_id']
+
+        # Update the components variable.
+        components = ComponentSlider.query.filter_by( instance_id = instance_id ).all()
+
+    # Pass the data to the template.
+    return render_template( 'browse-db.html',
+        admin = admin,
         users = users,
-        components = components
+        components = components,
+        instance_id = instance_id
     )
 
 #

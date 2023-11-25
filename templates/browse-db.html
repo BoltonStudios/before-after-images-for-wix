@@ -1,0 +1,124 @@
+{% extends 'site-layout.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-6 col-xs-12">
+            <h2 class="title">Users</h2>
+            <div class="accordion pt-2" id="accordionUsers">
+                    
+                {% for user in users %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ user.instance_id }}" aria-expanded="true" aria-controls="collapse{{ user.instance_id }}">
+                            <b>Instance ID:</b> &nbsp;{{ user.instance_id }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ user.instance_id }}" class="accordion-collapse collapse" data-bs-parent="#accordionUsers">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col">
+                                    <p><b>Created:</b> {{ user.created_at }}</p>
+                                </div>
+                                <div class="col text-end">
+                                    <form action="{{ url_for( 'browse_db', instance_id=user.instance_id ) }}" method="POST">
+
+                                        <!--Instance ID-->
+                                        <input type="hidden" id="instance_id" name="instance_id" value="{{user.instance_id}}">
+
+                                        <!--Submit-->
+                                        <input type="submit" class="btn btn-outline-primary" value="View Components" />
+                                    </form>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <p>Site ID: {{ user.site_id }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p>User ID: {{ user.user_id }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p>Refresh Token: {{ user.refresh_token }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p>Is Free: {{ user.is_free }}</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-6 col-xs-12">
+            <div class="row align-items-end">
+                <div class="col-4">
+                    <h2 class="title">Components</h2>
+                </div>
+                {% if instance_id != None %}
+                <div class="col-8">
+                    <p class="mb-2"><small><strong>Instance ID</strong>: {{instance_id}}</small></p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="accordion pt-2" id="accordionComponents">
+                {% for component in components %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ component.component_id }}" aria-expanded="true" aria-controls="collapse{{ component.component_id }}">
+                            <b>ID:</b> &nbsp;{{ component.component_id }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ component.component_id }}" class="accordion-collapse collapse" data-bs-parent="#accordionComponents">
+                        <div class="accordion-body">
+                            <p><b>Created:</b> {{ component.created_at }}</p>
+
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <p><b>Instance ID:</b> {{ component.instance_id }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Before Image URL:</strong> {{ component.before_image }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Before Label Text:</strong> {{ component.before_label_text }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Before Alt Text:</strong> {{ component.before_alt_text }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>After Image URL:</strong> {{ component.after_image }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>After Label Text:</strong> {{ component.after_label_text }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>After Alt Text:</strong> {{ component.after_alt_text }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Offset:</strong> {{ component.offset }}</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Offset Percentage:</strong> {{ component.offset_float }}%</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <nav aria-label="Page navigation example" class="mt-4">
+                <ul class="pagination justify-content-start">
+                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

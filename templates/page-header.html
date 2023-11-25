@@ -1,0 +1,14 @@
+<!-- start page header -->
+<div class="page-header container-fluid pt-5 mb-5 bg-primary-subtle border-bottom">
+    <div class="container">
+        <div class="row pt-5 pb-4 justify-content-end">
+            <div class="col">
+                <h1 class="title">{% block title %} Database Explorer {% endblock %}</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{{ url_for( 'browse_db' ) }}" class="btn btn-outline-primary">View All Records</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page header -->
