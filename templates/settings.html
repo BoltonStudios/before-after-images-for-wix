@@ -149,7 +149,7 @@
                         </div>
 
                         <hr />
-                        
+
                         <!--After Image-->
                         <div id="baie-after-image" 
                             class="baie-image-select container-fluid px-4 py-3" 
@@ -210,16 +210,58 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!--Slider Offset-->
                         <div class="container px-4 py-3">
                             <div class="row">
                                 <div class="col-9">
-                                    <!--Slider Offset-->
                                     <label for="sliderOffsetRange" class="form-label">Slider Offset</label><br>
                                     <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieComponent()" value="{{ slider_offset }}">
                                 </div>
                                 <div class="col-3">
                                     <br>
                                     <p class="fs-5"><span id="sliderOffsetNumber">{{ slider_offset }}</span>%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Orientation-->
+                        <div class="container px-4 py-1">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="sliderOrientation" class="form-label">Slider Orientation</label><br>
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="sliderOrientation"
+                                            id="sliderOrientation1"
+                                            value="horizontal"
+                                            onchange="updateBaieComponent( this )"
+                                            {% if slider_orientation=='horizontal' %}
+                                            checked
+                                            {%endif%}
+                                        >
+                                        <label class="form-check-label" for="sliderOrientation1">
+                                          Horizontal
+                                        </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input 
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="sliderOrientation"
+                                            id="sliderOrientation2"
+                                            value="vertical"
+                                            onchange="updateBaieComponent( this )" 
+                                            {% if slider_orientation=='vertical' %}
+                                            checked
+                                            {%endif%}
+                                        >
+                                        <label class="form-check-label" for="sliderOrientation2">
+                                          Vertical
+                                        </label>
+                                      </div>
                                 </div>
                             </div>
                         </div>
@@ -313,6 +355,19 @@
                 var afterAltText    = document.getElementById( "after-alt-text" ).value;
                 var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
                 var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
+                var sliderOrientation = document.getElementsByName( "sliderOrientation" );
+
+                // Extract value from Slider Orientation radio options.
+                // Iterate over the radio options.
+                for( i = 0; i < sliderOrientation.length; i++ ){
+
+                    // If the current radio option is checked.
+                    if( sliderOrientation[ i ].checked ){
+
+                        // Store the value of the checked option.
+                        sliderOrientation = sliderOrientation[ i ].value;
+                    }
+                }
 
                 // Prepare message.
                 var message = {
@@ -323,7 +378,8 @@
                     afterLabelText: afterLabelText,
                     afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
-                    sliderOffsetFloat: sliderOffsetFloat
+                    sliderOffsetFloat: sliderOffsetFloat,
+                    sliderOrientation: sliderOrientation
                 };
 
                 // Manipulate settings panel.

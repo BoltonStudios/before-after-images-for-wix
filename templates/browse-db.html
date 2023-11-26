@@ -68,13 +68,11 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ component.component_id }}" aria-expanded="true" aria-controls="collapse{{ component.component_id }}">
-                            <b>ID:</b> &nbsp;{{ component.component_id }}
+                            <b>ID:</b> &nbsp;{{ component.component_id }} <b class="ms-3">Created:</b> &nbsp;{{ component.created_at }}
                         </button>
                     </h2>
                     <div id="collapse{{ component.component_id }}" class="accordion-collapse collapse" data-bs-parent="#accordionComponents">
                         <div class="accordion-body">
-                            <p><b>Created:</b> {{ component.created_at }}</p>
-
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                     <p><b>Instance ID:</b> {{ component.instance_id }}</p>
@@ -102,6 +100,9 @@
                                 </li>
                                 <li class="list-group-item">
                                     <p><strong>Offset Percentage:</strong> {{ component.offset_float }}%</p>
+                                </li>
+                                <li class="list-group-item">
+                                    <p><strong>Orientation:</strong> {{ component.orientation }}</p>
                                 </li>
                             </ul>
                         </div>

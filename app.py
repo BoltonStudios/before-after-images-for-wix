@@ -97,6 +97,7 @@ class ComponentSlider( db.Model ):
     after_alt_text: db.Column       = db.Column( db.String( 1000 ) )
     offset: db.Column               = db.Column( db.Integer )
     offset_float: db.Column         = db.Column( db.Float )
+    orientation: db.Column          = db.Column( db.String( 1000 ) )
     created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
@@ -361,6 +362,7 @@ def settings():
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
+    slider_orientation = 'horizontal'
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -375,15 +377,16 @@ def settings():
         if component_in_db != None:
 
             # Update the local variables with the requested_component values.
-            instance_id     = component_in_db.instance_id
-            before_image    = component_in_db.before_image
-            before_label_text = component_in_db.before_label_text
-            before_alt_text = component_in_db.before_alt_text
-            after_image     = component_in_db.after_image
-            after_label_text  = component_in_db.after_label_text
-            after_alt_text  = component_in_db.after_alt_text
-            slider_offset   = component_in_db.offset
+            instance_id         = component_in_db.instance_id
+            before_image        = component_in_db.before_image
+            before_label_text   = component_in_db.before_label_text
+            before_alt_text     = component_in_db.before_alt_text
+            after_image         = component_in_db.after_image
+            after_label_text    = component_in_db.after_label_text
+            after_alt_text      = component_in_db.after_alt_text
+            slider_offset       = component_in_db.offset
             slider_offset_float = component_in_db.offset_float
+            slider_orientation  = component_in_db.orientation
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
@@ -398,7 +401,8 @@ def settings():
         after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
-        slider_offset_float = slider_offset_float
+        slider_offset_float = slider_offset_float,
+        slider_orientation = slider_orientation
     )
 
 # Widget Component: Slider
@@ -420,6 +424,7 @@ def widget_component_slider():
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
+    slider_orientation = 'horizontal'
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -453,6 +458,7 @@ def widget_component_slider():
                 component_in_db.after_alt_text = request_data[ 'afterAltText' ]
                 component_in_db.offset = request_data[ 'sliderOffset' ]
                 component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
+                component_in_db.orientation = request_data[ 'sliderOrientation' ]
 
                 # Add a new component to the ComponentSlider table.
                 db.session.add( component_in_db )
@@ -471,7 +477,8 @@ def widget_component_slider():
                 after_label_text = request_data[ 'afterLabelText' ],
                 after_alt_text = request_data[ 'afterAltText' ],
                 offset = request_data[ 'sliderOffset' ],
-                offset_float = request_data[ 'sliderOffsetFloat' ]
+                offset_float = request_data[ 'sliderOffsetFloat' ],
+                orientation = request_data[ 'sliderOrientation' ]
             )
 
             # Add a new component to the ComponentSlider table.
@@ -509,6 +516,7 @@ def widget_component_slider():
             after_alt_text = component_in_db.after_alt_text
             slider_offset = component_in_db.offset
             slider_offset_float = component_in_db.offset_float
+            slider_orientation = component_in_db.orientation
 
     # Pass local variables to Flask and render the template.
     return render_template( 'widget-component-slider.html',
@@ -521,7 +529,8 @@ def widget_component_slider():
         after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
-        slider_offset_float = slider_offset_float
+        slider_offset_float = slider_offset_float,
+        slider_orientation = slider_orientation
     )
 
 # Database

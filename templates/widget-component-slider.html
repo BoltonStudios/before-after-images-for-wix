@@ -14,6 +14,7 @@
             data-after-alt-text="{{after_alt_text}}"
             data-slider-offset="{{slider_offset}}"
             data-slider-offset-float="{{slider_offset_float}}"
+            data-slider-orientation="{{slider_orientation}}"
         >
             <!-- The before image is first -->
             {% if before_image != '' %}
@@ -37,7 +38,7 @@
             <li>Slider Offset Float: <span id="{{component_id}}-slider-offset-float" class="slider-offset-float">{{slider_offset_float}}</span></li>
         </ul>
 
-        <p>Go to <a href="/">/index</a></p>
+        <p>Go to <a href="{{ url_for('browse_db')}}">/index</a></p>
 
        <p id="target-text">Then</p>
        {% if requests_list %}
@@ -81,12 +82,14 @@
             slider.dataset.afterAltText = e.afterAltText;
             slider.dataset.sliderOffset = e.sliderOffset;
             slider.dataset.sliderOffsetFloat = e.sliderOffsetFloat;
+            slider.dataset.sliderOrientation = e.sliderOrientation;
 
             // Update labels.
             document.getElementById( "{{component_id}}-before-image" ).innerHTML = e.beforeImage;
             document.getElementById( "{{component_id}}-after-image" ).innerHTML = e.afterImage;
             document.getElementById( "{{component_id}}-slider-offset" ).innerHTML = e.sliderOffset;
             document.getElementById( "{{component_id}}-slider-offset-float" ).innerHTML = e.sliderOffsetFloat;
+            //document.getElementById( "{{component_id}}-slider-orientation" ).innerHTML = e.sliderOrientation;
 
             // Update image attributes.
             beforeImage.src = e.beforeImage;
@@ -105,7 +108,8 @@
             jQuery("#{{component_id}}-twentytwenty").twentytwenty({
                 before_label: e.beforeLabelText, // Set a custom before label.
                 after_label: e.afterLabelText, // Set a custom after label.
-                default_offset_pct: e.sliderOffsetFloat // How much of the before image is visible when the page loads.
+                default_offset_pct: e.sliderOffsetFloat, // How much of the before image is visible when the page loads.
+                orientation: e.sliderOrientation // Orientation of the before and after images ('horizontal' or 'vertical')
             });
 
             //
@@ -150,6 +154,7 @@
             var afterAltText = slider.dataset.afterAltText;
             var sliderOffset = slider.dataset.sliderOffset;
             var sliderOffsetFloat = slider.dataset.sliderOffsetFloat;
+            var sliderOrientation = slider.dataset.sliderOrientation;
 
             // Send the attribute data to the app in an asynchronous POST request.
             fetch( "{{ url_for('widget_component_slider') }}", {
@@ -167,7 +172,8 @@
                     afterLabelText: afterLabelText,
                     afterAltText: afterAltText,
                     sliderOffset: sliderOffset,
-                    sliderOffsetFloat: sliderOffsetFloat
+                    sliderOffsetFloat: sliderOffsetFloat,
+                    sliderOrientation: sliderOrientation
                 }),
                 headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -181,6 +187,7 @@
         var beforeLabelText = "{{before_label_text}}"
         var afterLabelText = "{{after_label_text}}"
         var sliderOffsetFloat = Number( "{{slider_offset_float}}" )
+        var sliderOrientation = "{{slider_orientation}}"
 
         // Initialize TwentyTwenty
         $(function(){
@@ -188,6 +195,7 @@
                 before_label: beforeLabelText, // Set a custom before label.
                 after_label: afterLabelText, // Set a custom after label.
                 default_offset_pct: sliderOffsetFloat, // How much of the before image is visible when the page loads
+                orientation: sliderOrientation // Orientation of the before and after images ('horizontal' or 'vertical')
             });
         });
        </script>
