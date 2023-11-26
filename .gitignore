@@ -167,6 +167,7 @@ baie-component-slider.html
 model/BaieComponentSlider.py
 database.db
 component-record.html
+*.pyc
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
