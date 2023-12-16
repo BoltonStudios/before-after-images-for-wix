@@ -144,7 +144,7 @@ def root():
     )
 
 # App URL (Installation) page.
-@app.route( '/app-wix', methods=[ 'POST', 'GET' ] )
+@app.route( '/app-wix/', methods=[ 'POST', 'GET' ] )
 def app_wix():
 
     """
@@ -176,7 +176,7 @@ def app_wix():
     return redirect( url )
 
 # Redirect URL (App Authorized, Complete Installation).
-@app.route( '/redirect-wix', methods=[ 'POST', 'GET' ] )
+@app.route( '/redirect-wix/', methods=[ 'POST', 'GET' ] )
 def redirect_wix():
 
     """
@@ -261,6 +261,9 @@ def redirect_wix():
         # Add the new or updated user record to the User table.
         db.session.add( user )
         db.session.commit()
+        
+        print( "redirecting to " + redirect_url )
+        print( "=============================" )
 
         # Close the consent window by redirecting the user to the following URL
         # with the user's access token.
