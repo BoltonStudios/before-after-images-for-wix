@@ -68,7 +68,6 @@ class User( db.Model ):
     """
     instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
     site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
-    user_id: db.Column          = db.Column( db.String( 200 ), unique = True )
     refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
     is_free: db.Column          = db.Column( db.String( 200 ) )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
@@ -97,7 +96,6 @@ class ComponentSlider( db.Model ):
     after_alt_text: db.Column       = db.Column( db.String( 1000 ) )
     offset: db.Column               = db.Column( db.Integer )
     offset_float: db.Column         = db.Column( db.Float )
-    orientation: db.Column          = db.Column( db.String( 1000 ) )
     created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
