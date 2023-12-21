@@ -69,7 +69,7 @@ class User( db.Model ):
     instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
     site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
     refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
-    is_free: db.Column          = db.Column( db.String( 200 ) )
+    is_free: db.Column          = db.Column( db.Boolean )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
@@ -78,7 +78,7 @@ class User( db.Model ):
 
 # Define the slider component table class.
 @dataclass
-class ComponentSlider( db.Model ):
+class Extension( db.Model ):
 
     # pylint: disable=too-many-instance-attributes
     # Eight is reasonable in this case.
@@ -86,21 +86,25 @@ class ComponentSlider( db.Model ):
     """
     Class to define the Slider Component table.
     """
-    component_id: db.Column         = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    instance_id: db.Column          = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
-    before_image: db.Column         = db.Column( db.String( 1000 ) )
-    before_label_text: db.Column    = db.Column( db.String( 1000 ) )
-    before_alt_text: db.Column      = db.Column( db.String( 1000 ) )
-    after_image: db.Column          = db.Column( db.String( 1000 ) )
-    after_label_text: db.Column     = db.Column( db.String( 1000 ) )
-    after_alt_text: db.Column       = db.Column( db.String( 1000 ) )
-    offset: db.Column               = db.Column( db.Integer )
-    offset_float: db.Column         = db.Column( db.Float )
-    created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
-                                        server_default = func.now() )
+    extension_id: db.Column                 = db.Column( db.String( 80 ), primary_key = True, unique = True )
+    instance_id: db.Column                  = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
+    before_image: db.Column                 = db.Column( db.String( 1000 ) )
+    before_label_text: db.Column            = db.Column( db.String( 1000 ) )
+    before_alt_text: db.Column              = db.Column( db.String( 1000 ) )
+    after_image: db.Column                  = db.Column( db.String( 1000 ) )
+    after_label_text: db.Column             = db.Column( db.String( 1000 ) )
+    after_alt_text: db.Column               = db.Column( db.String( 1000 ) )
+    offset: db.Column                       = db.Column( db.Integer )
+    offset_float: db.Column                 = db.Column( db.Float )
+    is_vertical: db.Column                  = db.Column( db.Boolean )
+    mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
+    handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
+    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean )
+    created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
+                                                server_default = func.now() )
 
     def __repr__( self ):
-        return f'<slider { self.component_id } in { self.instance_id }>'
+        return f'<slider { self.extension_id } in { self.instance_id }>'
 
 # Define the function to create a database.
 def init_db():
