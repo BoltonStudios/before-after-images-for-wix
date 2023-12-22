@@ -1,6 +1,5 @@
 # Python imports
 import os
-from datetime import datetime
 
 # Flask imports
 from flask import Flask

@@ -5,7 +5,6 @@ A Flask app for Wix.
 # pylint: disable=not-callable
 
 # Python imports
-import os
 import json
 import urllib.parse
 import jwt
@@ -20,7 +19,7 @@ from . import app, db
 from . import constants as conf_settings
 from . import logic
 
-# Import our models.
+# Import models.
 from .models import User, Extension
 
 # Use a template context processor to pass the current date to every template
