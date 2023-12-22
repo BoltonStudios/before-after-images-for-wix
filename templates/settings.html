@@ -1,14 +1,13 @@
 {% extends 'site-layout.html' %}
-
 {% block content %}
     <!-- start content -->
-    <div class="container p-0">
-
-        <div class="row">
-            <div class="d-flex align-items-start">
+    <div class="container p-0 vh-100">
+        
+        <div class="row vh-100">
+            <div class="d-flex align-items-start vh-100">
                 <!--Settings Navigation-->
-                <div class="nav flex-column nav-pills p-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button class="nav-link active" id="v-pills-main-tab" 
+                <div class="nav flex-column nav-pills p-3 vh-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link active rounded-pill" id="v-pills-main-tab" 
                         data-bs-toggle="pill" 
                         data-bs-target="#v-pills-main" 
                         type="button" 
@@ -17,7 +16,7 @@
                         aria-selected="true">
                         Main
                     </button>
-                    <button class="nav-link" id="v-pills-images-tab"
+                    <button class="nav-link rounded-pill" id="v-pills-images-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-images"
                         type="button"
@@ -26,7 +25,7 @@
                         aria-selected="false">
                         Images
                     </button>
-                    <button class="nav-link" id="v-pills-options-tab"
+                    <button class="nav-link rounded-pill" id="v-pills-options-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-options"
                         type="button"
@@ -36,7 +35,7 @@
                         Options
                     </button>
                     <hr>
-                    <button class="nav-link" id="v-pills-support-tab"
+                    <button class="nav-link rounded-pill" id="v-pills-support-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-support"
                         type="button"
@@ -45,18 +44,20 @@
                         aria-selected="false">
                         Support
                     </button>
+
+                    {% if is_free == True %}
                     <hr>
-                    <a class="nav-link" 
+                    <a class="nav-link rounded-pill" 
                         id="v-pills-upgrade"
                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
                         target="_blank">
                         Upgrade
                     </a>
+                    {% endif %}
 
-                    
                 </div>
                 <!--Tab Content-->
-                <div class="tab-content mx-auto" id="v-pills-tabContent" style="width: 100%;">
+                <div class="tab-content mx-auto vh-100 overflow-auto" id="v-pills-tabContent" style="width: 100%;">
 
                     <!--Main-->
                     <div class="tab-pane fade show active" id="v-pills-main" role="tabpanel" aria-labelledby="v-pills-main-tab">
@@ -64,10 +65,9 @@
                         <div class="container-fluid mt-4 p-3  text-center">
                             <div class="row">
                                 <div class="col">
-                        
                                     <p><img src="{{ url_for('static', filename='images/baie-logo.svg') }}" style="border-radius: 70px;" alt="Baie logo" width="70" height="70"/></p>
                                     <p class="fw-light">Easily compare two images with before-and-after image sliders.</p>
-                                    <button class="btn btn-primary" type="button" role="button" onclick="changeBaieSettingsTab( trigger = '#v-pills-images-tab' )">Add Images</button>
+                                    <button class="btn btn-primary rounded-pill" type="button" role="button" onclick="changeBaieSettingsTab( trigger = '#v-pills-images-tab' )">Add Images</button>
                                 </div>
                             </div>
                         </div>
@@ -106,10 +106,10 @@
 
                             <div class="row mb-2">
                                 <div class="col-auto">
-                                    <h6>Before</h6>
+                                    <strong>Before</strong>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <button class="btn btn-primary btn-sm update-baie-images-toggle" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle" type="button">Select Image</button>
                                 </div>
                             </div>
 
@@ -118,7 +118,7 @@
                                 <div class="col" style="text-align: center;">
 
                                     <!--Image-->
-                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
+                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="250" height="133" />
                                     
                                     <!--Before Label-->
                                     <div class="input-group mb-2">
@@ -158,10 +158,10 @@
 
                             <div class="row mb-2">
                                 <div class="col-auto">
-                                    <h6>After</6>
+                                    <strong>After</strong>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <button class="btn btn-primary btn-sm update-baie-images-toggle" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle" type="button">Select Image</button>
                                 </div>
                             </div>
                             
@@ -170,7 +170,7 @@
                                 <div class="col" style="text-align: center;">
 
                                     <!--Image-->
-                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="220" height="113" />
+                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" width="250" height="133" />
                                     
                                     <!--After Label-->
                                     <div class="input-group mb-2">
@@ -206,17 +206,17 @@
                         <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light">Options</h5>
+                                    <h5 class="fw-light">Slider Options</h5>
                                 </div>
                             </div>
                         </div>
 
                         <!--Slider Offset-->
-                        <div class="container px-4 py-3">
+                        <div class="container px-4 pt-2 pb-1">
                             <div class="row">
                                 <div class="col-9">
-                                    <label for="sliderOffsetRange" class="form-label">Slider Offset</label><br>
-                                    <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieComponent()" value="{{ slider_offset }}">
+                                    <label for="sliderOffsetRange" class="form-label"><strong>Offset</strong></label><br>
+                                    <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieExtension()" value="{{ slider_offset }}">
                                 </div>
                                 <div class="col-3">
                                     <br>
@@ -225,43 +225,324 @@
                             </div>
                         </div>
 
+                        {% if is_free == True %}
+                        <div class="container-fluid text-bg-light mb-2 px-4 pt-3 pb-2 border-top border-bottom">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="fw-light">Plus Options</h5>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <!--Orientation-->
-                        <div class="container px-4 py-1">
+                        <div class="container px-4 py-2">
                             <div class="row">
                                 <div class="col-12">
-                                    <label for="sliderOrientation" class="form-label">Slider Orientation</label><br>
+                                    <label for="sliderOrientation" class="form-label"><strong>Orientation</strong></label><br>
+                                    <div class="form-check ps-0">
+                                        <div class="btn-group" role="group" aria-label="slider orientation radio toggle button group">
+                                            <input 
+                                                type="radio" 
+                                                class="btn-check" 
+                                                name="sliderOrientation"
+                                                id="sliderOrientation1"
+                                                value="horizontal"
+                                                onchange="updateBaieExtension( this )"
+                                                {% if is_vertical == False %}
+                                                    checked
+                                                {% endif %}
+                                                {% if is_free == True %}
+                                                    disabled
+                                                {% endif %}
+                                            >
+                                            <label
+                                                class="btn btn-outline-primary"
+                                                for="sliderOrientation1"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-title="Slide left and right."
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-vr" viewBox="0 0 16 16">
+                                                    <path d="M3 12V4a1 1 0 0 1 1-1h2.5V2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5v-1H4a1 1 0 0 1-1-1m6.5 1v1H12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H9.5v1H12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1zM8 16a.5.5 0 0 1-.5-.5V.5a.5.5 0 0 1 1 0v15a.5.5 0 0 1-.5.5"/>
+                                                </svg>
+                                                <span class="visually-hidden">Slide left and right</span>
+                                            </label>
+
+                                            <input
+                                                type="radio"
+                                                class="btn-check"
+                                                name="sliderOrientation"
+                                                id="sliderOrientation2"
+                                                value="vertical"
+                                                onchange="updateBaieExtension( this )"
+                                                {% if is_vertical == True %}
+                                                    checked
+                                                {% endif %}
+                                                {% if is_free == True %}
+                                                    disabled
+                                                {% endif %}
+                                            >
+                                            <label
+                                                class="btn btn-outline-primary"
+                                                for="sliderOrientation2"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-title="Slide up and down."
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hr" viewBox="0 0 16 16">
+                                                    <path d="M12 3H4a1 1 0 0 0-1 1v2.5H2V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5h-1V4a1 1 0 0 0-1-1M2 9.5h1V12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9.5h1V12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm-1.5-2a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1z"></path>
+                                                </svg>
+                                                <span class="visually-hidden">Slide up and down</span>
+                                            </label>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Mouseover Action-->
+                        <div class="container px-4 pt-3 pb-2">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="sliderMouseoverAction" class="form-label"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-title="Choose what happens when you hover over the slider."
+                                        >
+                                        <strong>Mouseover Action</strong>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                                        </svg>
+                                    </label><br>
+                                    <div class="form-check">
+                                        <input
+                                            type="radio"
+                                            class="form-check-input"
+                                            name="sliderMouseoverAction"
+                                            id="sliderMouseoverAction0"
+                                            value="0"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if mouseover_action == 0 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderMouseoverAction0"
+                                        >
+                                            <span>None</span>
+                                        </label>
+                                    </div>
                                     <div class="form-check">
                                         <input 
-                                            class="form-check-input"
-                                            type="radio"
-                                            name="sliderOrientation"
-                                            id="sliderOrientation1"
-                                            value="horizontal"
-                                            onchange="updateBaieComponent( this )"
-                                            {% if slider_orientation=='horizontal' %}
-                                            checked
-                                            {%endif%}
+                                            type="radio" 
+                                            class="form-check-input" 
+                                            name="sliderMouseoverAction"
+                                            id="sliderMouseoverAction1"
+                                            value="1"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if mouseover_action == 1 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
                                         >
-                                        <label class="form-check-label" for="sliderOrientation1">
-                                          Horizontal
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderMouseoverAction1"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-title="Show the slider overlay with before and after labels."
+                                        >
+                                            <span>Show Overlay</span>
                                         </label>
-                                      </div>
-                                      <div class="form-check">
+                                    </div>
+                                    <div class="form-check">
+                                        <input
+                                            type="radio"
+                                            class="form-check-input"
+                                            name="sliderMouseoverAction"
+                                            id="sliderMouseoverAction2"
+                                            value="2"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if mouseover_action == 2 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderMouseoverAction2"
+                                        >
+                                            <span>Move Slider</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Click to Move-->
+                        <div class="container px-4 py-2">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="sliderOnClickToggle"
+                                        class="form-label"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        {% if mouseover_action == 2 %}
+                                            data-bs-title="Disabled when Move Slider is selected above."
+                                        {% else %}
+                                            data-bs-title="Allow a user to click (or tap) anywhere on the image to move the slider to that location."
+                                        {% endif %}
+                                    >
+                                        <strong>Click to move?</strong>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                                        </svg>
+                                    </label><br>
+
+                                    <div class="form-check form-switch">
+
                                         <input 
                                             class="form-check-input"
-                                            type="radio"
-                                            name="sliderOrientation"
-                                            id="sliderOrientation2"
-                                            value="vertical"
-                                            onchange="updateBaieComponent( this )" 
-                                            {% if slider_orientation=='vertical' %}
-                                            checked
-                                            {%endif%}
+                                            type="checkbox"
+                                            role="switch"
+                                            name="sliderMoveOnClickToggle"
+                                            id="sliderMoveOnClickToggle"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if is_move_on_click_enabled == True %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True or mouseover_action == 2 %}
+                                                disabled
+                                            {% endif %}
                                         >
-                                        <label class="form-check-label" for="sliderOrientation2">
-                                          Vertical
+                                        <label class="form-check-label" for="sliderMoveOnClickToggle" id="sliderMoveOnClickToggleLabel">
+                                            {% if is_move_on_click_enabled == True %}
+                                                Enabled
+                                            {% else %}
+                                                Disabled
+                                            {% endif %}
                                         </label>
-                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Animation-->
+                        <div class="container px-4 py-2">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="sliderHandleAnimation" class="form-label"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-title="Choose what happens when you hover over the slider."
+                                        >
+                                        <strong>Animation</strong>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                                        </svg>
+                                    </label><br>
+                                    <div class="form-check">
+                                        <input 
+                                            type="radio" 
+                                            class="form-check-input" 
+                                            name="sliderHandleAnimation"
+                                            id="sliderHandleAnimation0"
+                                            value="0"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if handle_animation == 0 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderHandleAnimation0"
+                                        >
+                                            <span>None</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input
+                                            type="radio"
+                                            class="form-check-input"
+                                            name="sliderHandleAnimation"
+                                            id="sliderHandleAnimation1"
+                                            value="1"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if handle_animation == 1 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderHandleAnimation1"
+                                        >
+                                            <span>Stretch</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input
+                                            type="radio"
+                                            class="form-check-input"
+                                            name="sliderHandleAnimation"
+                                            id="sliderHandleAnimation2"
+                                            value="2"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if handle_animation == 2 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderHandleAnimation2"
+                                        >
+                                            <span>Pulse</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input
+                                            type="radio"
+                                            class="form-check-input"
+                                            name="sliderHandleAnimation"
+                                            id="sliderHandleAnimation3"
+                                            value="3"
+                                            onchange="updateBaieExtension( this )"
+                                            {% if handle_animation == 3 %}
+                                                checked
+                                            {% endif %}
+                                            {% if is_free == True %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                        <label
+                                            class="form-check-label"
+                                            for="sliderHandleAnimation3"
+                                        >
+                                            <span>See-saw</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -295,153 +576,205 @@
                         <div class="container-fluid px-4 py-3">
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light"><strong>Component ID</strong>: {{component_id}}</p>
+                                    <p class="fw-light"><strong>Extension ID</strong>: {{extension_id}}</p>
                                     <p class="fw-light"><strong>Instance ID</strong>: {{instance_id}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
         
-        <script>
-            
-            // Define the function to update image elements with user's media selections.
-            function updateBaieImages( event, element ){
+    <script>
 
-                console.log( "updateBaieImages() called." )
+        // Initialize Boostrap tooltips.
+        // Source: https://getbootstrap.com/docs/5.3/components/tooltips/
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        
+        // Define the function to update image elements with user's media selections.
+        function updateBaieImages( event, element ){
 
-                // Declare variables.
-                var imageURL = '';
-                var imageType = element.dataset.baieImageType;
-                var thumbnailImage = element.querySelector( '.img-thumbnail' );
+            console.log( "updateBaieImages() called." )
 
-                // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
-                // https://dev.wix.com/api/iframe-sdk/sdk/wix.settings#sdk_wix.settings_openmediadialog
-                Wix.Settings.openMediaDialog(
-                    Wix.Settings.MediaType.IMAGE, // mediaType
-                    false, // multiSelect
-                    function( data ){
-                        // onSuccess
-                        // fullSizeImageURL = Wix.Utils.Media.getImageUrl( data.relativeUri );
-                        thumbnailURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 220, 113 )
-                        imageURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 637, 328 )
-                        
-                        // Add the image URL to the data attribute.
-                        element.dataset.baieImage = imageURL;
+            // Declare variables.
+            var imageURL = '';
+            var imageType = element.dataset.baieImageType;
+            var thumbnailImage = element.querySelector( '.img-thumbnail' );
 
-                        // Update the thumbnail with the selected image URL.
-                        thumbnailImage.src = thumbnailURL;
+            // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
+            // https://dev.wix.com/api/iframe-sdk/sdk/wix.settings#sdk_wix.settings_openmediadialog
+            Wix.Settings.openMediaDialog(
+                Wix.Settings.MediaType.IMAGE, // mediaType
+                false, // multiSelect
+                function( data ){
+                    // onSuccess
+                    // fullSizeImageURL = Wix.Utils.Media.getImageUrl( data.relativeUri );
+                    thumbnailURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 250, 133 )
+                    imageURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 637, 328 )
+                    
+                    // Add the image URL to the data attribute.
+                    element.dataset.baieImage = imageURL;
 
-                        // Update the component to reflect the settings changes.
-                        updateBaieComponent()
-                    }
-                );
-            }
+                    // Update the thumbnail with the selected image URL.
+                    thumbnailImage.src = thumbnailURL;
 
-            // Define the function to update the widget component with user's Settings inputs.
-            function updateBaieComponent(){
-
-                console.log( "updateBaieComponent() called." )
-                
-                // Initialize variables.
-                var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
-                var beforeLabelText   = document.getElementById( "before-label-text" ).value;
-                var beforeAltText   = document.getElementById( "before-alt-text" ).value;
-                var afterImage      = document.getElementById( "baie-after-image" ).dataset.baieImage;
-                var afterLabelText    = document.getElementById( "after-label-text" ).value;
-                var afterAltText    = document.getElementById( "after-alt-text" ).value;
-                var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
-                var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
-                var sliderOrientation = document.getElementsByName( "sliderOrientation" );
-
-                // Extract value from Slider Orientation radio options.
-                // Iterate over the radio options.
-                for( i = 0; i < sliderOrientation.length; i++ ){
-
-                    // If the current radio option is checked.
-                    if( sliderOrientation[ i ].checked ){
-
-                        // Store the value of the checked option.
-                        sliderOrientation = sliderOrientation[ i ].value;
-                    }
+                    // Update the extension to reflect the settings changes.
+                    updateBaieExtension()
                 }
+            );
+        }
 
-                // Prepare message.
-                var message = {
-                    beforeImage: beforeImage,
-                    beforeLabelText: beforeLabelText,
-                    beforeAltText: beforeAltText,
-                    afterImage: afterImage,
-                    afterLabelText: afterLabelText,
-                    afterAltText: afterAltText,
-                    sliderOffset: sliderOffset,
-                    sliderOffsetFloat: sliderOffsetFloat,
-                    sliderOrientation: sliderOrientation
-                };
+        // Define the function to update the widget extension with user's Settings inputs.
+        function updateBaieExtension(){
 
-                // Manipulate settings panel.
-                document.getElementById( "sliderOffsetNumber" ).innerHTML = sliderOffset;
-
-                // Print status update to the console.
-                console.log( "updateBaieComponent() called." );
-                console.log( "message = " );
-                console.log( message );
-                
-                // Send message to the component iframe.
-                Wix.Settings.triggerSettingsUpdatedEvent( message, '{{component_id}}' );
-            }
-
-            // Get elements to pair with event listeners.
-            var updateBaieImagesToggles = document.getElementsByClassName( "update-baie-images-toggle" );
+            console.log( "updateBaieExtension() called." )
             
-            // Iterate over the elements found.
-            for( let i = 0; i < updateBaieImagesToggles.length; i++ ){
+            // Initialize variables.
+            var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
+            var beforeLabelText   = document.getElementById( "before-label-text" ).value;
+            var beforeAltText   = document.getElementById( "before-alt-text" ).value;
+            var afterImage      = document.getElementById( "baie-after-image" ).dataset.baieImage;
+            var afterLabelText    = document.getElementById( "after-label-text" ).value;
+            var afterAltText    = document.getElementById( "after-alt-text" ).value;
+            var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
+            var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
+            var sliderOrientation = document.getElementsByName( "sliderOrientation" );
+            var sliderMouseoverAction = document.getElementsByName( "sliderMouseoverAction" );
+            var sliderHandleAnimation = document.getElementsByName( "sliderHandleAnimation" );
+            var sliderMoveOnClickToggle = document.getElementsByName( "sliderMoveOnClickToggle" );
+            var sliderMoveOnClickToggleLabel =  document.getElementById( "sliderMoveOnClickToggleLabel" );
 
-                // Add a listener for the "click" even to each element.
-                updateBaieImagesToggles[ i ].addEventListener( "click", function( event ){
+            // Extract value from Slider Orientation radio options.
+            // Iterate over the radio options.
+            for( i = 0; i < sliderOrientation.length; i++ ){
 
-                    // Get the parent element with the class .baie-image-select,
-                    // which has many data attributes used to toggle changes in the iframe(s).
-                    baieImageSelect = this.closest( ".baie-image-select" );
+                // If the current radio option is checked.
+                if( sliderOrientation[ i ].checked ){
 
-                    // On click, run the updateBaieImages() function.
-                    updateBaieImages( event, baieImageSelect )
-                });
+                    // Store the value of the checked option.
+                    sliderOrientation = sliderOrientation[ i ].value;
+                }
             }
 
-            // Get elements to trigger label text changes.
-            var updateBaieLabelToggles = document.getElementsByClassName( "update-baie-label-toggle" );
+            // Extract value from Slider Mouseover Action radio options.
+            // Iterate over the radio options.
+            for( i = 0; i < sliderMouseoverAction.length; i++ ){
+
+                // If the current radio option is checked.
+                if( sliderMouseoverAction[ i ].checked ){
+                    
+                    // Get the value of the checked radio button: 1 or 0.
+                    sliderMouseoverAction = Number( sliderMouseoverAction[ i ].value );
+
+                    // Disable the click to move toggle if the user elected to move slider on hover.
+                    sliderMoveOnClickToggle[ 0 ].disabled = ( sliderMouseoverAction == 2 ) ? true : false;
+                }
+            }
+
+            // Extract value from Slider Handle Animation radio options.
+            // Iterate over the radio options.
+            for( i = 0; i < sliderHandleAnimation.length; i++ ){
+
+                // If the current radio option is checked.
+                if(  sliderHandleAnimation[ i ].checked ){
+
+                    // Store the value of the checked option.
+                    sliderHandleAnimation =  sliderHandleAnimation[ i ].value;
+                }
+            }
             
-            // Iterate over the elements found.
-            for( let i = 0; i < updateBaieLabelToggles.length; i++ ){
+            // Extract value from Slider Move On Click Toggle radio or checkbox options.
+            // Iterate over the items.
+            for( i = 0; i < sliderMoveOnClickToggle.length; i++ ){
 
-                // Add a listener for the "click" event to each element.
-                updateBaieLabelToggles[ i ].addEventListener(  "focusout", function( event ){
+                // Warning: This label change must come before the subsequent function
+                // overwrites sliderMoveOnClickToggle with 0 or 1.
+                sliderMoveOnClickToggleLabel.innerHTML = ( sliderMoveOnClickToggle[ i ].checked ) ? "Enabled" : "Disabled";
 
-                    console.log( "focusout event fired" );
-                    console.log( event.srcElement.value );
-                    updateBaieComponent()
-                });
+                // Update the value based on the checked status.
+                sliderMoveOnClickToggle = ( sliderMoveOnClickToggle[ i ].checked ) ? 1 : 0;
             }
 
-            // Get elements to trigger alt text changes.
-            var updateBaieAltToggles = document.getElementsByClassName( "update-baie-alt-toggle" );
+            // Prepare message.
+            var message = {
+                beforeImage: beforeImage,
+                beforeLabelText: beforeLabelText,
+                beforeAltText: beforeAltText,
+                afterImage: afterImage,
+                afterLabelText: afterLabelText,
+                afterAltText: afterAltText,
+                sliderOffset: sliderOffset,
+                sliderOffsetFloat: sliderOffsetFloat,
+                sliderOrientation: sliderOrientation,
+                sliderMouseoverAction: sliderMouseoverAction,
+                sliderHandleAnimation: sliderHandleAnimation,
+                sliderMoveOnClickToggle: sliderMoveOnClickToggle
+            };
 
-            // Iterate over the elements found.
-            for( let i = 0; i < updateBaieAltToggles.length; i++ ){
+            // Manipulate settings panel.
+            document.getElementById( "sliderOffsetNumber" ).innerHTML = sliderOffset;
 
-                // Add a listener for the "click" event to each element.
-                updateBaieAltToggles[ i ].addEventListener(  "focusout", function( event ){
+            // Print status update to the console.
+            console.log( "updateBaieExtension() called." );
+            console.log( "message = " );
+            console.log( message );
+            
+            // Send message to the extension iframe.
+            Wix.Settings.triggerSettingsUpdatedEvent( message, '{{extension_id}}' );
+        }
 
-                    console.log( "focusout event fired" );
-                    console.log( event.srcElement.value );
-                    updateBaieComponent()
-                });
-            }
+        // Get elements to pair with event listeners.
+        var updateBaieImagesToggles = document.getElementsByClassName( "update-baie-images-toggle" );
+        
+        // Iterate over the elements found.
+        for( let i = 0; i < updateBaieImagesToggles.length; i++ ){
 
-        </script>
+            // Add a listener for the "click" even to each element.
+            updateBaieImagesToggles[ i ].addEventListener( "click", function( event ){
+
+                // Get the parent element with the class .baie-image-select,
+                // which has many data attributes used to toggle changes in the iframe(s).
+                baieImageSelect = this.closest( ".baie-image-select" );
+
+                // On click, run the updateBaieImages() function.
+                updateBaieImages( event, baieImageSelect )
+            });
+        }
+
+        // Get elements to trigger label text changes.
+        var updateBaieLabelToggles = document.getElementsByClassName( "update-baie-label-toggle" );
+        
+        // Iterate over the elements found.
+        for( let i = 0; i < updateBaieLabelToggles.length; i++ ){
+
+            // Add a listener for the "click" event to each element.
+            updateBaieLabelToggles[ i ].addEventListener(  "focusout", function( event ){
+
+                console.log( "focusout event fired" );
+                console.log( event.srcElement.value );
+                updateBaieExtension()
+            });
+        }
+
+        // Get elements to trigger alt text changes.
+        var updateBaieAltToggles = document.getElementsByClassName( "update-baie-alt-toggle" );
+
+        // Iterate over the elements found.
+        for( let i = 0; i < updateBaieAltToggles.length; i++ ){
+
+            // Add a listener for the "click" event to each element.
+            updateBaieAltToggles[ i ].addEventListener(  "focusout", function( event ){
+
+                console.log( "focusout event fired" );
+                console.log( event.srcElement.value );
+                updateBaieExtension()
+            });
+        }
+
+    </script>
     </div>
 {% endblock %}

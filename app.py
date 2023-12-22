@@ -7,122 +7,21 @@ A Flask app for Wix.
 # Python imports
 import os
 import json
-import logging
 import urllib.parse
-from dataclasses import dataclass
 import jwt
 from datetime import datetime
+import requests
 
 # Flask imports
-from flask import Flask, Response, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-from flask_migrate import Migrate
+from flask import Response, redirect, render_template, request, url_for
 
 # Local imports
-from . import constants
-from .controllers import utils
-from .controllers import wix_auth_controller
-from .controllers import slider_controller
+from . import app, db
+from . import constants as conf_settings
+from . import logic
 
-# Define a base directory as the current directory.
-basedir = os.path.abspath( os.path.dirname( __file__ ) )
-
-# Create a Flask application instance.
-app = Flask( __name__ )
-
-# Define the database URI to specify the database with which to connect.
-# Format for SQL Lite: sqlite:///path/to/database.db
-# Format for MySQL mysql://username:password@host:port/database_name
-# Format for PostgreSQL: postgresql://username:password@host:port/database_name
-db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
-
-# Configure Flask-SQLAlchemy configuration keys.
-# Set the database URI to specify the database with which to connect.
-app.config[ 'SQLALCHEMY_DATABASE_URI'] = db_uri
-
-# Disable tracking modifications of objects to use less memory.
-app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
-
-# Create a database object.
-db = SQLAlchemy( app )
-
-# Create a Migrate object.
-migrate = Migrate( app, db )
-
-# Define other globals.
-temp_requests_list = []
-requests_list = []
-component_list = []
-logger = logging.getLogger()
-
-# Define the user table class.
-@dataclass
-class User( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the User table.
-    """
-    instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
-    site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
-    refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
-    is_free: db.Column          = db.Column( db.Boolean )
-    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
-                                        server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<user { self.instance_id }>'
-
-# Define the slider component table class.
-@dataclass
-class Extension( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the Slider Component table.
-    """
-    extension_id: db.Column                 = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    instance_id: db.Column                  = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
-    before_image: db.Column                 = db.Column( db.String( 1000 ) )
-    before_label_text: db.Column            = db.Column( db.String( 1000 ) )
-    before_alt_text: db.Column              = db.Column( db.String( 1000 ) )
-    after_image: db.Column                  = db.Column( db.String( 1000 ) )
-    after_label_text: db.Column             = db.Column( db.String( 1000 ) )
-    after_alt_text: db.Column               = db.Column( db.String( 1000 ) )
-    offset: db.Column                       = db.Column( db.Integer )
-    offset_float: db.Column                 = db.Column( db.Float )
-    is_vertical: db.Column                  = db.Column( db.Boolean )
-    mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
-    handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
-    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean )
-    created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
-                                                server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<slider { self.extension_id } in { self.instance_id }>'
-
-# Define the function to create a database.
-def init_db():
-
-    """Initialze the application's database."""
-
-    # Issue CREATE statements for our tables and their related constructs.
-    # Note: the db.create_all() function does not recreate or update a table if it already exists.
-    db.create_all()
-
-    # Return feedback to the console.
-    print( "Initialized the database." )
-
-# Ensure we are working within the application context...
-with app.app_context():
-
-    # Then create the tables if they do not already exist.
-    init_db()
+# Import our models.
+from .models import User, Extension
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -146,7 +45,7 @@ def root():
     )
 
 # App URL (Installation) page.
-@app.route( '/app-wix/', methods=[ 'POST', 'GET' ] )
+@app.route( '/app-wix', methods=[ 'POST', 'GET' ] )
 def app_wix():
 
     """
@@ -164,7 +63,7 @@ def app_wix():
 
     # Construct the app installation URL.
     permission_request_url = "https://www.wix.com/installer/install"
-    app_id = constants.APP_ID
+    app_id = conf_settings.APP_ID
     redirect_url = 'https://' + request.host + '/redirect-wix'
     redirect_url = urllib.parse.quote( redirect_url, safe='~')
     token = request.args.get( 'token' )
@@ -178,7 +77,7 @@ def app_wix():
     return redirect( url )
 
 # Redirect URL (App Authorized, Complete Installation).
-@app.route( '/redirect-wix/', methods=[ 'POST', 'GET' ] )
+@app.route( '/redirect-wix', methods=[ 'POST', 'GET' ] )
 def redirect_wix():
 
     """
@@ -195,48 +94,49 @@ def redirect_wix():
     print( "=============================" )
 
     # Get the authorization code from Wix.
+    instance_id = request.args.get( 'instanceId' )
     authorization_code = request.args.get( 'code' )
+
+    # Print the authorization code to the console for debugging.
+    logic.dump( authorization_code, "authorization_code" )
+    logic.dump( request.args, "request.args" )
 
     try:
         print( "Getting Tokens From Wix." )
         print( "=======================" )
 
-        # Get a refresh token from Wix.
-        refresh_token = json.loads(
-            wix_auth_controller.get_tokens_from_wix(
-                authorization_code,
-                auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
-                app_secret = constants.APP_SECRET,
-                app_id = constants.APP_ID
-            )
-        )[ 'refresh_token' ]
+        # Initialize variables.
+        auth_provider_base_url = conf_settings.AUTH_PROVIDER_BASE_URL
+        app_secret = conf_settings.APP_SECRET
+        app_id = conf_settings.APP_ID
 
-        # Get an access token from Wix.
-        access_token = wix_auth_controller.get_access_token(
-            refresh_token,
-            auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
-            app_secret = constants.APP_SECRET,
-            app_id = constants.APP_ID
-        )
+        # Prepare request.
+        request_body_parameters = {
+            'code': authorization_code,
+            'client_secret': app_secret,
+            'client_id': app_id,
+            'grant_type': "authorization_code"
+        }
 
-        # Get data about the installation of this app on the user's website.
-        app_instance = wix_auth_controller.get_app_instance(
-            refresh_token,
-            'https://www.wixapis.com/apps/v1/instance',
-            auth_provider_base_url = constants.AUTH_PROVIDER_BASE_URL,
-            app_secret = constants.APP_SECRET,
-            app_id = constants.APP_ID
-        )
+        # Request an access token from Wix.
+        token_request = requests.post( auth_provider_base_url + "/access", json = request_body_parameters, timeout=2.50 ).text
+
+        # Parse response as JSON.
+        tokens = json.loads( token_request )
+
+        # Extract the access_token string from the response.
+        access_token = tokens[ 'access_token' ]
+        refresh_token = tokens[ 'refresh_token' ]
+
+        # Print the response to the console for debugging.
+        logic.dump( tokens, "tokens" )
+        logic.dump( access_token, "access_token" )
+        logic.dump( refresh_token, "refresh_token" )
 
         # Construct the URL to Completes the OAuth flow.
         # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
-        redirect_url = "https://www.wix.com/installer/close-window?access_token="
-        redirect_url += access_token
-
-        # Extract data from the app instance.
-        instance_id = app_instance[ 'instance' ][ 'instanceId' ]
-        site_id = app_instance[ 'site' ][ 'siteId' ]
-        is_free = app_instance[ 'instance' ][ 'isFree' ]
+        complete_oauth_redirect_url = "https://www.wix.com/installer/close-window?access_token="
+        complete_oauth_redirect_url += access_token
 
         # Search the User table for the instance ID (primary key)
         user_in_db = User.query.get( instance_id )
@@ -246,30 +146,24 @@ def redirect_wix():
 
             # Construct a new User record.
             user = User(
-                instance_id = app_instance[ 'instance' ][ 'instanceId' ],
-                site_id = app_instance[ 'site' ][ 'siteId' ],
-                is_free = app_instance[ 'instance' ][ 'isFree' ],
+                instance_id = instance_id,
                 refresh_token = refresh_token
             )
 
-        else:
-
-            # Update the user record.
-            user = user_in_db
-            user.site_id = site_id
-            user.is_free = is_free
-            user.refresh_token = refresh_token
-
-        # Add the new or updated user record to the User table.
-        db.session.add( user )
-        db.session.commit()
-        
-        print( "redirecting to " + redirect_url )
-        print( "=============================" )
+            # Add the new or updated user record to the User table.
+            db.session.add( user )
+            db.session.commit()
 
         # Close the consent window by redirecting the user to the following URL
         # with the user's access token.
-        return redirect( redirect_url )
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+
+        print( "redirecting to " + complete_oauth_redirect_url )
+        print( "=============================" )
+
+        return redirect( complete_oauth_redirect_url )
 
     except Exception as err:
         print( "Error getting token from Wix" )
@@ -290,7 +184,7 @@ def uninstall():
 
     # Initialize variables.
     instance_id = ''
-    secret = constants.WEBHOOK_PUBLIC_KEY
+    secret = conf_settings.WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -304,34 +198,26 @@ def uninstall():
         # Load the JSON payload.
         request_data = json.loads( data['data'] )
 
-        # Print the data received to the console for debugging.
-        utils.dump( request_data, "request_data" )
-
         # Extract the instance ID
-        instance_id = request_data[ 'instanceId' ]
+        instance_id = request_data[ 'instanceID' ]
 
         # Search the tables for records, filtering by instance ID.
-        # user_in_db = User.query.get( instance_id )
-        # component_in_db = ComponentSlider.query.filter_by( instance_id = instance_id ).first()
+        user = User.query.filter_by( instance_id = instance_id ).first()
+        extensions = Extension.query.filter_by( instance_id = instance_id )
 
-        users = User.query.filter_by( instance_id = instance_id )
-        components = ComponentSlider.query.filter_by( instance_id = instance_id )
+        # Delete the user.
+        db.session.delete( user )
 
-        for user in users:
+        # Return feedback to the console.
+        print( "Deleted user #" + instance_id )
 
-            # Delete the user.
-            db.session.delete( user )
-
-            # Return feedback to the console.
-            print( "Deleted user #" + instance_id )
-
-        for component in components:
+        for extension in extensions:
 
             # Delete the user.
-            db.session.delete( component )
+            db.session.delete( extension )
 
             # Return feedback to the console.
-            print( "Deleted component #" + component.component_id )
+            print( "Deleted extension #" + extension.extension_id )
 
         # Save changes.
         db.session.commit()
@@ -343,22 +229,143 @@ def uninstall():
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
     return "", 200
 
+# Update the users isFree status (Paid Plan Purchased)
+def upgrade( request ):
+
+    """
+    Take action when the application recieves a POST request from the Paid Plan Purchased webhook.
+    
+    See documentation:
+    https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
+    """
+
+    # Initialize variables.
+    instance_id = ''
+    secret = conf_settings.WEBHOOK_PUBLIC_KEY
+
+    # If the user submitted a POST request...
+    if request.method == 'POST':
+
+        # Get the encoded data received.
+        encoded_jwt = request.data
+
+        # Decode the data using our secret.
+        data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
+
+        # Load the JSON payload.
+        request_data = json.loads( data['data'] )
+        product_data = json.loads( request_data['data'] )
+
+        logic.dump( request_data, "request_data" )
+
+        # Extract the instance ID
+        instance_id = request_data[ 'instanceID' ]
+        logic.dump( instance_id, "instance_id" )
+
+        instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
+        logic.dump( instance_id, "instance_id" )
+
+        # Extract the product ID
+        product_id = product_data[ 'vendorProductId' ]
+
+        # Search the tables for records, filtering by instance ID.
+        user = User.query.filter_by( instance_id = instance_id ).first()
+
+        # If the user exists and the product_id is not null.
+        if user and product_id:
+
+            # Delete the user.
+            user.is_free = False
+
+            # Add the new or updated user record to the User table.
+            db.session.commit()
+
+            # Return feedback to the console.
+            print( "User #" + instance_id + " upgraded.")
+
+    # The app must return a 200 response upon successful receipt of a webhook.
+    # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
+    return "", 200
+
+# Update the users isFree status (Paid Plan Cancelled)
+def downgrade( request ):
+
+    """
+    Take action when the application recieves a POST request from the Paid Plan Auto Renewal Cancelled webhook.
+    
+    See documentation:
+    https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
+    """
+
+    # Initialize variables.
+    instance_id = ''
+    secret = conf_settings.WEBHOOK_PUBLIC_KEY
+
+    # If the user submitted a POST request...
+    if request.method == 'POST':
+
+        # Get the encoded data received.
+        encoded_jwt = request.data
+
+        # Decode the data using our secret.
+        data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
+
+        # Load the JSON payload.
+        request_data = json.loads( data['data'] )
+        product_data = json.loads( request_data['data'] )
+
+        logic.dump( request_data, "request_data" )
+
+        # Extract the instance ID
+        instance_id = request_data[ 'instanceID' ]
+        logic.dump( instance_id, "instance_id" )
+
+        instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
+        logic.dump( instance_id, "instance_id" )
+
+        # Extract the product ID
+        product_id = product_data[ 'vendorProductId' ]
+
+        # Search the tables for records, filtering by instance ID.
+        user = User.query.filter_by( instance_id = instance_id ).first()
+
+        # If the user exists and the product_id is not null.
+        if user and product_id:
+
+            # Delete the user.
+            user.is_free = True
+
+            # Add the new or updated user record to the User table.
+            db.session.commit()
+
+            # Return feedback to the console.
+            print( "User #" + instance_id + " downgraded.")
+
+    # The app must return a 200 response upon successful receipt of a webhook.
+    # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
+    return "", 200
+
 # App Settings Panel
 @app.route('/settings', methods=['POST','GET'])
 def settings():
+    
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-statements
+    # Our variables are reasonable in this case.
 
     """
-    Build the App Settings panel allowing users to customize the app iframe component.
+    Build the App Settings panel allowing users to customize the app iframe extension.
     
     Find recommended App Settings panel features here:
     https://devforum.wix.com/kb/en/article/build-an-app-settings-panel-for-website-iframe-components
     """
+
     print("Settings route called.")
+
     # Initialize variables.
-    message = "It's running! Another Test"
     instance_id = None
-    requested_component_id = None
-    component_in_db = None
+    requested_extension_id = None
+    extension_in_db = None
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
     before_alt_text = ''
@@ -367,38 +374,47 @@ def settings():
     after_alt_text = ''
     slider_offset = 50
     slider_offset_float = 0.5
-    slider_orientation = 'horizontal'
+    mouseover_action = 1
+    handle_animation = 0
+    is_move_on_click_enabled = False
+    is_vertical = False
+    is_free = False # False for dev environmet. Change to True for production.
 
     # If the user submitted a GET request...
     if request.method == 'GET':
 
-        # Assign the value of 'origCompId' from the GET request to the component_id variable.
-        requested_component_id = request.args.get( 'origCompId' )
+        # Assign the value of 'origCompId' from the GET request to the extension_id variable.
+        requested_extension_id = request.args.get( 'origCompId' )
 
-        # Search the ComponentSlider table for the component by its component ID (primary key).
-        component_in_db = ComponentSlider.query.get( requested_component_id )
+        # Search the Extension table for the extension by its extension ID (primary key).
+        extension_in_db = Extension.query.get( requested_extension_id )
 
-        # If the requested_component variable is not empty...
-        if component_in_db != None:
+        # Load existing extension...
+        if extension_in_db is not None:
 
-            # Update the local variables with the requested_component values.
-            instance_id         = component_in_db.instance_id
-            before_image        = component_in_db.before_image
-            before_label_text   = component_in_db.before_label_text
-            before_alt_text     = component_in_db.before_alt_text
-            after_image         = component_in_db.after_image
-            after_label_text    = component_in_db.after_label_text
-            after_alt_text      = component_in_db.after_alt_text
-            slider_offset       = component_in_db.offset
-            slider_offset_float = component_in_db.offset_float
-            slider_orientation  = component_in_db.orientation
+            # Update the local variables with the requested_extension values.
+            instance_id                 = extension_in_db.user.instance_id
+            is_free                     = extension_in_db.user.is_free
+            before_image                = extension_in_db.before_image
+            before_label_text           = extension_in_db.before_label_text
+            before_alt_text             = extension_in_db.before_alt_text
+            after_image                 = extension_in_db.after_image
+            after_label_text            = extension_in_db.after_label_text
+            after_alt_text              = extension_in_db.after_alt_text
+            slider_offset               = extension_in_db.offset
+            slider_offset_float         = extension_in_db.offset_float
+            mouseover_action            = extension_in_db.mouseover_action
+            handle_animation            = extension_in_db.handle_animation
+            is_move_on_click_enabled    = extension_in_db.is_move_on_click_enabled
+            is_vertical                 = extension_in_db.is_vertical
+
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
         page_id = 'settings',
-        message = message,
         instance_id = instance_id,
-        component_id = requested_component_id,
+        is_free = is_free,
+        extension_id = requested_extension_id,
         before_image = before_image,
         before_label_text = before_label_text,
         before_alt_text = before_alt_text,
@@ -407,20 +423,33 @@ def settings():
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float,
-        slider_orientation = slider_orientation
+        is_vertical = is_vertical,
+        mouseover_action = mouseover_action,
+        handle_animation = handle_animation,
+        is_move_on_click_enabled = is_move_on_click_enabled
     )
 
-# Widget Component: Slider
-@app.route('/widget-component-slider', methods=['POST','GET'])
-def widget_component_slider():
+# Widget Slider
+@app.route('/widget', methods=['POST','GET'])
+def widget():
 
     """
-    Build the widget iframe component containing a before-and-after slider.
+    Build the widget iframe extension containing a before-and-after slider.
+    """
+
+ 
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-statements
+    # Our variables are reasonable in this case.
+
+    """
+    Build the widget iframe extension containing a before-and-after slider.
     """
 
     # Initialize variables.
-    requested_component_id = None
-    component_in_db = None
+    requested_extension_id = None
+    extension_in_db = None
+    is_free = True
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
     before_alt_text = ''
@@ -430,65 +459,127 @@ def widget_component_slider():
     slider_offset = 50
     slider_offset_float = 0.5
     slider_orientation = 'horizontal'
+    is_vertical = False
+    mouseover_action = 1
+    handle_animation = 0
+    slider_no_overlay = False
+    slider_move_slider_on_hover = False
+    is_move_on_click_enabled = False
 
     # If the user submitted a POST request...
     if request.method == 'POST':
 
+        print( "Widget POST request" )
+
         # Get the data received.
-        utils.dump( request.data, "request.data" )
+        logic.dump( request.data, "request.data" )
         request_data = json.loads( request.data )
-        requested_component_id = request_data[ "componentID" ]
+        requested_extension_id = request_data[ "extensionID" ]
 
-        # Search the ComponentSlider table for the component by its component ID (primary key).
-        component_in_db = ComponentSlider.query.get( requested_component_id )
+        # Search the Extension table for the extension by its extension ID (primary key).
+        extension_in_db = Extension.query.get( requested_extension_id )
 
-        #
-        if component_in_db is not None:
+        # Edit existing extension.
+        if extension_in_db is not None:
 
-            #
+            # Delete existing extension.
             if request_data[ "action" ] == "delete" :
 
-                # Delete the component by its ID.
-                db.session.delete( component_in_db )
+                # Delete the extension by its ID.
+                db.session.delete( extension_in_db )
                 db.session.commit()
 
             else:
 
-                # Edit the ComponentSlider record.
-                component_in_db.before_image = request_data[ 'beforeImage' ]
-                component_in_db.before_label_text = request_data[ 'beforeLabelText' ]
-                component_in_db.before_alt_text = request_data[ 'beforeAltText' ]
-                component_in_db.after_image = request_data[ 'afterImage' ]
-                component_in_db.after_label_text = request_data[ 'afterLabelText' ]
-                component_in_db.after_alt_text = request_data[ 'afterAltText' ]
-                component_in_db.offset = request_data[ 'sliderOffset' ]
-                component_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
-                component_in_db.orientation = request_data[ 'sliderOrientation' ]
+                # If the user selected the vertical orientation...
+                if request_data[ 'sliderOrientation' ] == 'vertical' :
 
-                # Add a new component to the ComponentSlider table.
-                db.session.add( component_in_db )
+                    # Update the variable.
+                    is_vertical = True
+
+                # If the request contains a sliderMoveOnClickToggle value...
+                if 'sliderMoveOnClickToggle' in request_data.keys():
+                    
+                    # If the user selected the move on click option...
+                    if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
+
+                        # Update the variable.
+                        is_move_on_click_enabled = True
+
+                # Edit the extensionSlider record.
+                extension_in_db.before_image = request_data[ 'beforeImage' ]
+                extension_in_db.before_label_text = request_data[ 'beforeLabelText' ]
+                extension_in_db.before_alt_text = request_data[ 'beforeAltText' ]
+                extension_in_db.after_image = request_data[ 'afterImage' ]
+                extension_in_db.after_label_text = request_data[ 'afterLabelText' ]
+                extension_in_db.after_alt_text = request_data[ 'afterAltText' ]
+                extension_in_db.offset = request_data[ 'sliderOffset' ]
+                extension_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
+                extension_in_db.is_vertical = is_vertical
+                extension_in_db.mouseover_action = request_data[ 'sliderMouseoverAction' ]
+                extension_in_db.handle_animation = request_data[ 'sliderHandleAnimation' ]
+                extension_in_db.is_move_on_click_enabled = is_move_on_click_enabled
+
+                # Add a new extension to the Extension table.
                 db.session.commit()
 
         else:
+        
+            print( "Create new EXTENSION" )
 
-            # Construct a new ComponentSlider record.
-            component = ComponentSlider(
-                component_id = requested_component_id,
-                instance_id = request_data[ 'instanceID' ],
-                before_image = request_data[ 'beforeImage' ],
-                before_label_text = request_data[ 'beforeLabelText' ],
-                before_alt_text = request_data[ 'beforeAltText' ],
-                after_image = request_data[ 'afterImage' ],
-                after_label_text = request_data[ 'afterLabelText' ],
-                after_alt_text = request_data[ 'afterAltText' ],
-                offset = request_data[ 'sliderOffset' ],
-                offset_float = request_data[ 'sliderOffsetFloat' ],
-                orientation = request_data[ 'sliderOrientation' ]
-            )
+            # Create new extension.
+            # If the request contains an instance ID...
+            if 'instanceID' in request_data.keys():
 
-            # Add a new component to the ComponentSlider table.
-            db.session.add( component )
-            db.session.commit()
+                # Extract the instance ID
+                instance_id = request_data[ 'instanceID' ]
+
+                # If the request contains an instance ID...
+                if instance_id:
+                    
+                    logic.dump( instance_id, "instance_id")
+
+                    # Get the associated User instance.
+                    user_in_db = User.query.get( instance_id )
+
+                    logic.dump( user_in_db, "user_in_db")
+
+                    # If the user selected the vertical orientation...
+                    if request_data[ 'sliderOrientation' ] == 'vertical' :
+
+                        # Update the variable.
+                        is_vertical = True
+
+                    # If the request contains a sliderMoveOnClickToggle value...
+                    if 'sliderMoveOnClickToggle' in request_data.keys():
+                        
+                        # If the user selected the move on click option...
+                        if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
+
+                            # Update the variable.
+                            is_move_on_click_enabled = True
+
+                    # Construct a new Extension record.
+                    extension = Extension(
+                        extension_id = requested_extension_id,
+                        instance_id = user_in_db.instance_id,
+                        before_image = request_data[ 'beforeImage' ],
+                        before_label_text = request_data[ 'beforeLabelText' ],
+                        before_alt_text = request_data[ 'beforeAltText' ],
+                        after_image = request_data[ 'afterImage' ],
+                        after_label_text = request_data[ 'afterLabelText' ],
+                        after_alt_text = request_data[ 'afterAltText' ],
+                        offset = request_data[ 'sliderOffset' ],
+                        offset_float = request_data[ 'sliderOffsetFloat' ],
+                        is_vertical = is_vertical,
+                        mouseover_action = request_data[ 'sliderMouseoverAction' ],
+                        handle_animation = request_data[ 'sliderHandleAnimation' ],
+                        is_move_on_click_enabled = is_move_on_click_enabled
+                    )
+
+                    # Add a new extension to the extensionSlider table.
+                    db.session.add( extension )
+                    db.session.commit()
 
         # Return a success message.
         return "", 201
@@ -499,34 +590,61 @@ def widget_component_slider():
         # If the GET request provided the 'origCompId'...
         if request.args.get( 'origCompId' ):
 
-            # Assign its value to component_id...
-            requested_component_id = request.args.get( 'origCompId' )
+            # Assign its value to extension_id...
+            requested_extension_id = request.args.get( 'origCompId' )
 
-        elif request.args.get( 'viewerCompId' ):
+        # Otherwise, use the 'viewerCompId' (front-end) extension ID.
+        elif request.args.get( 'viewerCompId' ) :
 
-            # Otherwise, use the 'viewerCompId' (front-end) component ID.
-            requested_component_id = request.args.get( 'viewerCompId' )
+            # Assign its value to extension_id.
+            requested_extension_id = request.args.get( 'viewerCompId' )
 
-        # Search the database and get the component by the requested component ID (primary key).
-        component_in_db = ComponentSlider.query.get( requested_component_id )
+        # Search the database and get the extension by the requested extension ID (primary key).
+        extension_in_db = Extension.query.get( requested_extension_id )
 
-        if component_in_db is not None:
+        # Extension found.
+        if extension_in_db is not None:
 
-            # Edit the ComponentSlider record.
-            before_image = component_in_db.before_image
-            before_label_text = component_in_db.before_label_text
-            before_alt_text = component_in_db.before_alt_text
-            after_image = component_in_db.after_image
-            after_label_text = component_in_db.after_label_text
-            after_alt_text = component_in_db.after_alt_text
-            slider_offset = component_in_db.offset
-            slider_offset_float = component_in_db.offset_float
-            slider_orientation = component_in_db.orientation
+            # Update the free local variables.
+            is_free = extension_in_db.user.is_free
+            before_image = extension_in_db.before_image
+            before_label_text = extension_in_db.before_label_text
+            before_alt_text = extension_in_db.before_alt_text
+            after_image = extension_in_db.after_image
+            after_label_text = extension_in_db.after_label_text
+            after_alt_text = extension_in_db.after_alt_text
+            slider_offset = extension_in_db.offset
+            slider_offset_float = extension_in_db.offset_float
 
-    # Pass local variables to Flask and render the template.
-    return render_template( 'widget-component-slider.html',
-        page_id = 'baie-slider',
-        component_id = requested_component_id,
+            # If the user is on a paid plan.
+            if is_free is False :
+
+                # Update the paid local variables.
+                mouseover_action = extension_in_db.mouseover_action
+                handle_animation = extension_in_db.handle_animation
+                is_move_on_click_enabled = extension_in_db.is_move_on_click_enabled
+
+                # Mouseover action logic.
+                # Move slider on mouseover.
+                if mouseover_action == 2:
+                    slider_no_overlay = False
+                    slider_move_slider_on_hover = True
+
+                # Do nothing on mouseover.
+                if mouseover_action == 0:
+                    slider_no_overlay = True
+                    slider_move_slider_on_hover = False
+
+                # If the user selected the vertical orientation...
+                if extension_in_db.is_vertical is True :
+
+                    # Update the local variable for use in the widget template.
+                    slider_orientation  = 'vertical'
+
+    # Pass local variables to Django and render the template.
+    return render_template( 'widget.html',
+        page_id = "widget",
+        extension_id = requested_extension_id,
         before_image = before_image,
         before_label_text = before_label_text,
         before_alt_text = before_alt_text,
@@ -535,7 +653,12 @@ def widget_component_slider():
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float,
-        slider_orientation = slider_orientation
+        slider_orientation = slider_orientation,
+        slider_mouseover_action = int( mouseover_action ),
+        slider_handle_animation = int( handle_animation ),
+        slider_no_overlay = int( slider_no_overlay ),
+        slider_move_slider_on_hover = int( slider_move_slider_on_hover ),
+        slider_move_on_click_toggle = int( is_move_on_click_enabled )
     )
 
 # Database
@@ -548,31 +671,31 @@ def browse_db( instance_id = None ):
     # Initialize variables.
     admin = True
     users = User.query.all()
-    components = ComponentSlider.query.all()
+    extensions = Extension.query.all()
 
     # If the user posted data...
     if request.method == 'POST':
 
         # Update the instance_id variable.
         instance_id = request.form['instance_id']
-
-        # Update the components variable.
-        components = ComponentSlider.query.filter_by( instance_id = instance_id ).all()
+        
+        # Update the extensions variable.
+        extensions = Extension.query.filter_by( instance_id = instance_id ).all()
 
     # Pass the data to the template.
     return render_template( 'browse-db.html',
         admin = admin,
         users = users,
-        components = components,
+        extensions = extensions,
         instance_id = instance_id
     )
 
 #
-@app.route( '/<int:component_id>/' )
-def user_component( component_id ):
+@app.route( '/<int:extension_id>/' )
+def user_extension( extension_id ):
 
     """Return database contents."""
-    component_record = ComponentSlider.query.get_or_404( component_id )
-    return render_template( 'component.html',
-        component = component_record
+    extension_record = Extension.query.get_or_404( extension_id )
+    return render_template( 'extension.html',
+        extension = extension_record
     )
