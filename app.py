@@ -17,10 +17,7 @@ from dotenv import load_dotenv
 from flask import Response, redirect, render_template, request, url_for
 
 # Local imports
-from app import app, logic
-
-# Import db
-from app import db
+from app import app, db, logic
 
 # Load environment variables from .env file
 load_dotenv()
