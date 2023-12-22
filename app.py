@@ -17,13 +17,17 @@ from dotenv import load_dotenv
 from flask import Response, redirect, render_template, request, url_for
 
 # Local imports
-from . import app, db, logic
+from . import app, logic
+
+# Import db
+from app import db
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Import models.
 from .models import User, Extension
+
 
 # Wix Constants
 WEBHOOK_PUBLIC_KEY = os.getenv("WEBHOOK_PUBLIC_KEY")
