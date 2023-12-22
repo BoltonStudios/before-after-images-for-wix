@@ -1,5 +1,7 @@
 # Python imports
 import os
+import sys
+from dotenv import load_dotenv
 
 # Flask imports
 from flask import Flask
@@ -10,14 +12,40 @@ from flask_migrate import Migrate
 # Define a base directory as the current directory.
 basedir = os.path.abspath( os.path.dirname( __file__ ) )
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# from pathlib import Path
+# BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv()
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv( "DEBUG", "False" ) == "True"
+DEVELOPMENT_MODE = os.getenv( "DEVELOPMENT_MODE", "False" ) == "True"
+
 # Create a Flask application instance.
 app = Flask( __name__ )
+
+# Define the database URI to specify the database with which to connect.
+if DEVELOPMENT_MODE is True:
+
+    # SQL Lite for local development.
+    db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
+
+elif len( sys.argv ) > 0 and sys.argv[1] != 'static':
+
+    if os.getenv( "DATABASE_URL", None ) is None:
+
+        raise ValueError( "DATABASE_URL environment variable not defined" )
+    
+    # Defined in the cloud hosting production environment 
+    db_uri = os.environ.get( "DATABASE_URL" )
 
 # Define the database URI to specify the database with which to connect.
 # Format for SQL Lite: sqlite:///path/to/database.db
 # Format for MySQL mysql://username:password@host:port/database_name
 # Format for PostgreSQL: postgresql://username:password@host:port/database_name
-db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
+# db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
 
 # Configure Flask-SQLAlchemy configuration keys.
 # Set the database URI to specify the database with which to connect.
@@ -31,9 +59,6 @@ db = SQLAlchemy( app )
 
 # Create a Migrate object.
 migrate = Migrate( app, db )
-
-# Import our models.
-from .models import User, Extension
 
 # Define the function to create a database.
 def init_db():

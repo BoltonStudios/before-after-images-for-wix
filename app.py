@@ -5,22 +5,32 @@ A Flask app for Wix.
 # pylint: disable=not-callable
 
 # Python imports
+import os
 import json
 import urllib.parse
 import jwt
 from datetime import datetime
 import requests
+from dotenv import load_dotenv
 
 # Flask imports
 from flask import Response, redirect, render_template, request, url_for
 
 # Local imports
-from . import app, db
-from . import constants as conf_settings
-from . import logic
+from . import app, db, logic
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import models.
 from .models import User, Extension
+
+# Wix Constants
+WEBHOOK_PUBLIC_KEY = os.getenv("WEBHOOK_PUBLIC_KEY")
+APP_ID = os.getenv("APP_ID")
+APP_SECRET = os.getenv("APP_SECRET")
+AUTH_PROVIDER_BASE_URL = os.getenv("AUTH_PROVIDER_BASE_URL")
+INSTANCE_API_URL = os.getenv("INSTANCE_API_URL")
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -62,7 +72,7 @@ def app_wix():
 
     # Construct the app installation URL.
     permission_request_url = "https://www.wix.com/installer/install"
-    app_id = conf_settings.APP_ID
+    app_id = APP_ID
     redirect_url = 'https://' + request.host + '/redirect-wix'
     redirect_url = urllib.parse.quote( redirect_url, safe='~')
     token = request.args.get( 'token' )
@@ -105,9 +115,9 @@ def redirect_wix():
         print( "=======================" )
 
         # Initialize variables.
-        auth_provider_base_url = conf_settings.AUTH_PROVIDER_BASE_URL
-        app_secret = conf_settings.APP_SECRET
-        app_id = conf_settings.APP_ID
+        auth_provider_base_url = AUTH_PROVIDER_BASE_URL
+        app_secret = APP_SECRET
+        app_id = APP_ID
 
         # Prepare request.
         request_body_parameters = {
@@ -183,7 +193,7 @@ def uninstall():
 
     # Initialize variables.
     instance_id = ''
-    secret = conf_settings.WEBHOOK_PUBLIC_KEY
+    secret = WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -240,7 +250,7 @@ def upgrade( request ):
 
     # Initialize variables.
     instance_id = ''
-    secret = conf_settings.WEBHOOK_PUBLIC_KEY
+    secret = WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -298,7 +308,7 @@ def downgrade( request ):
 
     # Initialize variables.
     instance_id = ''
-    secret = conf_settings.WEBHOOK_PUBLIC_KEY
+    secret = WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'POST':
