@@ -25,11 +25,6 @@ from flask_migrate import Migrate
 #import utils
 import logic
 
-# Load global variables.
-# db = app.db
-# logic = utils.logic
-from extensions import db
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -80,12 +75,12 @@ app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
 
 # Create a database object.
 # db = SQLAlchemy( app )
-from app.extensions import db
+from extensions import db
 db.init_app( app )
 
 # Create a Migrate object.
 # migrate = Migrate( app, db )
-from app.extensions import migrate
+from extensions import migrate
 migrate.init_app( app, db )
 
 # Define the function to create a database.
