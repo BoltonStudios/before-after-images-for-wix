@@ -5,7 +5,7 @@ Models for my Flask app for Wix.
 from sqlalchemy.sql import func
 
 # Local imports.
-from . import db
+from app.extensions import db
 
 # Define the user table class.
 class User( db.Model ):
