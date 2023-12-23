@@ -23,7 +23,7 @@ from flask_migrate import Migrate
 # Local imports
 #from app import app
 #import utils
-from .utils import logic
+import logic
 
 # Load global variables.
 # db = app.db
