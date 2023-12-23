@@ -55,10 +55,14 @@ app.config[ 'SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
 
 # Create a database object.
-db = SQLAlchemy( app )
+# db = SQLAlchemy( app )
+from app.extensions import db
+db.init_app( app )
 
 # Create a Migrate object.
-migrate = Migrate( app, db )
+# migrate = Migrate( app, db )
+from app.extensions import migrate
+migrate.init_app( app, db )
 
 # Define the function to create a database.
 def init_db():

@@ -17,12 +17,14 @@ from dotenv import load_dotenv
 from flask import Response, redirect, render_template, request, url_for
 
 # Local imports
-import app
-import utils
+from app import app
+#import utils
+from app.utils import logic
 
 # Load global variables.
-db = app.db
-logic = utils.logic
+# db = app.db
+# logic = utils.logic
+from app.extensions import db
 
 # Load environment variables from .env file
 load_dotenv()
