@@ -28,7 +28,7 @@ import logic
 # Load global variables.
 # db = app.db
 # logic = utils.logic
-from app.extensions import db
+from extensions import db
 
 # Load environment variables from .env file
 load_dotenv()
