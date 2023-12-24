@@ -13,6 +13,7 @@ import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
+import psycopg2
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
