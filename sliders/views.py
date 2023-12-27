@@ -17,16 +17,19 @@ from dotenv import load_dotenv
 from dataclasses import dataclass
 
 # Flask imports
-from flask import Flask, Response, redirect, render_template, request, url_for
+from flask import Blueprint, Flask, Response, redirect, render_template, request, url_for
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 # from flask_migrate import Migrate
 
+sliders = Blueprint('sliders', __name__,
+                        template_folder='templates')
+
 # Local imports
 #from app import app
 #import utils
-import logic
-from app.extensions import db, migrate
+from . import helpers
+from .extensions import db, migrate
 
 # Load environment variables from .env file
 load_dotenv()
@@ -47,7 +50,8 @@ DATABASE_PORT       = os.getenv( "DATABASE_PORT" )
 DATABASE_NAME       = os.getenv( "DATABASE_NAME" )
 
 # Create a Flask application instance.
-app = Flask( __name__ )
+# app = Flask( __name__ )
+#from . import app
 
 # Define the database URI to specify the database with which to connect.
 if DEVELOPMENT_MODE is True:
@@ -158,13 +162,13 @@ INSTANCE_API_URL = os.getenv("INSTANCE_API_URL")
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
-@app.context_processor
+@sliders.context_processor
 def inject_now():
     return {'now': datetime.utcnow()}
 
 # Define Flask routes.
 # Homepage.
-@app.route('/')
+@sliders.route('/')
 def root():
 
     """Return a friendly greeting."""
@@ -178,7 +182,7 @@ def root():
     )
 
 # App URL (Installation) page.
-@app.route( '/app-wix', methods=[ 'POST', 'GET' ] )
+@sliders.route( '/app-wix', methods=[ 'POST', 'GET' ] )
 def app_wix():
 
     """
@@ -210,7 +214,7 @@ def app_wix():
     return redirect( url )
 
 # Redirect URL (App Authorized, Complete Installation).
-@app.route( '/redirect-wix', methods=[ 'POST', 'GET' ] )
+@sliders.route( '/redirect-wix', methods=[ 'POST', 'GET' ] )
 def redirect_wix():
 
     """
@@ -231,8 +235,8 @@ def redirect_wix():
     authorization_code = request.args.get( 'code' )
 
     # Print the authorization code to the console for debugging.
-    logic.dump( authorization_code, "authorization_code" )
-    logic.dump( request.args, "request.args" )
+    helpers.dump( authorization_code, "authorization_code" )
+    helpers.dump( request.args, "request.args" )
 
     try:
         print( "Getting Tokens From Wix." )
@@ -262,9 +266,9 @@ def redirect_wix():
         refresh_token = tokens[ 'refresh_token' ]
 
         # Print the response to the console for debugging.
-        logic.dump( tokens, "tokens" )
-        logic.dump( access_token, "access_token" )
-        logic.dump( refresh_token, "refresh_token" )
+        helpers.dump( tokens, "tokens" )
+        helpers.dump( access_token, "access_token" )
+        helpers.dump( refresh_token, "refresh_token" )
 
         # Construct the URL to Completes the OAuth flow.
         # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
@@ -305,7 +309,7 @@ def redirect_wix():
 
 
 # Remove application files and data for the instance (App Uninstalled)
-@app.route( '/uninstall', methods=[ 'POST' ] )
+@sliders.route( '/uninstall', methods=[ 'POST' ] )
 def uninstall():
 
     """
@@ -389,14 +393,14 @@ def upgrade( request ):
         request_data = json.loads( data['data'] )
         product_data = json.loads( request_data['data'] )
 
-        logic.dump( request_data, "request_data" )
+        helpers.dump( request_data, "request_data" )
 
         # Extract the instance ID
         instance_id = request_data[ 'instanceID' ]
-        logic.dump( instance_id, "instance_id" )
+        helpers.dump( instance_id, "instance_id" )
 
         instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
-        logic.dump( instance_id, "instance_id" )
+        helpers.dump( instance_id, "instance_id" )
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
@@ -447,14 +451,14 @@ def downgrade( request ):
         request_data = json.loads( data['data'] )
         product_data = json.loads( request_data['data'] )
 
-        logic.dump( request_data, "request_data" )
+        helpers.dump( request_data, "request_data" )
 
         # Extract the instance ID
         instance_id = request_data[ 'instanceID' ]
-        logic.dump( instance_id, "instance_id" )
+        helpers.dump( instance_id, "instance_id" )
 
         instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
-        logic.dump( instance_id, "instance_id" )
+        helpers.dump( instance_id, "instance_id" )
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
@@ -479,7 +483,7 @@ def downgrade( request ):
     return "", 200
 
 # App Settings Panel
-@app.route('/settings', methods=['POST','GET'])
+@sliders.route('/settings', methods=['POST','GET'])
 def settings():
     
     # pylint: disable=too-many-locals
@@ -563,7 +567,7 @@ def settings():
     )
 
 # Widget Slider
-@app.route('/widget', methods=['POST','GET'])
+@sliders.route('/widget', methods=['POST','GET'])
 def widget():
 
     """
@@ -605,7 +609,7 @@ def widget():
         print( "Widget POST request" )
 
         # Get the data received.
-        logic.dump( request.data, "request.data" )
+        helpers.dump( request.data, "request.data" )
         request_data = json.loads( request.data )
         requested_extension_id = request_data[ "extensionID" ]
 
@@ -670,12 +674,12 @@ def widget():
                 # If the request contains an instance ID...
                 if instance_id:
                     
-                    logic.dump( instance_id, "instance_id")
+                    helpers.dump( instance_id, "instance_id")
 
                     # Get the associated Instance instance.
                     instance_in_db = Instance.query.get( instance_id )
 
-                    logic.dump( instance_in_db, "instance_in_db")
+                    helpers.dump( instance_in_db, "instance_in_db")
 
                     # If the user selected the vertical orientation...
                     if request_data[ 'sliderOrientation' ] == 'vertical' :
@@ -795,8 +799,8 @@ def widget():
     )
 
 # Database
-@app.route( '/browse-db' )
-@app.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
+@sliders.route( '/browse-db' )
+@sliders.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
 def browse_db( instance_id = None ):
 
     """Return database contents."""
@@ -824,7 +828,7 @@ def browse_db( instance_id = None ):
     )
 
 #
-@app.route( '/<int:extension_id>/' )
+@sliders.route( '/<int:extension_id>/' )
 def instance_extension( extension_id ):
 
     """Return database contents."""
