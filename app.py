@@ -25,7 +25,7 @@ from flask_migrate import Migrate
 # Local imports
 #from app import app
 #import utils
-import app.logic
+import app.logic as logic
 
 # Load environment variables from .env file
 load_dotenv()
