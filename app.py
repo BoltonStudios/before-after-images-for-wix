@@ -3,6 +3,8 @@ A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
 # pylint: disable=not-callable
+debug = True
+print(__name__)
 
 # Python imports
 import os
@@ -24,9 +26,28 @@ from sqlalchemy.sql import func
 
 # Local imports
 #from app import app
-#import utils
-import app.logic as logic
-from app.extensions import db, migrate
+#import utils.logic as logic
+try:
+    # Trying to find module in the parent package
+    #from . import config
+    
+    from .utils import logic
+    from .extensions import db, migrate
+    print( debug )
+    
+except ImportError:
+    print('Relative import failed')
+
+try:
+    # Trying to find module on sys.path
+    import logic
+    from extensions import db, migrate
+    print(debug)
+except ModuleNotFoundError:
+    print('Absolute import failed')
+
+#import app.logic as logic
+#from app.extensions import db, migrate
 
 # Load environment variables from .env file
 load_dotenv()

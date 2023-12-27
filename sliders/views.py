@@ -28,7 +28,7 @@ sliders = Blueprint('sliders', __name__,
 # Local imports
 #from app import app
 #import utils
-from . import helpers
+import helpers
 from .extensions import db, migrate
 
 # Load environment variables from .env file
