@@ -25,7 +25,7 @@ from sqlalchemy.sql import func
 # Local imports
 #from app import app
 #import utils
-import logic
+import app.logic
 from app.extensions import db, migrate
 
 # Load environment variables from .env file
