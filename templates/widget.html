@@ -133,7 +133,7 @@
             fetch( "{{ url_for('widget') }}", {
                 method: "POST",
                 body: JSON.stringify({
-                    extensionID: "{{extension_id}}",
+                    extensionId: "{{extension_id}}",
                     action: "delete"
                 }),
                 headers: {
@@ -157,10 +157,10 @@
                 method: "POST",
                 body: JSON.stringify({
                     action: "publish",
-                    extensionID: slider.dataset.sliderId,
-                    siteID: Wix.Utils.getSiteOwnerId(),
-                    userID: Wix.Utils.getUid(),
-                    instanceID: Wix.Utils.getInstanceId(),
+                    extensionId: slider.dataset.sliderId,
+                    siteId: Wix.Utils.getSiteOwnerId(),
+                    userId: Wix.Utils.getUid(),
+                    instanceId: Wix.Utils.getInstanceId(),
                     beforeImage: slider.dataset.beforeImage,
                     beforeLabelText: slider.dataset.beforeLabelText,
                     beforeAltText: slider.dataset.beforeAltText,

@@ -557,7 +557,7 @@ def widget():
             print( "Create new EXTENSION" )
 
             # Extract the instance ID
-            instance_id = request_data[ 'instanceId' ]
+            instance_id = request_data[ 'instanceId' ] 
 
             # If the request contains an instance ID...
             if instance_id:
