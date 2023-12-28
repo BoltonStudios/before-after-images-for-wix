@@ -20,7 +20,7 @@ class Instance( db.Model ):
     site_id: db.Column          = db.Column( db.String( 255 ), unique = True )
     extensions                  = db.relationship( 'Extension', backref = 'instance' )
     refresh_token: db.Column    = db.Column( db.String( 2000 ), unique = True )
-    is_free: db.Column          = db.Column( db.Boolean )
+    is_free: db.Column          = db.Column( db.Boolean, default = True )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
@@ -46,10 +46,10 @@ class Extension( db.Model ):
     after_alt_text: db.Column               = db.Column( db.String( 1000 ) )
     offset: db.Column                       = db.Column( db.Integer )
     offset_float: db.Column                 = db.Column( db.Float )
-    is_vertical: db.Column                  = db.Column( db.Boolean )
+    is_vertical: db.Column                  = db.Column( db.Boolean, default = False )
     mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
     handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
-    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean )
+    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean, default = False )
     created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
                                                 server_default = func.now() )
 
