@@ -3,8 +3,6 @@ A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
 # pylint: disable=not-callable
-debug = True
-print(__name__)
 
 # Python imports
 import os
