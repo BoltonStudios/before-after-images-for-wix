@@ -90,7 +90,7 @@ def app_wix():
     # Construct the app installation URL.
     permission_request_url = "https://www.wix.com/installer/install"
     app_id = APP_ID
-    redirect_url = 'https://' + request.host + '/redirect-wix'
+    redirect_url = 'https://' + request.host + '/redirect-wix/'
     redirect_url = urllib.parse.quote( redirect_url, safe='~')
     token = request.args.get( 'token' )
     url = permission_request_url + '?token=' + token + '&state=start'
