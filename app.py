@@ -207,7 +207,7 @@ def uninstall():
     See documentation:
     https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
     """
-    print( "Got a call from Wix for redirect-wix." )
+    print( "Got a call from Wix for uninstall." )
     print( "=============================" )
 
     # Initialize variables.
