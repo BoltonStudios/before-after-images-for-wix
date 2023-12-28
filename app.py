@@ -207,6 +207,8 @@ def uninstall():
     See documentation:
     https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
     """
+    print( "Got a call from Wix for redirect-wix." )
+    print( "=============================" )
 
     # Initialize variables.
     instance_id = ''
@@ -227,35 +229,32 @@ def uninstall():
         # Print data to the console for debugging.
         logic.dump( request_data, "request_data" )
 
-        # If the request contains an instance ID...
-        if 'instanceID' in request_data.keys():
+        # Extract the instance ID
+        instance_id = request_data[ 'instanceId' ]
 
-            # Extract the instance ID
-            instance_id = request_data[ 'instanceID' ]
+        # Search the tables for records, filtering by instance ID.
+        instance = Instance.query.filter_by( instance_id = instance_id ).first()
+        extensions = Extension.query.filter_by( instance_id = instance_id )
 
-            # Search the tables for records, filtering by instance ID.
-            instance = Instance.query.filter_by( instance_id = instance_id ).first()
-            extensions = Extension.query.filter_by( instance_id = instance_id )
+        # Delete the instance.
+        db.session.delete( instance )
+
+        # Return feedback to the console.
+        print( "Deleted instance #" + instance_id )
+
+        for extension in extensions:
 
             # Delete the instance.
-            db.session.delete( instance )
+            db.session.delete( extension )
 
             # Return feedback to the console.
-            print( "Deleted instance #" + instance_id )
+            print( "Deleted extension #" + extension.extension_id )
 
-            for extension in extensions:
+        # Save changes.
+        db.session.commit()
 
-                # Delete the instance.
-                db.session.delete( extension )
-
-                # Return feedback to the console.
-                print( "Deleted extension #" + extension.extension_id )
-
-            # Save changes.
-            db.session.commit()
-
-            # Return feedback to the console.
-            print( "Instance #" + instance_id + " uninstalled." )
+        # Return feedback to the console.
+        print( "Instance #" + instance_id + " uninstalled." )
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
@@ -291,7 +290,7 @@ def upgrade( request ):
         logic.dump( request_data, "request_data" )
 
         # Extract the instance ID
-        instance_id = request_data[ 'instanceID' ]
+        instance_id = request_data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
 
         instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
@@ -349,7 +348,7 @@ def downgrade( request ):
         logic.dump( request_data, "request_data" )
 
         # Extract the instance ID
-        instance_id = request_data[ 'instanceID' ]
+        instance_id = request_data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
 
         instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
@@ -528,15 +527,12 @@ def widget():
 
                     # Update the variable.
                     is_vertical = True
-
-                # If the request contains a sliderMoveOnClickToggle value...
-                if 'sliderMoveOnClickToggle' in request_data.keys():
                     
-                    # If the user selected the move on click option...
-                    if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
+                # If the user selected the move on click option...
+                if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
 
-                        # Update the variable.
-                        is_move_on_click_enabled = True
+                    # Update the variable.
+                    is_move_on_click_enabled = True
 
                 # Edit the extensionSlider record.
                 extension_in_db.before_image = request_data[ 'beforeImage' ]
@@ -556,62 +552,56 @@ def widget():
                 db.session.commit()
 
         else:
-        
-            print( "Create new EXTENSION" )
 
             # Create new extension.
+            print( "Create new EXTENSION" )
+
+            # Extract the instance ID
+            instance_id = request_data[ 'instanceId' ]
+
             # If the request contains an instance ID...
-            if 'instanceID' in request_data.keys():
+            if instance_id:
+                
+                logic.dump( instance_id, "instance_id")
 
-                # Extract the instance ID
-                instance_id = request_data[ 'instanceID' ]
+                # Get the associated Instance instance.
+                instance_in_db = Instance.query.get( instance_id )
 
-                # If the request contains an instance ID...
-                if instance_id:
+                logic.dump( instance_in_db, "instance_in_db")
+
+                # If the user selected the vertical orientation...
+                if request_data[ 'sliderOrientation' ] == 'vertical' :
+
+                    # Update the variable.
+                    is_vertical = True
                     
-                    logic.dump( instance_id, "instance_id")
+                # If the user selected the move on click option...
+                if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
 
-                    # Get the associated Instance instance.
-                    instance_in_db = Instance.query.get( instance_id )
+                    # Update the variable.
+                    is_move_on_click_enabled = True
 
-                    logic.dump( instance_in_db, "instance_in_db")
+                # Construct a new Extension record.
+                extension = Extension(
+                    extension_id = requested_extension_id,
+                    instance_id = instance_in_db.instance_id,
+                    before_image = request_data[ 'beforeImage' ],
+                    before_label_text = request_data[ 'beforeLabelText' ],
+                    before_alt_text = request_data[ 'beforeAltText' ],
+                    after_image = request_data[ 'afterImage' ],
+                    after_label_text = request_data[ 'afterLabelText' ],
+                    after_alt_text = request_data[ 'afterAltText' ],
+                    offset = request_data[ 'sliderOffset' ],
+                    offset_float = request_data[ 'sliderOffsetFloat' ],
+                    is_vertical = is_vertical,
+                    mouseover_action = request_data[ 'sliderMouseoverAction' ],
+                    handle_animation = request_data[ 'sliderHandleAnimation' ],
+                    is_move_on_click_enabled = is_move_on_click_enabled
+                )
 
-                    # If the user selected the vertical orientation...
-                    if request_data[ 'sliderOrientation' ] == 'vertical' :
-
-                        # Update the variable.
-                        is_vertical = True
-
-                    # If the request contains a sliderMoveOnClickToggle value...
-                    if 'sliderMoveOnClickToggle' in request_data.keys():
-                        
-                        # If the user selected the move on click option...
-                        if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
-
-                            # Update the variable.
-                            is_move_on_click_enabled = True
-
-                    # Construct a new Extension record.
-                    extension = Extension(
-                        extension_id = requested_extension_id,
-                        instance_id = instance_in_db.instance_id,
-                        before_image = request_data[ 'beforeImage' ],
-                        before_label_text = request_data[ 'beforeLabelText' ],
-                        before_alt_text = request_data[ 'beforeAltText' ],
-                        after_image = request_data[ 'afterImage' ],
-                        after_label_text = request_data[ 'afterLabelText' ],
-                        after_alt_text = request_data[ 'afterAltText' ],
-                        offset = request_data[ 'sliderOffset' ],
-                        offset_float = request_data[ 'sliderOffsetFloat' ],
-                        is_vertical = is_vertical,
-                        mouseover_action = request_data[ 'sliderMouseoverAction' ],
-                        handle_animation = request_data[ 'sliderHandleAnimation' ],
-                        is_move_on_click_enabled = is_move_on_click_enabled
-                    )
-
-                    # Add a new extension to the extensionSlider table.
-                    db.session.add( extension )
-                    db.session.commit()
+                # Add a new extension to the extensionSlider table.
+                db.session.add( extension )
+                db.session.commit()
 
         # Return a success message.
         return "", 201
