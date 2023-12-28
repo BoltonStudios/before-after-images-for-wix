@@ -3,70 +3,31 @@ A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
 # pylint: disable=not-callable
+debug = True
+print(__name__)
 
 # Python imports
 import os
-import sys
 import json
 import urllib.parse
 import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
-import psycopg2
 from dataclasses import dataclass
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-from flask_migrate import Migrate
 
 # Local imports
-#from app import app
-#import utils
 import logic
+from database import db, db_uri, migrate
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Define a base directory as the current directory.
-basedir = os.path.abspath( os.path.dirname( __file__ ) )
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# from pathlib import Path
-# BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load environment variables from .env file
-load_dotenv()
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv( "DEBUG", "False" ) == "True"
-DEVELOPMENT_MODE = os.getenv( "DEVELOPMENT_MODE", "False" ) == "True"
 
 # Create a Flask application instance.
 app = Flask( __name__ )
-
-# Define the database URI to specify the database with which to connect.
-if DEVELOPMENT_MODE is True:
-
-    # SQL Lite for local development.
-    db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
-
-elif len( sys.argv ) > 0 and sys.argv[1] != 'static':
-
-    if os.getenv( "DATABASE_URL", None ) is None:
-
-        raise ValueError( "DATABASE_URL environment variable not defined" )
-    
-    # Defined in the cloud hosting production environment 
-    db_uri = os.environ.get( "DATABASE_URL" )
-
-# Define the database URI to specify the database with which to connect.
-# Format for SQL Lite: sqlite:///path/to/database.db
-# Format for MySQL mysql://username:password@host:port/database_name
-# Format for PostgreSQL: postgresql://username:password@host:port/database_name
-# db_uri = 'sqlite:///' + os.path.join( basedir, 'database.db' )
 
 # Configure Flask-SQLAlchemy configuration keys.
 # Set the database URI to specify the database with which to connect.
@@ -76,13 +37,9 @@ app.config[ 'SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
 
 # Create a database object.
-# db = SQLAlchemy( app )
-from extensions import db
 db.init_app( app )
 
 # Create a Migrate object.
-# migrate = Migrate( app, db )
-from extensions import migrate
 migrate.init_app( app, db )
 
 # Define the function to create a database.
@@ -104,58 +61,7 @@ with app.app_context():
     init_db()
 
 # Import models.
-#from .models import User, Extension
-
-# Define the user table class.
-@dataclass
-class User( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the User table.
-    """
-    instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
-    site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
-    extensions                  = db.relationship( 'Extension', backref = 'user' )
-    refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
-    is_free: db.Column          = db.Column( db.Boolean )
-    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
-                                        server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<user { self.instance_id }>'
-
-# Define the slider extension table class.
-@dataclass
-class Extension( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the Slider extension table.
-    """
-    extension_id: db.Column                 = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    instance_id: db.Column                  = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
-    before_image: db.Column                 = db.Column( db.String( 1000 ) )
-    before_label_text: db.Column            = db.Column( db.String( 1000 ) )
-    before_alt_text: db.Column              = db.Column( db.String( 1000 ) )
-    after_image: db.Column                  = db.Column( db.String( 1000 ) )
-    after_label_text: db.Column             = db.Column( db.String( 1000 ) )
-    after_alt_text: db.Column               = db.Column( db.String( 1000 ) )
-    offset: db.Column                       = db.Column( db.Integer )
-    offset_float: db.Column                 = db.Column( db.Float )
-    is_vertical: db.Column                  = db.Column( db.Boolean )
-    mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
-    handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
-    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean )
-    created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
-                                                server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<slider { self.extension_id } in { self.instance_id }>'
+from models import Instance, Extension
 
 # Wix Constants
 WEBHOOK_PUBLIC_KEY = os.getenv("WEBHOOK_PUBLIC_KEY")
@@ -279,20 +185,20 @@ def redirect_wix():
         complete_oauth_redirect_url = "https://www.wix.com/installer/close-window?access_token="
         complete_oauth_redirect_url += access_token
 
-        # Search the User table for the instance ID (primary key)
-        user_in_db = User.query.get( instance_id )
+        # Search the Instance table for the instance ID (primary key)
+        instance_in_db = Instance.query.get( instance_id )
 
-        # If the user does not exist in the table...
-        if user_in_db is None:
+        # If the instance does not exist in the table...
+        if instance_in_db is None:
 
-            # Construct a new User record.
-            user = User(
+            # Construct a new Instance record.
+            instance = Instance(
                 instance_id = instance_id,
                 refresh_token = refresh_token
             )
 
-            # Add the new or updated user record to the User table.
-            db.session.add( user )
+            # Add the new or updated instance record to the Instance table.
+            db.session.add( instance )
             db.session.commit()
 
         # Close the consent window by redirecting the user to the following URL
@@ -312,7 +218,7 @@ def redirect_wix():
         return Response("{'error':'wixError'}", status=500, mimetype='application/json')
 
 
-# Remove application files and data for the user (App Uninstalled)
+# Remove application files and data for the instance (App Uninstalled)
 @app.route( '/uninstall', methods=[ 'POST' ] )
 def uninstall():
 
@@ -343,18 +249,18 @@ def uninstall():
         instance_id = request_data[ 'instanceID' ]
 
         # Search the tables for records, filtering by instance ID.
-        user = User.query.filter_by( instance_id = instance_id ).first()
+        instance = Instance.query.filter_by( instance_id = instance_id ).first()
         extensions = Extension.query.filter_by( instance_id = instance_id )
 
-        # Delete the user.
-        db.session.delete( user )
+        # Delete the instance.
+        db.session.delete( instance )
 
         # Return feedback to the console.
-        print( "Deleted user #" + instance_id )
+        print( "Deleted instance #" + instance_id )
 
         for extension in extensions:
 
-            # Delete the user.
+            # Delete the instance.
             db.session.delete( extension )
 
             # Return feedback to the console.
@@ -410,19 +316,19 @@ def upgrade( request ):
         product_id = product_data[ 'vendorProductId' ]
 
         # Search the tables for records, filtering by instance ID.
-        user = User.query.filter_by( instance_id = instance_id ).first()
+        instance = Instance.query.filter_by( instance_id = instance_id ).first()
 
-        # If the user exists and the product_id is not null.
-        if user and product_id:
+        # If the instance exists and the product_id is not null.
+        if instance and product_id:
 
-            # Delete the user.
-            user.is_free = False
+            # Delete the instance.
+            instance.is_free = False
 
-            # Add the new or updated user record to the User table.
+            # Add the new or updated instance record to the Instance table.
             db.session.commit()
 
             # Return feedback to the console.
-            print( "User #" + instance_id + " upgraded.")
+            print( "Instance #" + instance_id + " upgraded.")
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
@@ -468,19 +374,19 @@ def downgrade( request ):
         product_id = product_data[ 'vendorProductId' ]
 
         # Search the tables for records, filtering by instance ID.
-        user = User.query.filter_by( instance_id = instance_id ).first()
+        instance = Instance.query.filter_by( instance_id = instance_id ).first()
 
-        # If the user exists and the product_id is not null.
-        if user and product_id:
+        # If the instance exists and the product_id is not null.
+        if instance and product_id:
 
-            # Delete the user.
-            user.is_free = True
+            # Delete the instance.
+            instance.is_free = True
 
-            # Add the new or updated user record to the User table.
+            # Add the new or updated instance record to the Instance table.
             db.session.commit()
 
             # Return feedback to the console.
-            print( "User #" + instance_id + " downgraded.")
+            print( "Instance #" + instance_id + " downgraded.")
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
@@ -534,8 +440,8 @@ def settings():
         if extension_in_db is not None:
 
             # Update the local variables with the requested_extension values.
-            instance_id                 = extension_in_db.user.instance_id
-            is_free                     = extension_in_db.user.is_free
+            instance_id                 = extension_in_db.instance.instance_id
+            is_free                     = extension_in_db.instance.is_free
             before_image                = extension_in_db.before_image
             before_label_text           = extension_in_db.before_label_text
             before_alt_text             = extension_in_db.before_alt_text
@@ -680,10 +586,10 @@ def widget():
                     
                     logic.dump( instance_id, "instance_id")
 
-                    # Get the associated User instance.
-                    user_in_db = User.query.get( instance_id )
+                    # Get the associated Instance instance.
+                    instance_in_db = Instance.query.get( instance_id )
 
-                    logic.dump( user_in_db, "user_in_db")
+                    logic.dump( instance_in_db, "instance_in_db")
 
                     # If the user selected the vertical orientation...
                     if request_data[ 'sliderOrientation' ] == 'vertical' :
@@ -703,7 +609,7 @@ def widget():
                     # Construct a new Extension record.
                     extension = Extension(
                         extension_id = requested_extension_id,
-                        instance_id = user_in_db.instance_id,
+                        instance_id = instance_in_db.instance_id,
                         before_image = request_data[ 'beforeImage' ],
                         before_label_text = request_data[ 'beforeLabelText' ],
                         before_alt_text = request_data[ 'beforeAltText' ],
@@ -747,7 +653,7 @@ def widget():
         if extension_in_db is not None:
 
             # Update the free local variables.
-            is_free = extension_in_db.user.is_free
+            is_free = extension_in_db.instance.is_free
             before_image = extension_in_db.before_image
             before_label_text = extension_in_db.before_label_text
             before_alt_text = extension_in_db.before_alt_text
@@ -811,7 +717,7 @@ def browse_db( instance_id = None ):
 
     # Initialize variables.
     admin = True
-    users = User.query.all()
+    instances = Instance.query.all()
     extensions = Extension.query.all()
 
     # If the user posted data...
@@ -826,14 +732,14 @@ def browse_db( instance_id = None ):
     # Pass the data to the template.
     return render_template( 'browse-db.html',
         admin = admin,
-        users = users,
+        instances = instances,
         extensions = extensions,
         instance_id = instance_id
     )
 
 #
 @app.route( '/<int:extension_id>/' )
-def user_extension( extension_id ):
+def instance_extension( extension_id ):
 
     """Return database contents."""
     extension_record = Extension.query.get_or_404( extension_id )

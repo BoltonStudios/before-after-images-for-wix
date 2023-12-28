@@ -166,7 +166,9 @@ student.html
 baie-component-slider.html
 model/BaieComponentSlider.py
 database.db
+database-old.db
 component-record.html
+/migrations-old-2
 *.pyc
 
 # PyCharm
