@@ -409,7 +409,7 @@ def settings():
     handle_animation = 0
     is_move_on_click_enabled = False
     is_vertical = False
-    is_free = False # False for dev environmet. Change to True for production.
+    is_free = True # False for dev environmet. Change to True for production.
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -505,7 +505,7 @@ def widget():
         # Get the data received.
         logic.dump( request.data, "request.data" )
         request_data = json.loads( request.data )
-        requested_extension_id = request_data[ "extensionID" ]
+        requested_extension_id = request_data[ "extensionId" ]
 
         # Search the Extension table for the extension by its extension ID (primary key).
         extension_in_db = Extension.query.get( requested_extension_id )
