@@ -14,14 +14,13 @@ import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
-from dataclasses import dataclass
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
 
 # Local imports
-import logic
 from database import db, db_uri, migrate
+import logic
 
 # Load environment variables from .env file
 load_dotenv()
@@ -42,33 +41,15 @@ db.init_app( app )
 # Create a Migrate object.
 migrate.init_app( app, db )
 
-# Define the function to create a database.
-def init_db():
-
-    """Initialze the application's database."""
-
-    # Issue CREATE statements for our tables and their related constructs.
-    # Note: the db.create_all() function does not recreate or update a table if it already exists.
-    db.create_all()
-
-    # Return feedback to the console.
-    print( "Initialized the database." )
-
-# Ensure we are working within the application context...
-with app.app_context():
-
-    # Then create the tables if they do not already exist.
-    init_db()
-
 # Import models.
 from models import Instance, Extension
 
 # Wix Constants
-WEBHOOK_PUBLIC_KEY = os.getenv("WEBHOOK_PUBLIC_KEY")
-APP_ID = os.getenv("APP_ID")
-APP_SECRET = os.getenv("APP_SECRET")
-AUTH_PROVIDER_BASE_URL = os.getenv("AUTH_PROVIDER_BASE_URL")
-INSTANCE_API_URL = os.getenv("INSTANCE_API_URL")
+WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
+APP_ID = os.getenv( "APP_ID" )
+APP_SECRET = os.getenv( "APP_SECRET" )
+AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
+INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
