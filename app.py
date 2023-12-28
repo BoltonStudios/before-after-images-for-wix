@@ -223,6 +223,9 @@ def uninstall():
         # Decode the data using our secret.
         data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
 
+        # Print data to the console for debugging.
+        logic.dump( data, "event body" )
+
         # Load the JSON payload.
         request_data = json.loads( data['data'] )
 
