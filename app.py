@@ -71,7 +71,7 @@ def root():
     )
 
 # App URL (Installation) page.
-@app.route( '/app-wix', methods=[ 'POST', 'GET' ] )
+@app.route( '/app-wix/', methods=[ 'POST', 'GET' ] )
 def app_wix():
 
     """
@@ -103,7 +103,7 @@ def app_wix():
     return redirect( url )
 
 # Redirect URL (App Authorized, Complete Installation).
-@app.route( '/redirect-wix', methods=[ 'POST', 'GET' ] )
+@app.route( '/redirect-wix/', methods=[ 'POST', 'GET' ] )
 def redirect_wix():
 
     """
@@ -198,7 +198,7 @@ def redirect_wix():
 
 
 # Remove application files and data for the instance (App Uninstalled)
-@app.route( '/uninstall', methods=[ 'POST' ] )
+@app.route( '/uninstall/', methods=[ 'POST' ] )
 def uninstall():
 
     """
@@ -372,7 +372,7 @@ def downgrade( request ):
     return "", 200
 
 # App Settings Panel
-@app.route('/settings', methods=['POST','GET'])
+@app.route('/settings/', methods=['POST','GET'])
 def settings():
     
     # pylint: disable=too-many-locals
@@ -456,7 +456,7 @@ def settings():
     )
 
 # Widget Slider
-@app.route('/widget', methods=['POST','GET'])
+@app.route('/widget/', methods=['POST','GET'])
 def widget():
 
     """
@@ -688,7 +688,7 @@ def widget():
     )
 
 # Database
-@app.route( '/browse-db' )
+@app.route( '/browse-db/' )
 @app.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
 def browse_db( instance_id = None ):
 
