@@ -8,82 +8,26 @@ print(__name__)
 
 # Python imports
 import os
-import sys
 import json
 import urllib.parse
 import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
-# import psycopg2
 from dataclasses import dataclass
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
-# from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-# from flask_migrate import Migrate
 
 # Local imports
-#from app import app
-#import utils.logic as logic
-try:
-    # Trying to find module in the parent package
-    #from . import config
-    
-    from .utils import logic
-    from .extensions import db, migrate
-    print( debug )
-    
-except ImportError:
-    print('Relative import failed')
-
-try:
-    # Trying to find module on sys.path
-    import logic
-    from extensions import db, migrate
-    print(debug)
-except ModuleNotFoundError:
-    print('Absolute import failed')
-
-#import app.logic as logic
-#from app.extensions import db, migrate
+import logic
+from database import db, db_uri, migrate
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Define a base directory as the current directory.
-basedir = os.path.abspath( os.path.dirname( __file__ ) )
-
-# Load environment variables from .env file
-load_dotenv()
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG               = os.getenv( "DEBUG", "False" ) == "True"
-DEVELOPMENT_MODE    = os.getenv( "DEVELOPMENT_MODE", "False" ) == "True"
-DATABASE_USERNAME   = os.getenv( "DATABASE_USERNAME" )
-DATABASE_PASSWORD   = os.getenv( "DATABASE_PASSWORD" )
-DATABASE_HOST       = os.getenv( "DATABASE_HOST" )
-DATABASE_PORT       = os.getenv( "DATABASE_PORT" )
-DATABASE_NAME       = os.getenv( "DATABASE_NAME" )
 
 # Create a Flask application instance.
 app = Flask( __name__ )
-
-# Define the database URI to specify the database with which to connect.
-if DEVELOPMENT_MODE is True:
-
-    # SQL Lite for local development.
-    db_uri = 'postgresql://' + DATABASE_USERNAME + ':' + DATABASE_PASSWORD + '@' + DATABASE_HOST + ':' + DATABASE_PORT + '/' + DATABASE_NAME
-    
-elif len( sys.argv ) > 0 and sys.argv[1] != 'static':
-
-    if os.getenv( "DATABASE_URL", None ) is None:
-
-        raise ValueError( "DATABASE_URL environment variable not defined" )
-    
-    # Defined in the cloud hosting production environment 
-    db_uri = os.environ.get( "DATABASE_URL" )
 
 # Configure Flask-SQLAlchemy configuration keys.
 # Set the database URI to specify the database with which to connect.
@@ -117,58 +61,7 @@ with app.app_context():
     init_db()
 
 # Import models.
-#from .models import Instance, Extension
-
-# Define the user table class.
-@dataclass
-class Instance( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the Instance table.
-    """
-    instance_id: db.Column      = db.Column( db.String( 255 ), primary_key = True, unique = True )
-    site_id: db.Column          = db.Column( db.String( 255 ), unique = True )
-    extensions                  = db.relationship( 'Extension', backref = 'instance' )
-    refresh_token: db.Column    = db.Column( db.String( 2000 ), unique = True )
-    is_free: db.Column          = db.Column( db.Boolean )
-    created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
-                                        server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<instance { self.instance_id }>'
-
-# Define the slider extension table class.
-@dataclass
-class Extension( db.Model ):
-
-    # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
-
-    """
-    Class to define the Slider extension table.
-    """
-    extension_id: db.Column                 = db.Column( db.String( 255 ), primary_key = True, unique = True )
-    instance_id: db.Column                  = db.Column( db.String( 255 ), db.ForeignKey( Instance.instance_id ) )
-    before_image: db.Column                 = db.Column( db.String( 1000 ) )
-    before_label_text: db.Column            = db.Column( db.String( 1000 ) )
-    before_alt_text: db.Column              = db.Column( db.String( 1000 ) )
-    after_image: db.Column                  = db.Column( db.String( 1000 ) )
-    after_label_text: db.Column             = db.Column( db.String( 1000 ) )
-    after_alt_text: db.Column               = db.Column( db.String( 1000 ) )
-    offset: db.Column                       = db.Column( db.Integer )
-    offset_float: db.Column                 = db.Column( db.Float )
-    is_vertical: db.Column                  = db.Column( db.Boolean )
-    mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
-    handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
-    is_move_on_click_enabled: db.Column     = db.Column( db.Boolean )
-    created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
-                                                server_default = func.now() )
-
-    def __repr__( self ):
-        return f'<slider { self.extension_id } in { self.instance_id }>'
+from models import Instance, Extension
 
 # Wix Constants
 WEBHOOK_PUBLIC_KEY = os.getenv("WEBHOOK_PUBLIC_KEY")

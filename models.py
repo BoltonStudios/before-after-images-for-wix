@@ -5,10 +5,10 @@ Models for my Flask app for Wix.
 from sqlalchemy.sql import func
 
 # Local imports.
-from app.extensions import db
+from database import db
 
 # Define the user table class.
-class User( db.Model ):
+class Instance( db.Model ):
 
     # pylint: disable=too-many-instance-attributes
     # Eight is reasonable in this case.
@@ -16,16 +16,16 @@ class User( db.Model ):
     """
     Class to define the User table.
     """
-    instance_id: db.Column      = db.Column( db.String( 200 ), primary_key = True, unique = True )
-    site_id: db.Column          = db.Column( db.String( 200 ), unique = True )
-    extensions                  = db.relationship( 'Extension', backref = 'user' )
-    refresh_token: db.Column    = db.Column( db.String( 200 ) ) # Not unique because...?
+    instance_id: db.Column      = db.Column( db.String( 255 ), primary_key = True, unique = True )
+    site_id: db.Column          = db.Column( db.String( 255 ), unique = True )
+    extensions                  = db.relationship( 'Extension', backref = 'instance' )
+    refresh_token: db.Column    = db.Column( db.String( 2000 ), unique = True )
     is_free: db.Column          = db.Column( db.Boolean )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
     def __repr__( self ):
-        return f'<user { self.instance_id }>'
+        return f'<instance { self.instance_id }>'
 
 # Define the slider extension table class.
 class Extension( db.Model ):
@@ -36,8 +36,8 @@ class Extension( db.Model ):
     """
     Class to define the Slider extension table.
     """
-    extension_id: db.Column                 = db.Column( db.String( 80 ), primary_key = True, unique = True )
-    instance_id: db.Column                  = db.Column( db.String( 80 ), db.ForeignKey( User.instance_id ) )
+    extension_id: db.Column                 = db.Column( db.String( 255 ), primary_key = True, unique = True )
+    instance_id: db.Column                  = db.Column( db.String( 255 ), db.ForeignKey( Instance.instance_id ) )
     before_image: db.Column                 = db.Column( db.String( 1000 ) )
     before_label_text: db.Column            = db.Column( db.String( 1000 ) )
     before_alt_text: db.Column              = db.Column( db.String( 1000 ) )
