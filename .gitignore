@@ -168,7 +168,7 @@ model/BaieComponentSlider.py
 database.db
 database-old.db
 component-record.html
-/migrations-old-2
+/migrations-old
 *.pyc
 
 # PyCharm

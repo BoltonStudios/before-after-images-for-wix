@@ -20,6 +20,9 @@ from flask import Flask, Response, redirect, render_template, request, url_for
 from database import db, db_uri, migrate
 import logic
 
+# Import models.
+from models import Instance, Extension
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -38,9 +41,6 @@ db.init_app( app )
 
 # Create a Migrate object.
 migrate.init_app( app, db )
-
-# Import models.
-from models import Instance, Extension
 
 # Wix Constants
 WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
@@ -224,32 +224,38 @@ def uninstall():
         # Load the JSON payload.
         request_data = json.loads( data['data'] )
 
-        # Extract the instance ID
-        instance_id = request_data[ 'instanceID' ]
+        # Print data to the console for debugging.
+        logic.dump( request_data, "request_data" )
 
-        # Search the tables for records, filtering by instance ID.
-        instance = Instance.query.filter_by( instance_id = instance_id ).first()
-        extensions = Extension.query.filter_by( instance_id = instance_id )
+        # If the request contains an instance ID...
+        if 'instanceID' in request_data.keys():
 
-        # Delete the instance.
-        db.session.delete( instance )
+            # Extract the instance ID
+            instance_id = request_data[ 'instanceID' ]
 
-        # Return feedback to the console.
-        print( "Deleted instance #" + instance_id )
-
-        for extension in extensions:
+            # Search the tables for records, filtering by instance ID.
+            instance = Instance.query.filter_by( instance_id = instance_id ).first()
+            extensions = Extension.query.filter_by( instance_id = instance_id )
 
             # Delete the instance.
-            db.session.delete( extension )
+            db.session.delete( instance )
 
             # Return feedback to the console.
-            print( "Deleted extension #" + extension.extension_id )
+            print( "Deleted instance #" + instance_id )
 
-        # Save changes.
-        db.session.commit()
+            for extension in extensions:
 
-        # Return feedback to the console.
-        print( "Instance #" + instance_id + " uninstalled." )
+                # Delete the instance.
+                db.session.delete( extension )
+
+                # Return feedback to the console.
+                print( "Deleted extension #" + extension.extension_id )
+
+            # Save changes.
+            db.session.commit()
+
+            # Return feedback to the console.
+            print( "Instance #" + instance_id + " uninstalled." )
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
