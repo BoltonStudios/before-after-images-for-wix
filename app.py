@@ -271,7 +271,7 @@ def uninstall():
 
 # Update the users isFree status (Paid Plan Purchased)
 @app.route( '/upgrade/', methods=[ 'POST' ] )
-def upgrade( request ):
+def upgrade():
 
     """
     Take action when the application recieves a POST request from the Paid Plan Purchased webhook.
@@ -330,7 +330,7 @@ def upgrade( request ):
 
 # Update the users isFree status (Paid Plan Cancelled)
 @app.route( '/downgrade/', methods=[ 'POST' ] )
-def downgrade( request ):
+def downgrade():
 
     """
     Take action when the application recieves a POST request from the Paid Plan Auto Renewal Cancelled webhook.
