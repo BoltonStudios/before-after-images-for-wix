@@ -270,6 +270,7 @@ def uninstall():
     return "", 200
 
 # Update the users isFree status (Paid Plan Purchased)
+@app.route( '/upgrade/', methods=[ 'POST' ] )
 def upgrade( request ):
 
     """
@@ -328,6 +329,7 @@ def upgrade( request ):
     return "", 200
 
 # Update the users isFree status (Paid Plan Cancelled)
+@app.route( '/downgrade/', methods=[ 'POST' ] )
 def downgrade( request ):
 
     """
