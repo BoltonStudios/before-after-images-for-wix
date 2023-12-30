@@ -238,26 +238,32 @@ def uninstall():
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
         extensions = Extension.query.filter_by( instance_id = instance_id )
+        
+        # Wix will repeatedly call this route if we return an error code.
+        # Prevent that from happening by proceeding only if the instance exists.
 
-        # Delete the instance.
-        db.session.delete( instance )
-
-        # Return feedback to the console.
-        print( "Deleted instance #" + instance_id )
-
-        for extension in extensions:
+        # If the instance exists...
+        if instance is not None:
 
             # Delete the instance.
-            db.session.delete( extension )
+            db.session.delete( instance )
 
             # Return feedback to the console.
-            print( "Deleted extension #" + extension.extension_id )
+            print( "Deleted instance #" + instance_id )
 
-        # Save changes.
-        db.session.commit()
+            for extension in extensions:
 
-        # Return feedback to the console.
-        print( "Instance #" + instance_id + " uninstalled." )
+                # Delete the instance.
+                db.session.delete( extension )
+
+                # Return feedback to the console.
+                print( "Deleted extension #" + extension.extension_id )
+
+            # Save changes.
+            db.session.commit()
+
+            # Return feedback to the console.
+            print( "Instance #" + instance_id + " uninstalled." )
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
