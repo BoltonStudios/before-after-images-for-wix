@@ -735,18 +735,17 @@ def dashboard():
 
     # If the user submitted a POST request...
     if request.method == 'GET':
-
-        print( "GET request.args." )
-        print( request.args )
         
-        encoded_jwt = "eyJhbGciOiJIUzI1NiJ9" + "." + request.args.get( 'instance' ).split( ".", 1 )[1] + "." + "EZv6JXIphZ-sIyOLsz-C9HzEaTcVZf1yHFmX4GtwPww"
+        header = '{"alg": "HS256"}'
+        logic.dump( header, "header" )
 
-    # Decode the data using our secret.
-    data = jwt.decode(
-        request.args.get( 'instance' ),
-        options={"verify_signature": False}
-    )
-    logic.dump( data, "data" )
+        encoded_header = str(base64.b64encode( bytes( header, 'utf-8' ) ), 'utf-8')
+        logic.dump( encoded_header, "encoded_header" )
+        
+        encoded_header_without_padding = encoded_header.replace('=', '').replace('+', '-').replace('/', '_') 
+        logic.dump( encoded_header_without_padding, "encoded_header_without_padding" )
+        
+        
     
     return "", 200
 
