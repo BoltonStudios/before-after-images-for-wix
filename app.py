@@ -713,7 +713,7 @@ def widget():
         slider_move_on_click_toggle = int( is_move_on_click_enabled )
     )
 
-# 
+# Dashboard
 @app.route( '/dashboard/', methods=['GET','POST'] )
 def dashboard():
 
@@ -728,56 +728,50 @@ def dashboard():
     # If the user submitted a POST request...
     if request.method == 'GET':
         
-        # Header
-        header = '{"alg": "RS256"}'
-        logic.dump( header, "header" )
+        # Get app instance.
+        # Extract signature and data.
+        # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+        wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
 
-        encoded_header = str(base64.b64encode( bytes( header, 'utf-8' ) ), 'utf-8')
-        logic.dump( encoded_header, "encoded_header" )
+        # Print signature for debugging.
+        logic.dump( wix_signature, "wix_signature" )
         
-        encoded_header_without_padding = encoded_header.replace('=', '').replace('+', '-').replace('/', '_') 
-        logic.dump( encoded_header_without_padding, "encoded_header_without_padding" )
+        # Generate a signature.
+        hm = hmac.new( secret.encode("UTF-8"), encoded_json.encode("UTF-8"), hashlib.sha512 )
+        my_signature = base64.urlsafe_b64encode( hm.digest() )
 
-        # Payload
-        instance = request.args.get( 'instance' )
-        # instance = "Rr7cobFnXaJuSBiUjUT2JRWpEo4-QQhmFYO9fwsmW20.eyJpbnN0YW5jZUlkIjoiYWU2M2UyZmEtYjc3Mi00ZjBmLTljNzktYmY0ZGEyZjk3YThjIiwiYXBwRGVmSWQiOiJhY2U2MzFjNy0zMjNiLTQ3YzktOTY5Zi03ZjM0MjE1MTUxNzEiLCJzaWduRGF0ZSI6IjIwMjMtMTItMzFUMTA6NTE6MzkuNzA2WiIsInVpZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJkZW1vTW9kZSI6ZmFsc2UsInNpdGVPd25lcklkIjoiZjE4OTk0OTktNzVhYi00ODYzLWJlZDMtZDM1M2Y3YjI5ZGZmIiwic2l0ZU1lbWJlcklkIjoiZWM5NWZiNTItMzM3MC00MmNmLWI1YzUtZmRlNTM2Njk5MDlmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIzLTEyLTMxVDE0OjUxOjM5LjcwNloiLCJsb2dpbkFjY291bnRJZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsImxwYWkiOm51bGwsImFvciI6dHJ1ZX0"
-        payload = instance.split( ".", 1 )[1]
-        logic.dump( payload, "payload" )
+        # Remove padding.
+        my_signature = str( my_signature ).replace( "=", "" )
         
-        # Signature
-        message = encoded_header + "." + payload
-        message_bytes = bytes( message, 'utf-8' )
-        encoded_message_bytes = base64.b64encode( message_bytes )
+        # Print signature for debugging.
+        logic.dump( my_signature, "my_signature")
 
-        signature = hmac.new(
-            base64.b64encode( bytes( secret, 'utf-8') ),
-            msg = encoded_message_bytes,
-            digestmod = hashlib.sha256
-        ).hexdigest()
+        # Compare the signatures for verification.
+        if wix_signature is not my_signature :
 
-        logic.dump( signature, "signature" )
+            print( "The signatures do not match." )
         
-        """
-        encoded_signature = str(base64.b64encode( signature ), 'utf-8')
-        logic.dump( encoded_signature, "encoded_signature" )
+        else:
+
+            print( "MATCH" )
+
+        # Decode data.
+        # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
+        # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+        # Retrieved 12/31/2023
+        #
+        # The '=' below is sufficient padding.
+        # Source: https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
+        # Retrieved 12/31/2023
+        decoded_data = encoded_json + ( "=" * ((4 - len( encoded_json ) % 4) % 4) )
+
+        # Load data from Wix.
+        data = json.loads( base64.b64decode( decoded_data ) )
         
-        encoded_signature_without_padding = str(base64.b64encode( signature ), 'utf-8').replace('=', '').replace('+', '-').replace('/', '_')
-        logic.dump( encoded_signature_without_padding, "encoded_signature_without_padding" )
-        """
-        jwt_token = encoded_header_without_padding + "." + payload + "." + signature
-        logic.dump( jwt_token, "jwt_token" )
-
-        # Decode the data.
-        data = jwt.decode(
-            jwt_token,
-            secret,
-            algorithms = ["RS256"]
-        )
-
         # Extract the instance ID
         instance_id = data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
-    
+
     return "", 200
 
 # Database
