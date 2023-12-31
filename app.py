@@ -301,19 +301,11 @@ def upgrade():
     # If the user submitted a POST request...
     if request.method == 'POST':
 
-        print( request )
-        print( request.args )
-        print( request.data )
-
         # Get the encoded data received.
         encoded_jwt = request.data
-        vs_encoded_jwt = "3qPgp5UtdLSit9HaLvx-xMXhBF3_Z_UJ-cmJxrjeQaE.eyJpbnN0YW5jZUlkIjoiYWU2M2UyZmEtYjc3Mi00ZjBmLTljNzktYmY0ZGEyZjk3YThjIiwiYXBwRGVmSWQiOiJhY2U2MzFjNy0zMjNiLTQ3YzktOTY5Zi03ZjM0MjE1MTUxNzEiLCJzaWduRGF0ZSI6IjIwMjMtMTItMzFUMDg6MjE6MzguNDMxWiIsInVpZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJkZW1vTW9kZSI6ZmFsc2UsInNpdGVPd25lcklkIjoiZjE4OTk0OTktNzVhYi00ODYzLWJlZDMtZDM1M2Y3YjI5ZGZmIiwic2l0ZU1lbWJlcklkIjoiZWM5NWZiNTItMzM3MC00MmNmLWI1YzUtZmRlNTM2Njk5MDlmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIzLTEyLTMxVDEyOjIxOjM4LjQzMVoiLCJsb2dpbkFjY291bnRJZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsImxwYWkiOm51bGwsImFvciI6dHJ1ZX0"
-        #vs_encoded_jwt = "eyJraWQiOiJ3LS1VcWtvdiIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiZGF0YVwiOlwie1xcbiAgICBcXFwib3BlcmF0aW9uVGltZVN0YW1wXFxcIjogXFxcIjIwMTktMTItMDlUMDc6NDQ6NTMuNjU5WlxcXCIsXFxuICAgIFxcXCJ2ZW5kb3JQcm9kdWN0SWRcXFwiOiBcXFwiZThmNDI5ZDUtMGE2YS00NjhmLTgwNDQtODdmNTE5YTUzMjAyXFxcIixcXG4gICAgXFxcImN5Y2xlXFxcIjogXFxcIk1PTlRITFlcXFwiLFxcbiAgICBcXFwiZXhwaXJlc09uXFxcIjogXFxcIjIwMjAtMDEtMDlUMDc6NDQ6NTNaXFxcIlxcbn0gXCIsXCJpbnN0YW5jZUlkXCI6XCIxYjliODcwNC0yNWE3LTQ3OGItODFmZC1iOGZlY2E0MDRkODdcIixcImV2ZW50VHlwZVwiOlwiUGFpZFBsYW5QdXJjaGFzZWRcIn0iLCJpYXQiOjE3MDQwMTE0MDcsImV4cCI6MTcwNzYxMTQwN30.CwPHkiBLxVDXbTxld_OC_pexfGsqEAkp5NRL5rUd-jePW4QaXwUN4_dH4G_5pgtHsjFbkDmATXDAiPPHzyYa8Zi2o7unyQSF0RNGXRAcj5ovf6IpCYfbwnec9hEQDi_eFwFMpD_CfyzmJKnf25oPS8xfF99esgKna-rUioDphbQZglnNzsJjBReegieJEwyx1JPTFMsf8ZPOD-YwuL-EytTjvnnHEkKvSVx6zt1dgM4gGdhbYXkkOZD91l1siRDO8B-2OUv86FLZy7pFy2pWehkRX7yYHHAK9mQO7RZqtWvZrFCq2ohCgVWuMg7sogkSJZocKqTNOxr_n8vEfqZlqQ"
-        vs_encoded_jwt = bytes( vs_encoded_jwt, 'ascii' )
-        logic.dump( encoded_jwt, "encoded_jwt" )
-        logic.dump( vs_encoded_jwt, "vs_encoded_jwt" )
+        
         # Decode the data using our secret.
-        data = jwt.decode( vs_encoded_jwt, secret, algorithms=["RS256"] )
+        data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
 
         # Load the JSON payload.
         request_data = json.loads( data['data'] )
@@ -737,7 +729,7 @@ def dashboard():
     if request.method == 'GET':
         
         # Header
-        header = '{"alg": "HS256"}'
+        header = '{"alg": "RS256"}'
         logic.dump( header, "header" )
 
         encoded_header = str(base64.b64encode( bytes( header, 'utf-8' ) ), 'utf-8')
@@ -758,7 +750,7 @@ def dashboard():
         encoded_message_bytes = base64.b64encode( message_bytes )
 
         signature = hmac.new(
-            bytes( secret, 'utf-8'),
+            base64.b64encode( bytes( secret, 'utf-8') ),
             msg = encoded_message_bytes,
             digestmod = hashlib.sha256
         ).hexdigest()
@@ -774,6 +766,17 @@ def dashboard():
         """
         jwt_token = encoded_header_without_padding + "." + payload + "." + signature
         logic.dump( jwt_token, "jwt_token" )
+
+        # Decode the data.
+        data = jwt.decode(
+            jwt_token,
+            secret,
+            algorithms = ["RS256"]
+        )
+
+        # Extract the instance ID
+        instance_id = data[ 'instanceId' ]
+        logic.dump( instance_id, "instance_id" )
     
     return "", 200
 
