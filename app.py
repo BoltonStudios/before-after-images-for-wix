@@ -736,6 +736,7 @@ def dashboard():
     # If the user submitted a POST request...
     if request.method == 'GET':
         
+        # Header
         header = '{"alg": "HS256"}'
         logic.dump( header, "header" )
 
@@ -744,8 +745,35 @@ def dashboard():
         
         encoded_header_without_padding = encoded_header.replace('=', '').replace('+', '-').replace('/', '_') 
         logic.dump( encoded_header_without_padding, "encoded_header_without_padding" )
+
+        # Payload
+        instance = request.args.get( 'instance' )
+        # instance = "Rr7cobFnXaJuSBiUjUT2JRWpEo4-QQhmFYO9fwsmW20.eyJpbnN0YW5jZUlkIjoiYWU2M2UyZmEtYjc3Mi00ZjBmLTljNzktYmY0ZGEyZjk3YThjIiwiYXBwRGVmSWQiOiJhY2U2MzFjNy0zMjNiLTQ3YzktOTY5Zi03ZjM0MjE1MTUxNzEiLCJzaWduRGF0ZSI6IjIwMjMtMTItMzFUMTA6NTE6MzkuNzA2WiIsInVpZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJkZW1vTW9kZSI6ZmFsc2UsInNpdGVPd25lcklkIjoiZjE4OTk0OTktNzVhYi00ODYzLWJlZDMtZDM1M2Y3YjI5ZGZmIiwic2l0ZU1lbWJlcklkIjoiZWM5NWZiNTItMzM3MC00MmNmLWI1YzUtZmRlNTM2Njk5MDlmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIzLTEyLTMxVDE0OjUxOjM5LjcwNloiLCJsb2dpbkFjY291bnRJZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsImxwYWkiOm51bGwsImFvciI6dHJ1ZX0"
+        payload = instance.split( ".", 1 )[1]
+        logic.dump( payload, "payload" )
         
+        # Signature
+        message = encoded_header + "." + payload
+        message_bytes = bytes( message, 'utf-8' )
+        encoded_message_bytes = base64.b64encode( message_bytes )
+
+        signature = hmac.new(
+            bytes( secret, 'utf-8'),
+            msg = encoded_message_bytes,
+            digestmod = hashlib.sha256
+        ).hexdigest()
+
+        logic.dump( signature, "signature" )
         
+        """
+        encoded_signature = str(base64.b64encode( signature ), 'utf-8')
+        logic.dump( encoded_signature, "encoded_signature" )
+        
+        encoded_signature_without_padding = str(base64.b64encode( signature ), 'utf-8').replace('=', '').replace('+', '-').replace('/', '_')
+        logic.dump( encoded_signature_without_padding, "encoded_signature_without_padding" )
+        """
+        jwt_token = encoded_header_without_padding + "." + payload + "." + signature
+        logic.dump( jwt_token, "jwt_token" )
     
     return "", 200
 
