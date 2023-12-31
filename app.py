@@ -721,6 +721,35 @@ def widget():
         slider_move_on_click_toggle = int( is_move_on_click_enabled )
     )
 
+# 
+@app.route( '/dashboard/', methods=['GET','POST'] )
+def dashboard():
+
+    """Return database contents."""
+    print( "Got a call from Wix for /dashboard/" )
+    print( "=============================" )
+    
+    # Initialize variables.
+    instance_id = ''
+    secret = WEBHOOK_PUBLIC_KEY
+
+    # If the user submitted a POST request...
+    if request.method == 'GET':
+
+        print( "GET request.args." )
+        print( request.args )
+        
+        encoded_jwt = "eyJhbGciOiJIUzI1NiJ9" + "." + request.args.get( 'instance' ).split( ".", 1 )[1] + "." + "EZv6JXIphZ-sIyOLsz-C9HzEaTcVZf1yHFmX4GtwPww"
+
+    # Decode the data using our secret.
+    data = jwt.decode(
+        request.args.get( 'instance' ),
+        options={"verify_signature": False}
+    )
+    logic.dump( data, "data" )
+    
+    return "", 200
+
 # Database
 @app.route( '/browse-db/' )
 @app.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
