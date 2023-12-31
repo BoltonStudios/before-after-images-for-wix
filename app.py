@@ -12,9 +12,14 @@ import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
+import hmac
+import hashlib
+import base64
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
+#from flask_jwt_extended import jwt_required
+#from flask_jwt_extended import JWTManager
 
 # Local imports
 from database import db, db_uri, migrate
@@ -35,6 +40,13 @@ app.config[ 'SQLALCHEMY_DATABASE_URI'] = db_uri
 
 # Disable tracking modifications of objects to use less memory.
 app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
+
+# Disable strict slashes.
+app.url_map.strict_slashes = False
+
+#
+#app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+#jwt = JWTManager(app)
 
 # Create a database object.
 db.init_app( app )
@@ -279,6 +291,8 @@ def upgrade():
     See documentation:
     https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
     """
+    print( "Got a call from Wix for upgrade." )
+    print( "=============================" )
 
     # Initialize variables.
     instance_id = ''
@@ -287,11 +301,19 @@ def upgrade():
     # If the user submitted a POST request...
     if request.method == 'POST':
 
+        print( request )
+        print( request.args )
+        print( request.data )
+
         # Get the encoded data received.
         encoded_jwt = request.data
-
+        vs_encoded_jwt = "3qPgp5UtdLSit9HaLvx-xMXhBF3_Z_UJ-cmJxrjeQaE.eyJpbnN0YW5jZUlkIjoiYWU2M2UyZmEtYjc3Mi00ZjBmLTljNzktYmY0ZGEyZjk3YThjIiwiYXBwRGVmSWQiOiJhY2U2MzFjNy0zMjNiLTQ3YzktOTY5Zi03ZjM0MjE1MTUxNzEiLCJzaWduRGF0ZSI6IjIwMjMtMTItMzFUMDg6MjE6MzguNDMxWiIsInVpZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJkZW1vTW9kZSI6ZmFsc2UsInNpdGVPd25lcklkIjoiZjE4OTk0OTktNzVhYi00ODYzLWJlZDMtZDM1M2Y3YjI5ZGZmIiwic2l0ZU1lbWJlcklkIjoiZWM5NWZiNTItMzM3MC00MmNmLWI1YzUtZmRlNTM2Njk5MDlmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIzLTEyLTMxVDEyOjIxOjM4LjQzMVoiLCJsb2dpbkFjY291bnRJZCI6ImY4MWY0OTRlLTQwYTktNGUyMC1hMjE4LTcyYjUzZDY4OTc4ZiIsImxwYWkiOm51bGwsImFvciI6dHJ1ZX0"
+        #vs_encoded_jwt = "eyJraWQiOiJ3LS1VcWtvdiIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiZGF0YVwiOlwie1xcbiAgICBcXFwib3BlcmF0aW9uVGltZVN0YW1wXFxcIjogXFxcIjIwMTktMTItMDlUMDc6NDQ6NTMuNjU5WlxcXCIsXFxuICAgIFxcXCJ2ZW5kb3JQcm9kdWN0SWRcXFwiOiBcXFwiZThmNDI5ZDUtMGE2YS00NjhmLTgwNDQtODdmNTE5YTUzMjAyXFxcIixcXG4gICAgXFxcImN5Y2xlXFxcIjogXFxcIk1PTlRITFlcXFwiLFxcbiAgICBcXFwiZXhwaXJlc09uXFxcIjogXFxcIjIwMjAtMDEtMDlUMDc6NDQ6NTNaXFxcIlxcbn0gXCIsXCJpbnN0YW5jZUlkXCI6XCIxYjliODcwNC0yNWE3LTQ3OGItODFmZC1iOGZlY2E0MDRkODdcIixcImV2ZW50VHlwZVwiOlwiUGFpZFBsYW5QdXJjaGFzZWRcIn0iLCJpYXQiOjE3MDQwMTE0MDcsImV4cCI6MTcwNzYxMTQwN30.CwPHkiBLxVDXbTxld_OC_pexfGsqEAkp5NRL5rUd-jePW4QaXwUN4_dH4G_5pgtHsjFbkDmATXDAiPPHzyYa8Zi2o7unyQSF0RNGXRAcj5ovf6IpCYfbwnec9hEQDi_eFwFMpD_CfyzmJKnf25oPS8xfF99esgKna-rUioDphbQZglnNzsJjBReegieJEwyx1JPTFMsf8ZPOD-YwuL-EytTjvnnHEkKvSVx6zt1dgM4gGdhbYXkkOZD91l1siRDO8B-2OUv86FLZy7pFy2pWehkRX7yYHHAK9mQO7RZqtWvZrFCq2ohCgVWuMg7sogkSJZocKqTNOxr_n8vEfqZlqQ"
+        vs_encoded_jwt = bytes( vs_encoded_jwt, 'ascii' )
+        logic.dump( encoded_jwt, "encoded_jwt" )
+        logic.dump( vs_encoded_jwt, "vs_encoded_jwt" )
         # Decode the data using our secret.
-        data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
+        data = jwt.decode( vs_encoded_jwt, secret, algorithms=["RS256"] )
 
         # Load the JSON payload.
         request_data = json.loads( data['data'] )
@@ -303,7 +325,7 @@ def upgrade():
         instance_id = request_data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
 
-        instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
+        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c'
         logic.dump( instance_id, "instance_id" )
 
         # Extract the product ID
@@ -323,6 +345,11 @@ def upgrade():
 
             # Return feedback to the console.
             print( "Instance #" + instance_id + " upgraded.")
+
+        else:
+
+            # Return feedback to the console.
+            print( "Instance #" + instance_id + " or vendorProductId not found.")
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
