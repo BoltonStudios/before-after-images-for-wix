@@ -317,8 +317,8 @@ def upgrade():
         instance_id = request_data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
 
-        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c'
-        logic.dump( instance_id, "instance_id" )
+        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c' # REMOVE FOR PRODUCTION
+        logic.dump( instance_id, "instance_id" ) # REMOVE FOR PRODUCTION
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
@@ -329,7 +329,7 @@ def upgrade():
         # If the instance exists and the product_id is not null.
         if instance and product_id:
 
-            # Delete the instance.
+            # Change the user to a paid user.
             instance.is_free = False
 
             # Add the new or updated instance record to the Instance table.
@@ -381,8 +381,8 @@ def downgrade():
         instance_id = request_data[ 'instanceId' ]
         logic.dump( instance_id, "instance_id" )
 
-        instance_id = '729659d2-df1c-4504-b072-5b54b965ca31'
-        logic.dump( instance_id, "instance_id" )
+        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c' # REMOVE FOR PRODUCTION
+        logic.dump( instance_id, "instance_id" ) # REMOVE FOR PRODUCTION
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
@@ -723,7 +723,6 @@ def dashboard():
     
     # Initialize variables.
     instance_id = ''
-    secret = WEBHOOK_PUBLIC_KEY
 
     # If the user submitted a POST request...
     if request.method == 'GET':
@@ -732,30 +731,23 @@ def dashboard():
         # Extract signature and data.
         # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
         wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
+        payload = encoded_json.encode("UTF-8")
+        signature = wix_signature
+        secret = APP_SECRET.encode("UTF-8")
 
-        # Print signature for debugging.
-        logic.dump( wix_signature, "wix_signature" )
-        
-        # Generate a signature.
-        hm = hmac.new( secret.encode("UTF-8"), encoded_json.encode("UTF-8"), hashlib.sha512 )
-        my_signature = base64.urlsafe_b64encode( hm.digest() )
+        # Compare the signatures and verify a match.
+        signatures_did_match = logic.verify_hmac_signature( payload, signature, secret )
 
-        # Remove padding.
-        my_signature = str( my_signature ).replace( "=", "" )
-        
-        # Print signature for debugging.
-        logic.dump( my_signature, "my_signature")
-
-        # Compare the signatures for verification.
-        if wix_signature is not my_signature :
-
-            print( "The signatures do not match." )
+        # If the signatures match...
+        if signatures_did_match is True :
+            
+            print( "SUCCESS: Signatures match." )
         
         else:
 
-            print( "MATCH" )
+            print( "ERROR: Signatures do not match." )
 
-        # Decode data.
+        # Decode data from Wix.
         # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
         # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
         # Retrieved 12/31/2023
@@ -767,12 +759,24 @@ def dashboard():
 
         # Load data from Wix.
         data = json.loads( base64.b64decode( decoded_data ) )
-        
-        # Extract the instance ID
-        instance_id = data[ 'instanceId' ]
-        logic.dump( instance_id, "instance_id" )
+        logic.dump( data, "data" )
 
-    return "", 200
+        # Check if aid is returned in the instance parameter.
+        # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+        if 'aid' in data:
+             
+             # Block user.
+             return 200, ""
+        
+        if 'instanceId' in data:
+
+            # Extract the instance ID
+            instance_id = data[ 'instanceId' ]
+            logic.dump( instance_id, "instance_id" )# Pass the data to the template.
+
+    return render_template( 'dashboard.html',
+        instance_id = instance_id
+    )
 
 # Database
 @app.route( '/browse-db/' )

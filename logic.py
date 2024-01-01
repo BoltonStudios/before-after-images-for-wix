@@ -5,6 +5,9 @@ Helper functions mostly to handle Wix authorization.
 
 # Import dependencies.
 import requests
+import hmac
+import hashlib
+import base64
 
 # Dump variable values to the terminal.
 def dump( item, name ):
@@ -15,6 +18,30 @@ def dump( item, name ):
     print( name + "=" )
     print( item )
     print( "===========================" )
+
+def verify_hmac_signature( payload, signature, secret ):
+    """Verify an HMAC signature.
+
+    Args:
+    payload: The payload of the webhook request.
+    signature: The signature of the webhook request.
+    secret: The secret key used to generate the signature.
+
+    Returns:
+    True if the signature is valid, False otherwise.
+    """
+
+    # Generate signature
+    generated_signature = hmac.new( secret, payload, hashlib.sha256 ).digest()
+
+    # Encode signature
+    encoded_signature = base64.urlsafe_b64encode( generated_signature )
+
+    # Format signature to remove padding (Wix encoding does not add the padding character)
+    expected_signature = encoded_signature.decode().replace( "=", "" )
+
+    # Compare signatures.
+    return expected_signature == signature
 
 # Define functions.
 def get_tokens_from_wix( auth_code, auth_provider_base_url, app_secret, app_id ):
