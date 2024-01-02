@@ -35,11 +35,48 @@
 
        <script>
 
-        // Add event listeners as shown here:
+        // Add event listeners for Wix events as shown here:
         // https://dev.wix.com/api/iframe-sdk/sdk/wix#sdk_wix_addeventlistener
         Wix.addEventListener( Wix.Events.SETTINGS_UPDATED, updateWidgetExtension );
         Wix.addEventListener( Wix.Events.SITE_SAVED, publishWidgetExtension );
         Wix.addEventListener( Wix.Events.COMPONENT_DELETED, deleteWidgetExtension );
+
+        // Add other event listeners.
+        window.addEventListener( "resize", setWidgetDimensions );
+
+        // Update the widget iframe dimensions, as described here:
+        // https://dev.wix.com/docs/build-apps/developer-tools/extensions/iframes/set-your-app-dimensions
+        function setWidgetDimensions( e ){
+
+            // Print status to console.
+            console.log( "setWidgetDimensions called." )
+            console.log( e )
+
+            // Initialize variables.
+            var slider = document.getElementById( "{{extension_id}}-twentytwenty" );
+            var sliderWidth = slider.offsetWidth;
+            var sliderHeight = slider.offsetHeight;
+            var beforeImage = document.getElementById( "{{extension_id}}-before-image" );
+            var afterImage = document.getElementById( "{{extension_id}}-after-image" );
+            var imageWidth = beforeImage.offsetWidth;
+            var imageHeight = beforeImage.offsetHeight;
+
+            // Resize the window.
+            //window.resizeTo( sliderWidth, sliderHeight )
+            //updateWidgetExtension( e )
+            console.log( "sliderWidth is " + sliderWidth );
+            console.log( "sliderHeight is " + sliderHeight );
+            console.log( "imageWidth is " + imageWidth );
+            console.log( "imageHeight is " + imageHeight );
+
+            Wix.resizeComponent( {
+                width: imageWidth,
+                height: imageHeight
+             },
+             console.log( "resized component.") );
+            //Wix.setHeight( sliderHeight )
+            //Wix.setWidth( sliderWidth )
+        };
         
         // Do something when the user applies new settings.
         function updateWidgetExtension( e ){

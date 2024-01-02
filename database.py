@@ -45,3 +45,12 @@ elif len( sys.argv ) > 0 and sys.argv[1] != 'static':
     
     # Defined in the cloud hosting production environment 
     db_uri = os.environ.get( "DATABASE_URL" )
+
+# Define the function to create a database.
+def init_db():
+
+    """Initialze the application's database."""
+
+    # Issue CREATE statements for our tables and their related constructs.
+    # Note: the db.create_all() function does not recreate or update a table if it already exists.
+    db.create_all()
