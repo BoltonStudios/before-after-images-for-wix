@@ -668,6 +668,12 @@ def widget():
             slider_offset = extension_in_db.offset
             slider_offset_float = extension_in_db.offset_float
 
+            # If the user selected the vertical orientation...
+            if extension_in_db.is_vertical is True :
+
+                # Update the local variable for use in the widget template.
+                slider_orientation  = 'vertical'
+
             # If the user is on a paid plan.
             if is_free is False :
 
@@ -686,12 +692,6 @@ def widget():
                 if mouseover_action == 0:
                     slider_no_overlay = True
                     slider_move_slider_on_hover = False
-
-                # If the user selected the vertical orientation...
-                if extension_in_db.is_vertical is True :
-
-                    # Update the local variable for use in the widget template.
-                    slider_orientation  = 'vertical'
 
     # Pass local variables to Django and render the template.
     return render_template( 'widget.html',
