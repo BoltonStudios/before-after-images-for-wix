@@ -59,6 +59,9 @@
           afterImg.css("clip", "rect(0,"+offset.w+","+offset.h+","+offset.cw+")");
     	}
         container.css("height", offset.h);
+
+        console.log( "adjustContainer called " )
+        console.log( "Setting height to " + offset.h )
       };
 
       var adjustSlider = function(pct) {

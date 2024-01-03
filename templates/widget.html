@@ -91,8 +91,12 @@
             var afterImage = document.getElementById( extension_id + "-after-image" );
             var shortestImageHeight = beforeImage.offsetHeight < afterImage.offsetHeight ? beforeImage.offsetHeight : afterImage.offsetHeight;
 
+            console.log( "beforeImage.offsetHeight is " + beforeImage.offsetHeight );
+            console.log( "afterImage.offsetHeight is " +  afterImage.offsetHeight );
+            console.log( "shortestImageHeight is " +  shortestImageHeight );
+
             // Set the height of '.twentytwenty-container' to the height of the shortest image.
-            jQuery( '.twentytwenty-container' ).css( "height", shortestImageHeight + "px" );
+            jQuery( '.twentytwenty-container' ).css( "height",  shortestImageHeight + "px" );
         }
 
         // Update the widget iframe dimensions, as described here:
@@ -116,7 +120,8 @@
                 {
                     width: imageWidth,
                     height: imageHeight
-                }
+                },
+                //resizeTwentyTwentyContainer()
             );
         }
 
@@ -209,12 +214,12 @@
                 // Remove existing pulser element to handle.
                 jQuery( '.twentytwenty-handle' ).prepend( '<span class="pulser"></span>' );
             }
-
+            /*
             // Update the TwentyTwenty container size.
             // resizeTwentyTwentyContainer();
             // Get the height of the shortest image.
-            // var beforeImage = document.getElementById( extension_id + "-before-image" );
-            // var afterImage = document.getElementById( extension_id + "-after-image" );
+            beforeImage = document.getElementById( extension_id + "-before-image" );
+            afterImage = document.getElementById( extension_id + "-after-image" );
             var shortestImageWidth = beforeImage.offsetWidth < afterImage.offsetWidth ? beforeImage.offsetWidth : afterImage.offsetWidth;
             var shortestImageHeight = beforeImage.offsetHeight < afterImage.offsetHeight ? beforeImage.offsetHeight : afterImage.offsetHeight;
 
@@ -242,7 +247,7 @@
                 },
                 console.log( "resized component to " + shortestImageWidth + "px by " + shortestImageHeight + "px" )
             );
-
+                */
             // Save changes.
             publishWidgetExtension( e )
         }
