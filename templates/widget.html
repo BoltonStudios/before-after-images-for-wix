@@ -61,11 +61,13 @@
                 console.log('Resized finished.');
 
                 // Initialize variables.
-                var beforeImage = jQuery( "#" + extension_id + "-before-image" );
-                var beforeWidth = beforeImage.width();
-                var beforeHeight = beforeImage.height();
+                var container = jQuery("#" + extension_id + "-twentytwenty");
+                var beforeImg = container.find("img:first");
+                var afterImg = container.find("img:last");
+                var beforeWidth = beforeImg.width();
+                var beforeHeight = beforeImg.height();
 
-                console.log( "beforeImage is " + beforeImage.src );
+                console.log( "beforeImage is " + beforeImg.attr( 'src' ) );
                 console.log( 'beforeWidth is ' + beforeWidth + ' and beforeHeight is ' + beforeHeight );
 
                 // Resize the window to the before image dimensions to match TwentyTwenty.
@@ -73,10 +75,13 @@
                         width: beforeWidth,
                         height: beforeHeight
                     },
-                    // Set the height of '.twentytwenty-container' to the height of the before image.
-                    jQuery( '.twentytwenty-container' ).css( "height",  beforeHeight + "px" ));
+                    // Success
+                    jQuery(window).trigger("resize.twentytwenty")
+                    );
 
             }, 250 );
+
+            
         }
 
         // Do something when the user applies new settings.
@@ -140,6 +145,17 @@
             jQuery(".twentytwenty-before-label").remove();
             jQuery(".twentytwenty-after-label").remove();
             jQuery(".pulser").remove();
+
+            console.log( "...about to call TwentyTwenty and:")
+
+            var container = jQuery("#" + extension_id + "-twentytwenty");
+            var beforeImg = container.find("img:first");
+            var afterImg = container.find("img:last");
+            var beforeWidth = beforeImg.width();
+            var beforeHeight = beforeImg.height();
+
+            console.log( "beforeImg is " + beforeImg.attr( 'src' ) );
+            console.log( 'beforeWidth is ' + beforeWidth + ' and beforeHeight is ' + beforeHeight );
 
             // Reinitialize TwentyTwenty.
             jQuery("#" + extension_id + "-twentytwenty").twentytwenty({

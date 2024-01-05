@@ -428,11 +428,11 @@ def settings():
     requested_extension_id = None
     extension_in_db = None
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
-    before_image_thumbnail = before_image
+    before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
     before_alt_text = ''
     after_image = url_for( 'static', filename='images/placeholder-3.svg' )
-    after_image_thumbnail = after_image
+    after_image_thumbnail = url_for( 'static', filename='images/placeholder-3.svg' )
     after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50

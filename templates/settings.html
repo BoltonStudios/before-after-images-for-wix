@@ -155,7 +155,7 @@
                         <div id="baie-after-image" 
                             class="baie-image-select container-fluid px-4 py-3" 
                             data-type="after" 
-                            data-image="{{ after_image_thumbnail }}"
+                            data-image="{{ after_image }}"
                             data-thumbnail="{{ after_image_thumbnail }}">
 
                             <div class="row mb-2">
@@ -616,7 +616,7 @@
                 false, // multiSelect
                 function( data ){
                     // onSuccess
-                    thumbnailURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 250, 133 )
+                    thumbnailURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 500, 266 )
                     imageURL = Wix.Utils.Media.getImageUrl( data.relativeUri ) // full size
                     //imageURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 637, 328 )
                     
