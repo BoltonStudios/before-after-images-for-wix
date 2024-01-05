@@ -428,9 +428,11 @@ def settings():
     requested_extension_id = None
     extension_in_db = None
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_image_thumbnail = before_image
     before_label_text = 'Before'
     before_alt_text = ''
     after_image = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_image_thumbnail = after_image
     after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
@@ -457,9 +459,11 @@ def settings():
             instance_id                 = extension_in_db.instance.instance_id
             is_free                     = extension_in_db.instance.is_free
             before_image                = extension_in_db.before_image
+            before_image_thumbnail      = extension_in_db.before_image_thumbnail
             before_label_text           = extension_in_db.before_label_text
             before_alt_text             = extension_in_db.before_alt_text
             after_image                 = extension_in_db.after_image
+            after_image_thumbnail       = extension_in_db.after_image_thumbnail
             after_label_text            = extension_in_db.after_label_text
             after_alt_text              = extension_in_db.after_alt_text
             slider_offset               = extension_in_db.offset
@@ -477,9 +481,11 @@ def settings():
         is_free = is_free,
         extension_id = requested_extension_id,
         before_image = before_image,
+        before_image_thumbnail = before_image_thumbnail,
         before_label_text = before_label_text,
         before_alt_text = before_alt_text,
         after_image = after_image,
+        after_image_thumbnail = after_image_thumbnail,
         after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,
@@ -512,9 +518,11 @@ def widget():
     extension_in_db = None
     is_free = True
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
     before_alt_text = ''
     after_image = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_image_thumbnail = url_for( 'static', filename='images/placeholder-3.svg' )
     after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
@@ -566,9 +574,11 @@ def widget():
 
                 # Edit the extensionSlider record.
                 extension_in_db.before_image = request_data[ 'beforeImage' ]
+                extension_in_db.before_image_thumbnail = request_data[ 'beforeImageThumbnail' ]
                 extension_in_db.before_label_text = request_data[ 'beforeLabelText' ]
                 extension_in_db.before_alt_text = request_data[ 'beforeAltText' ]
                 extension_in_db.after_image = request_data[ 'afterImage' ]
+                extension_in_db.after_image_thumbnail = request_data[ 'afterImageThumbnail' ]
                 extension_in_db.after_label_text = request_data[ 'afterLabelText' ]
                 extension_in_db.after_alt_text = request_data[ 'afterAltText' ]
                 extension_in_db.offset = request_data[ 'sliderOffset' ]
@@ -616,9 +626,11 @@ def widget():
                     extension_id = requested_extension_id,
                     instance_id = instance_in_db.instance_id,
                     before_image = request_data[ 'beforeImage' ],
+                    before_image_thumbnail = request_data[ 'beforeImageThumbnail' ],
                     before_label_text = request_data[ 'beforeLabelText' ],
                     before_alt_text = request_data[ 'beforeAltText' ],
                     after_image = request_data[ 'afterImage' ],
+                    after_image_thumbnail = request_data[ 'afterImageThumbnail' ],
                     after_label_text = request_data[ 'afterLabelText' ],
                     after_alt_text = request_data[ 'afterAltText' ],
                     offset = request_data[ 'sliderOffset' ],
@@ -660,9 +672,11 @@ def widget():
             # Update the free local variables.
             is_free = extension_in_db.instance.is_free
             before_image = extension_in_db.before_image
+            before_image_thumbnail = extension_in_db.before_image_thumbnail
             before_label_text = extension_in_db.before_label_text
             before_alt_text = extension_in_db.before_alt_text
             after_image = extension_in_db.after_image
+            after_image_thumbnail = extension_in_db.after_image_thumbnail
             after_label_text = extension_in_db.after_label_text
             after_alt_text = extension_in_db.after_alt_text
             slider_offset = extension_in_db.offset
@@ -698,9 +712,11 @@ def widget():
         page_id = "widget",
         extension_id = requested_extension_id,
         before_image = before_image,
+        before_image_thumbnail = before_image_thumbnail,
         before_label_text = before_label_text,
         before_alt_text = before_alt_text,
         after_image = after_image,
+        after_image_thumbnail = after_image_thumbnail,
         after_label_text = after_label_text,
         after_alt_text = after_alt_text,
         slider_offset = slider_offset,

@@ -101,8 +101,9 @@
                         <!--Before Image-->
                         <div id="baie-before-image" 
                             class="baie-image-select container-fluid px-4 py-3" 
-                            data-baie-image-type="before" 
-                            data-baie-image="{{ before_image }}">
+                            data-type="before" 
+                            data-image="{{ before_image }}"
+                            data-thumbnail="{{ before_image_thumbnail }}">
 
                             <div class="row mb-2">
                                 <div class="col-auto">
@@ -118,7 +119,7 @@
                                 <div class="col" style="text-align: center;">
 
                                     <!--Image-->
-                                    <img src="{{ before_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="before image" width="250" height="133" />
+                                    <img src="{{ before_image_thumbnail }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="before image" width="250" height="133" />
                                     
                                     <!--Before Label-->
                                     <div class="input-group mb-2">
@@ -153,8 +154,9 @@
                         <!--After Image-->
                         <div id="baie-after-image" 
                             class="baie-image-select container-fluid px-4 py-3" 
-                            data-baie-image-type="after" 
-                            data-baie-image="{{ after_image }}">
+                            data-type="after" 
+                            data-image="{{ after_image_thumbnail }}"
+                            data-thumbnail="{{ after_image_thumbnail }}">
 
                             <div class="row mb-2">
                                 <div class="col-auto">
@@ -170,7 +172,7 @@
                                 <div class="col" style="text-align: center;">
 
                                     <!--Image-->
-                                    <img src="{{ after_image }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="after image" width="250" height="133" />
+                                    <img src="{{ after_image_thumbnail }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="after image" width="250" height="133" />
                                     
                                     <!--After Label-->
                                     <div class="input-group mb-2">
@@ -604,7 +606,7 @@
 
             // Declare variables.
             var imageURL = '';
-            var imageType = element.dataset.baieImageType;
+            var imageType = element.dataset.type;
             var thumbnailImage = element.querySelector( '.img-thumbnail' );
 
             // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
@@ -619,7 +621,8 @@
                     //imageURL = Wix.Utils.Media.getResizedImageUrl( data.relativeUri, 637, 328 )
                     
                     // Add the image URL to the data attribute.
-                    element.dataset.baieImage = imageURL;
+                    element.dataset.image = imageURL;
+                    element.dataset.thumbnail = thumbnailURL;
 
                     // Update the thumbnail with the selected image URL.
                     thumbnailImage.src = thumbnailURL;
@@ -636,19 +639,21 @@
             console.log( "updateBaieExtension() called." )
             
             // Initialize variables.
-            var beforeImage     = document.getElementById( "baie-before-image" ).dataset.baieImage;
-            var beforeLabelText   = document.getElementById( "before-label-text" ).value;
-            var beforeAltText   = document.getElementById( "before-alt-text" ).value;
-            var afterImage      = document.getElementById( "baie-after-image" ).dataset.baieImage;
-            var afterLabelText    = document.getElementById( "after-label-text" ).value;
-            var afterAltText    = document.getElementById( "after-alt-text" ).value;
-            var sliderOffset    = document.getElementById( "sliderOffsetRange" ).value;
-            var sliderOffsetFloat = parseFloat( sliderOffset ) / 100;
-            var sliderOrientation = document.getElementsByName( "sliderOrientation" );
-            var sliderMouseoverAction = document.getElementsByName( "sliderMouseoverAction" );
-            var sliderHandleAnimation = document.getElementsByName( "sliderHandleAnimation" );
-            var sliderMoveOnClickToggle = document.getElementsByName( "sliderMoveOnClickToggle" );
-            var sliderMoveOnClickToggleLabel =  document.getElementById( "sliderMoveOnClickToggleLabel" );
+            var beforeImage                     = document.getElementById( "baie-before-image" ).dataset.image;
+            var beforeImageThumbnail            = document.getElementById( "baie-before-image" ).dataset.thumbnail;
+            var beforeLabelText                 = document.getElementById( "before-label-text" ).value;
+            var beforeAltText                   = document.getElementById( "before-alt-text" ).value;
+            var afterImage                      = document.getElementById( "baie-after-image" ).dataset.image;
+            var afterImageThumbnail             = document.getElementById( "baie-after-image" ).dataset.thumbnail;
+            var afterLabelText                  = document.getElementById( "after-label-text" ).value;
+            var afterAltText                    = document.getElementById( "after-alt-text" ).value;
+            var sliderOffset                    = document.getElementById( "sliderOffsetRange" ).value;
+            var sliderOffsetFloat               = parseFloat( sliderOffset ) / 100;
+            var sliderOrientation               = document.getElementsByName( "sliderOrientation" );
+            var sliderMouseoverAction           = document.getElementsByName( "sliderMouseoverAction" );
+            var sliderHandleAnimation           = document.getElementsByName( "sliderHandleAnimation" );
+            var sliderMoveOnClickToggle         = document.getElementsByName( "sliderMoveOnClickToggle" );
+            var sliderMoveOnClickToggleLabel    = document.getElementById( "sliderMoveOnClickToggleLabel" );
 
             // Extract value from Slider Orientation radio options.
             // Iterate over the radio options.
@@ -704,9 +709,11 @@
             // Prepare message.
             var message = {
                 beforeImage: beforeImage,
+                beforeImageThumbnail: beforeImageThumbnail,
                 beforeLabelText: beforeLabelText,
                 beforeAltText: beforeAltText,
                 afterImage: afterImage,
+                afterImageThumbnail: afterImageThumbnail,
                 afterLabelText: afterLabelText,
                 afterAltText: afterAltText,
                 sliderOffset: sliderOffset,
@@ -756,8 +763,6 @@
             // Add a listener for the "click" event to each element.
             updateBaieLabelToggles[ i ].addEventListener(  "focusout", function( event ){
 
-                console.log( "focusout event fired" );
-                console.log( event.srcElement.value );
                 updateBaieExtension()
             });
         }
@@ -771,8 +776,6 @@
             // Add a listener for the "click" event to each element.
             updateBaieAltToggles[ i ].addEventListener(  "focusout", function( event ){
 
-                console.log( "focusout event fired" );
-                console.log( event.srcElement.value );
                 updateBaieExtension()
             });
         }
