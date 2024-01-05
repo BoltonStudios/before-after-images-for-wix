@@ -62,6 +62,7 @@
             jQuery(".pulser").remove();
 
             // Reinitialize TwentyTwenty.
+            console.log( "Initialize TwentyTwenty" );
             jQuery("#" + extension_id + "-twentytwenty").twentytwenty({
                 before_label: widget.beforeLabelText, // Set a custom before label.
                 after_label: widget.afterLabelText, // Set a custom after label.
@@ -87,13 +88,18 @@
             console.log( "resizeTwentyTwentyContainer called.");
 
             // Get the height of the shortest image.
-            var beforeImage = document.getElementById( extension_id + "-before-image" );
-            var afterImage = document.getElementById( extension_id + "-after-image" );
-            var shortestImageHeight = beforeImage.offsetHeight < afterImage.offsetHeight ? beforeImage.offsetHeight : afterImage.offsetHeight;
 
-            console.log( "beforeImage.offsetHeight is " + beforeImage.offsetHeight );
-            console.log( "afterImage.offsetHeight is " +  afterImage.offsetHeight );
-            console.log( "shortestImageHeight is " +  shortestImageHeight );
+            // Initialize variables.
+            var beforeImage = jQuery( "#" + extension_id + "-before-image" );
+            var afterImage = jQuery( "#" + extension_id + "-after-image" );
+            var beforeWidth = beforeImage.width();
+            var afterWidth = afterImage.width();
+            var beforeHeight = beforeImage.height();
+            var afterHeight = afterImage.height();
+
+            // Get the dimensions of the smallest image.
+            var imageWidth = beforeWidth > afterWidth ? beforeWidth : afterWidth;
+            var imageHeight = beforeHeight > afterHeight ? beforeHeight : afterHeight;
 
             // Set the height of '.twentytwenty-container' to the height of the shortest image.
             jQuery( '.twentytwenty-container' ).css( "height",  shortestImageHeight + "px" );
@@ -105,24 +111,40 @@
 
             console.log( "resizeComponentWindow called.");
 
-            // Initialize variables.
-            var beforeImage = document.getElementById( extension_id + "-before-image" );
-            var afterImage = document.getElementById( extension_id + "-after-image" );
+            // Source: https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
+            clearTimeout( window.resizedFinished );
+            window.resizedFinished = setTimeout( function(){
 
-            // Get the dimensions of the smallest image.
-            var imageWidth = beforeImage.offsetWidth < afterImage.offsetWidth ? beforeImage.offsetWidth : afterImage.offsetWidth;
-            var imageHeight = beforeImage.offsetHeight < afterImage.offsetHeight ? beforeImage.offsetHeight : afterImage.offsetHeight;
+                console.log('Resized finished.');
 
-            console.log( "resized component to " + imageWidth + "px by " + imageHeight + "px" )
+                // Initialize variables.
+                var beforeImage = jQuery( "#" + extension_id + "-before-image" );
+                var afterImage = jQuery( "#" + extension_id + "-after-image" );
+                var beforeWidth = beforeImage.width();
+                var afterWidth = afterImage.width();
+                var beforeHeight = beforeImage.height();
+                var afterHeight = afterImage.height();
 
-            // Resize the window.
-            Wix.resizeComponent(
-                {
-                    width: imageWidth,
-                    height: imageHeight
-                },
-                //resizeTwentyTwentyContainer()
-            );
+                // Get the dimensions of the smallest image.
+                var imageWidth = beforeWidth > afterWidth ? beforeWidth : afterWidth;
+                var imageHeight = beforeHeight > afterHeight ? beforeHeight : afterHeight;
+
+                // Override with before image dimensions to match twentytwenty
+                imageHeight = beforeHeight;
+
+                console.log( "resized component to " + imageWidth + "px by " + imageHeight + "px" )
+
+                // Resize the window.
+                Wix.resizeComponent(
+                    {
+                        width: imageWidth,
+                        height: imageHeight
+                    },
+                    //resizeTwentyTwentyContainer()
+                    // Set the height of '.twentytwenty-container' to the height of the shortest image.
+                    jQuery( '.twentytwenty-container' ).css( "height",  imageHeight + "px" )
+                );
+            }, 250 );
         }
 
         // Do something when the user applies new settings.
@@ -198,6 +220,7 @@
             jQuery(".pulser").remove();
 
             // Reinitialize TwentyTwenty.
+            console.log( "Initialize TwentyTwenty" );
             jQuery("#" + extension_id + "-twentytwenty").twentytwenty({
                 before_label: widget.beforeLabelText, // Set a custom before label.
                 after_label: widget.afterLabelText, // Set a custom after label.
@@ -214,6 +237,10 @@
                 // Remove existing pulser element to handle.
                 jQuery( '.twentytwenty-handle' ).prepend( '<span class="pulser"></span>' );
             }
+
+            //
+            resizeComponentWindow();
+
             /*
             // Update the TwentyTwenty container size.
             // resizeTwentyTwentyContainer();
@@ -312,6 +339,7 @@
 
        <script>
         // Initialize TwentyTwenty
+        console.log( "Initialize TwentyTwenty" );
         $(function(){
             $("#{{extension_id}}-twentytwenty").twentytwenty({
                 before_label: "{{before_label_text}}", // Set a custom before label.

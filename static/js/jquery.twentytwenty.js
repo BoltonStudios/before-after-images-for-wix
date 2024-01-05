@@ -41,6 +41,9 @@
       var calcOffset = function(dimensionPct) {
         var w = beforeImg.width();
         var h = beforeImg.height();
+
+        console.log( "beforeImg.height() is " + beforeImg.height() )
+        console.log( "(dimensionPct*h)+px is " + (dimensionPct*h)+"px" )
         return {
           w: w+"px",
           h: h+"px",
