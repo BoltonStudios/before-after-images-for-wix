@@ -750,7 +750,7 @@
 
                 // Warning: This label change must come before the subsequent function
                 // overwrites sliderMoveOnClickToggle with 0 or 1.
-                sliderMoveOnClickToggleLabel.innerHTML = ( sliderMoveOnClickToggle[ i ].checked ) ? "Enabled" : "Disabled";
+                sliderMoveOnClickToggleLabel.innerText = ( sliderMoveOnClickToggle[ i ].checked ) ? "Enabled" : "Disabled";
 
                 // Update the value based on the checked status.
                 sliderMoveOnClickToggle = ( sliderMoveOnClickToggle[ i ].checked ) ? 1 : 0;
@@ -775,7 +775,7 @@
             };
 
             // Manipulate settings panel.
-            document.getElementById( "sliderOffsetNumber" ).innerHTML = sliderOffset;
+            document.getElementById( "sliderOffsetNumber" ).innerText = sliderOffset;
 
             // Print status update to the console.
             console.log( "updateBaieExtension() called." );

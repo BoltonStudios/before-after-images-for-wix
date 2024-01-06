@@ -12,14 +12,10 @@ import jwt
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
-import hmac
-import hashlib
 import base64
 
 # Flask imports
 from flask import Flask, Response, redirect, render_template, request, url_for
-#from flask_jwt_extended import jwt_required
-#from flask_jwt_extended import JWTManager
 
 # Local imports
 from database import db, db_uri, migrate
