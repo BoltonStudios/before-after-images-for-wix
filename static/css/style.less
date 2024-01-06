@@ -62,7 +62,7 @@ TwentyTwenty overrides
                 .twentytwenty-right-arrow,
                 .twentytwenty-down-arrow,
                 .twentytwenty-left-arrow{
-                    border-color: orange !important;
+                    border-color: #FFA500 !important;
                 }
             }
             .twentytwenty-up-arrow,
@@ -75,6 +75,7 @@ TwentyTwenty overrides
                 border: 3px solid #dddddd;
                 position: absolute;
                 z-index: 100;
+                animation-delay: 0;
             }
         }
     }
@@ -160,7 +161,6 @@ TwentyTwenty overrides
             .twentytwenty-down-arrow{
                 animation-duration: 7s;
                 animation-iteration-count: infinite;
-                opacity: 0;
                 transition: 200ms;
             }
             .twentytwenty-up-arrow {
@@ -168,6 +168,25 @@ TwentyTwenty overrides
             }
             .twentytwenty-down-arrow {
                 animation-name: see-saw-down;
+                animation-delay: 1s;
+            }
+        }
+        // Vertical Fade
+        &[data-slider-handle-animation="4"]:not( .clicked ){
+            .twentytwenty-handle{
+                background: #ffffff;
+            }
+            .twentytwenty-up-arrow,
+            .twentytwenty-down-arrow{
+                animation-duration: 7s;
+                animation-iteration-count: infinite;
+                transition: 200ms;
+            }
+            .twentytwenty-up-arrow {
+                animation-name: fade;
+            }
+            .twentytwenty-down-arrow {
+                animation-name: fade;
                 animation-delay: 1s;
             }
         }
@@ -254,7 +273,6 @@ TwentyTwenty overrides
             .twentytwenty-left-arrow{
                 animation-duration: 7s;
                 animation-iteration-count: infinite;
-                opacity: 0;
                 transition: 200ms;
             }
             .twentytwenty-left-arrow {
@@ -265,62 +283,80 @@ TwentyTwenty overrides
                 animation-delay: 1s;
             }
         }
+        // Horizontal Fade
+        &[data-slider-handle-animation="4"]:not( .clicked ){
+            .twentytwenty-handle{
+                background: #ffffff;
+            }
+            .twentytwenty-right-arrow,
+            .twentytwenty-left-arrow{
+                animation-duration: 5s;
+                animation-iteration-count: infinite;
+                transition: 200ms;
+            }
+            .twentytwenty-left-arrow {
+                animation-name: fade;
+            }
+            .twentytwenty-right-arrow {
+                animation-name: fade;
+                animation-delay: 1s;
+            }
+        }
+    }
+}
+@keyframes fade{
+    33% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .3;
+    }
+    66% {
+        opacity: 1;
     }
 }
 @keyframes stretch-up{
-    0% {
-        top: -3px;
-    }
-    15% {
+    33% {
         top: 0;
     }
-    85% {
-        top: 0;
-    }
-    100% {
+    50% {
         top: -3px;
+    }
+    66% {
+        top: 0;
     }
 }
 @keyframes stretch-down{
-    0% {
-        bottom: -3px;
-    }
-    15% {
+    33% {
         bottom: 0;
     }
-    85% {
-        bottom: 0;
-    }
-    100% {
+    50% {
         bottom: -3px;
+    }
+    66% {
+        bottom: 0;
     }
 }
 @keyframes stretch-left{
-    0% {
-    left: -3px;
+    33% {
+        left: 0;
     }
-    15% {
-    left: 0;
+    50% {
+        left: -3px;
     }
-    85% {
-    left: 0;
-    }
-    100% {
-    left: -3px;
+    66% {
+        left: 0;
     }
 }
 @keyframes stretch-right{
-    0% {
-    right: -3px;
+    33% {
+        right: 0;
     }
-    15% {
-    right: 0;
+    50% {
+        right: -3px;
     }
-    85% {
-    right: 0;
-    }
-    100% {
-    right: -3px;
+    66% {
+        right: 0;
     }
 }
 @keyframes horizontal-pulse{
@@ -376,7 +412,14 @@ TwentyTwenty overrides
     }
 }
 @keyframes see-saw-left{
-    0% {
+    33% {
+        width: 22px;
+        height: 44px;
+        opacity: 1;
+        translate: 0 0;
+        left: 0;
+    }
+    50% {
         width: 26px;
         height: 49px;
         opacity: 1;
@@ -384,31 +427,23 @@ TwentyTwenty overrides
         border-radius: 28px 0 0 28px;
         left: 0;
     }
-    15% {
+    66% {
         width: 22px;
         height: 44px;
         opacity: 1;
         translate: 0 0;
-        left: 0;
-    }
-    85% {
-        width: 22px;
-        height: 44px;
-        opacity: 1;
-        translate: 0 0;
-        left: 0;
-    }
-    100% {
-        width: 26px;
-        height: 49px;
-        opacity: 1;
-        translate: -4px -2px;
-        border-radius: 28px 0 0 28px;
         left: 0;
     }
 }
 @keyframes see-saw-right{
-    0% {
+    33% {
+        width: 22px;
+        height: 44px;
+        opacity: 1;
+        translate: 0 0;
+        right: 0;
+    }
+    50% {
         width: 26px;
         height: 49px;
         opacity: 1;
@@ -416,79 +451,51 @@ TwentyTwenty overrides
         border-radius: 0 28px 28px 0;
         right: 0;
     }
-    15% {
+    66% {
         width: 22px;
         height: 44px;
         opacity: 1;
         translate: 0 0;
-        right: 0;
-    }
-    85% {
-        width: 22px;
-        height: 44px;
-        opacity: 1;
-        translate: 0 0;
-        right: 0;
-    }
-    100% {
-        width: 26px;
-        height: 49px;
-        opacity: 1;
-        translate: 4px -2px;
-        border-radius: 0 28px 28px 0;
         right: 0;
     }
 }
 @keyframes see-saw-up{
-    0% {
-        width: 49px;
-        height: 26px;
-        opacity: 1;
-        translate: -2px -4px;
-    }
-    15% {
+    33% {
         width: 44px;
         height: 22px;
         opacity: 1;
         translate: 0 0;
     }
-    85% {
-        width: 44px;
-        height: 22px;
-        opacity: 1;
-        translate: 0 0;
-        left: 0;
-    }
-    100% {
+    50% {
         width: 49px;
         height: 26px;
         opacity: 1;
         translate: -2px -4px;
+    }
+    66% {
+        width: 44px;
+        height: 22px;
+        opacity: 1;
+        translate: 0 0;
     }
 }
 @keyframes see-saw-down{
-    0% {
-        width: 49px;
-        height: 26px;
-        opacity: 1;
-        translate: -2px 4px;
-    }
-    15% {
+    33% {
         width: 44px;
         height: 22px;
         opacity: 1;
         translate: 0 0;
     }
-    85% {
-        width: 44px;
-        height: 22px;
-        opacity: 1;
-        translate: 0 0;
-    }
-    100% {
+    50% {
         width: 49px;
         height: 26px;
         opacity: 1;
         translate: -2px 4px;
+    }
+    66% {
+        width: 44px;
+        height: 22px;
+        opacity: 1;
+        translate: 0 0;
     }
 }
