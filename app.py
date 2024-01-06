@@ -572,13 +572,25 @@ def widget():
                     # Update the variable.
                     is_move_on_click_enabled = True
 
+                # Newly instantiated extensions may not yet have thumbnails.
+                if 'beforeImageThumbnail' in request_data :
+
+                    # Update the variable.
+                    before_image_thumbnail = request_data[ 'beforeImageThumbnail' ]
+
+                # Check if the request_data contains these properties.
+                if 'afterImageThumbnail' in request_data :
+
+                    # Update the variable.
+                    after_image_thumbnail = request_data[ 'afterImageThumbnail' ]
+
                 # Edit the extensionSlider record.
                 extension_in_db.before_image = request_data[ 'beforeImage' ]
-                extension_in_db.before_image_thumbnail = request_data[ 'beforeImageThumbnail' ]
+                extension_in_db.before_image_thumbnail = before_image_thumbnail
                 extension_in_db.before_label_text = request_data[ 'beforeLabelText' ]
                 extension_in_db.before_alt_text = request_data[ 'beforeAltText' ]
                 extension_in_db.after_image = request_data[ 'afterImage' ]
-                extension_in_db.after_image_thumbnail = request_data[ 'afterImageThumbnail' ]
+                extension_in_db.after_image_thumbnail = after_image_thumbnail
                 extension_in_db.after_label_text = request_data[ 'afterLabelText' ]
                 extension_in_db.after_alt_text = request_data[ 'afterAltText' ]
                 extension_in_db.offset = request_data[ 'sliderOffset' ]
@@ -595,6 +607,8 @@ def widget():
 
             # Create new extension.
             print( "Create new EXTENSION" )
+
+            logic.dump( request_data, "request_data" )
 
             # Extract the instance ID
             instance_id = request_data[ 'instanceId' ] 
@@ -626,11 +640,11 @@ def widget():
                     extension_id = requested_extension_id,
                     instance_id = instance_in_db.instance_id,
                     before_image = request_data[ 'beforeImage' ],
-                    before_image_thumbnail = request_data[ 'beforeImageThumbnail' ],
+                    before_image_thumbnail = before_image_thumbnail, # New extensions will not have thumbnails, so use the default.
                     before_label_text = request_data[ 'beforeLabelText' ],
                     before_alt_text = request_data[ 'beforeAltText' ],
                     after_image = request_data[ 'afterImage' ],
-                    after_image_thumbnail = request_data[ 'afterImageThumbnail' ],
+                    after_image_thumbnail = after_image_thumbnail,
                     after_label_text = request_data[ 'afterLabelText' ],
                     after_alt_text = request_data[ 'afterAltText' ],
                     offset = request_data[ 'sliderOffset' ],
