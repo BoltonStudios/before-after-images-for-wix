@@ -99,9 +99,9 @@ function updateWidgetExtension( e ){
     });
 
     // Pulse animation
-    if( e.sliderHandleAnimation == 2 ){
+    if( e.sliderHandleAnimation == 2 && e.isFree == false ){
         
-        // Remove existing pulser element to handle.
+        // Add the pulser element to the handle.
         jQuery( '.twentytwenty-handle' ).prepend( '<span class="pulser"></span>' );
     }
 
