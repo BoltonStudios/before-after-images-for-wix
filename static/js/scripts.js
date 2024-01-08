@@ -9,7 +9,6 @@ function resizeComponentWindow(){
         // Initialize variables.
         var container = jQuery("#" + extension_id + "-twentytwenty");
         var beforeImg = container.find("img:first");
-        var afterImg = container.find("img:last");
         var beforeWidth = beforeImg.width();
         var beforeHeight = beforeImg.height();
 
@@ -23,8 +22,6 @@ function resizeComponentWindow(){
             );
 
     }, 250 );
-
-    
 }
 
 // Do something when the user applies new settings.
@@ -56,6 +53,7 @@ function updateWidgetExtension( e ){
     slider.dataset.sliderMouseoverAction = e.sliderMouseoverAction;
     slider.dataset.sliderHandleAnimation = e.sliderHandleAnimation;
     slider.dataset.sliderMoveOnClickToggle = e.sliderMoveOnClickToggle;
+    slider.dataset.sliderHandleBorderColor = e.sliderHandleBorderColor;
 
     // Update image attributes.
     beforeImage.src = e.beforeImage;
@@ -88,17 +86,6 @@ function updateWidgetExtension( e ){
     jQuery(".twentytwenty-before-label").remove();
     jQuery(".twentytwenty-after-label").remove();
     jQuery(".pulser").remove();
-
-    console.log( "...about to call TwentyTwenty and:")
-
-    var container = jQuery("#" + extension_id + "-twentytwenty");
-    var beforeImg = container.find("img:first");
-    var afterImg = container.find("img:last");
-    var beforeWidth = beforeImg.width();
-    var beforeHeight = beforeImg.height();
-
-    console.log( "beforeImg is " + beforeImg.attr( 'src' ) );
-    console.log( 'beforeWidth is ' + beforeWidth + ' and beforeHeight is ' + beforeHeight );
 
     // Reinitialize TwentyTwenty.
     jQuery("#" + extension_id + "-twentytwenty").twentytwenty({
@@ -176,7 +163,8 @@ function publishWidgetExtension( e ){
             sliderOrientation: slider.dataset.sliderOrientation,
             sliderMouseoverAction: slider.dataset.sliderMouseoverAction,
             sliderHandleAnimation: slider.dataset.sliderHandleAnimation,
-            sliderMoveOnClickToggle: slider.dataset.sliderMoveOnClickToggle
+            sliderMoveOnClickToggle: slider.dataset.sliderMoveOnClickToggle,
+            sliderHandleBorderColor: slider.dataset.sliderHandleBorderColor
         }),
         headers: {
         "Content-type": "application/json; charset=UTF-8"

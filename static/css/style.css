@@ -44,9 +44,20 @@
 #settings .tab-content .btn.btn-primary:hover {
   background-color: #4eb7f5;
 }
-#settings .tab-content .baie-image-select img:hover {
+#settings .tab-content .baie-image-select .col {
+  position: relative;
+}
+#settings .tab-content .baie-image-select .col img:hover {
   cursor: pointer;
   opacity: 0.8;
+}
+#settings .tab-content .baie-image-select .col .spinner-grow,
+#settings .tab-content .baie-image-select .col .spinner-border {
+  position: absolute;
+  z-index: 10;
+  top: 53px;
+  left: 50%;
+  margin-left: -14px;
 }
 /*********************************
 TwentyTwenty overrides
@@ -58,12 +69,6 @@ TwentyTwenty overrides
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle {
   border: none;
 }
-.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:hover .twentytwenty-up-arrow,
-.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:hover .twentytwenty-right-arrow,
-.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:hover .twentytwenty-down-arrow,
-.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:hover .twentytwenty-left-arrow {
-  border-color: #FFA500 !important;
-}
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle .twentytwenty-up-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle .twentytwenty-right-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle .twentytwenty-down-arrow,
@@ -71,10 +76,17 @@ TwentyTwenty overrides
   background-color: #ffffff;
   background-repeat: no-repeat;
   display: block;
-  border: 3px solid #dddddd;
+  border-width: 3px;
+  border-style: solid;
   position: absolute;
   z-index: 100;
   animation-delay: 0;
+}
+.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-up-arrow,
+.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-right-arrow,
+.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-down-arrow,
+.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-left-arrow {
+  border-color: #dddddd !important;
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle {
   width: 50px;

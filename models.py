@@ -51,6 +51,7 @@ class Extension( db.Model ):
     is_vertical: db.Column                  = db.Column( db.Boolean, default = False )
     mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
     handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
+    handle_border_color: db.Column          = db.Column( db.String( 20 ), default = '#BBBBBB' )
     is_move_on_click_enabled: db.Column     = db.Column( db.Boolean, default = False )
     created_at: db.Column                   = db.Column( db.DateTime( timezone = True ),
                                                 server_default = func.now() )

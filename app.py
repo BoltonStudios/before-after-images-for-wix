@@ -435,6 +435,7 @@ def settings():
     slider_offset_float = 0.5
     mouseover_action = 1
     handle_animation = 0
+    handle_border_color = '#BBBBBB'
     is_move_on_click_enabled = False
     is_vertical = False
     is_free = True # False for dev environmet. Change to True for production.
@@ -466,6 +467,7 @@ def settings():
             slider_offset_float         = extension_in_db.offset_float
             mouseover_action            = extension_in_db.mouseover_action
             handle_animation            = extension_in_db.handle_animation
+            handle_border_color         = extension_in_db.handle_border_color
             is_move_on_click_enabled    = extension_in_db.is_move_on_click_enabled
             is_vertical                 = extension_in_db.is_vertical
 
@@ -489,6 +491,7 @@ def settings():
         is_vertical = is_vertical,
         mouseover_action = mouseover_action,
         handle_animation = handle_animation,
+        handle_border_color = handle_border_color,
         is_move_on_click_enabled = is_move_on_click_enabled
     )
 
@@ -527,6 +530,7 @@ def widget():
     is_vertical = False
     mouseover_action = 1
     handle_animation = 0
+    handle_border_color = '#BBBBBB'
     slider_no_overlay = False
     slider_move_slider_on_hover = False
     is_move_on_click_enabled = False
@@ -594,6 +598,7 @@ def widget():
                 extension_in_db.is_vertical = is_vertical
                 extension_in_db.mouseover_action = request_data[ 'sliderMouseoverAction' ]
                 extension_in_db.handle_animation = request_data[ 'sliderHandleAnimation' ]
+                extension_in_db.handle_border_color = request_data[ 'sliderHandleBorderColor' ]
                 extension_in_db.is_move_on_click_enabled = is_move_on_click_enabled
 
                 # Add a new extension to the Extension table.
@@ -648,6 +653,7 @@ def widget():
                     is_vertical = is_vertical,
                     mouseover_action = request_data[ 'sliderMouseoverAction' ],
                     handle_animation = request_data[ 'sliderHandleAnimation' ],
+                    handle_border_color = request_data[ 'sliderHandleBorderColor' ],
                     is_move_on_click_enabled = is_move_on_click_enabled
                 )
 
@@ -704,6 +710,7 @@ def widget():
                 # Update the paid local variables.
                 mouseover_action = extension_in_db.mouseover_action
                 handle_animation = extension_in_db.handle_animation
+                handle_border_color = extension_in_db.handle_border_color
                 is_move_on_click_enabled = extension_in_db.is_move_on_click_enabled
 
                 # Mouseover action logic.
@@ -720,6 +727,7 @@ def widget():
     # Pass local variables to Django and render the template.
     return render_template( 'widget.html',
         page_id = "widget",
+        is_free = is_free,
         extension_id = requested_extension_id,
         before_image = before_image,
         before_image_thumbnail = before_image_thumbnail,
@@ -734,6 +742,7 @@ def widget():
         slider_orientation = slider_orientation,
         slider_mouseover_action = int( mouseover_action ),
         slider_handle_animation = int( handle_animation ),
+        slider_handle_border_color = handle_border_color,
         slider_no_overlay = int( slider_no_overlay ),
         slider_move_slider_on_hover = int( slider_move_slider_on_hover ),
         slider_move_on_click_toggle = int( is_move_on_click_enabled )

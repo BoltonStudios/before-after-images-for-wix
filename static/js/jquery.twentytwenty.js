@@ -13,7 +13,7 @@
     }, options);
 
     return this.each(function() {
-        console.log( 'twentytwenty called' );
+        
       var sliderPct = options.default_offset_pct;
       var container = $(this);
       var sliderOrientation = options.orientation;
@@ -41,9 +41,7 @@
       var calcOffset = function(dimensionPct) {
         var w = beforeImg.width();
         var h = beforeImg.height();
-
-        console.log( "beforeImg.height() is " + beforeImg.height() )
-        console.log( "(dimensionPct*h)+px is " + (dimensionPct*h)+"px" )
+        
         return {
           w: w+"px",
           h: h+"px",
@@ -63,14 +61,6 @@
     	}
         container.css("height", offset.h);
 
-        console.log( "adjustContainer called for beforeImg " + beforeImg.attr( 'src' ) );
-        console.log( "beforeImg.height() is  " + beforeImg.height() );
-        console.log( "Setting height to " + offset.h );
-
-        /*Wix.resizeComponent({
-            width: offset.w,
-            height: offset.h
-        });*/
       };
 
       var adjustSlider = function(pct) {

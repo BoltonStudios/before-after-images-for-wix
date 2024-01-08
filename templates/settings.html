@@ -118,6 +118,11 @@
                             <div class="row">
                                 <div class="col" style="text-align: center;">
 
+                                    <!--Loading Icon-->
+                                    <div class="spinner-grow text-primary" role="status" style="display: none;">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+
                                     <!--Image-->
                                     <img src="{{ before_image_thumbnail }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="before image" width="250" height="133" />
                                     
@@ -170,6 +175,11 @@
                             {% if after_image != '' %}
                             <div class="row">
                                 <div class="col" style="text-align: center;">
+
+                                    <!--Loading Icon-->
+                                    <div class="spinner-grow text-primary" role="status" style="display: none;">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
 
                                     <!--Image-->
                                     <img src="{{ after_image_thumbnail }}" class="img-thumbnail mb-3 update-baie-images-toggle" alt="after image" width="250" height="133" />
@@ -435,16 +445,16 @@
                             </div>
                         </div>
 
-                        <!--Handle Color-->
+                        <!--Handle Border Color-->
                         <div class="container px-4 py-2">
                             <div class="row">
                                 <div class="col-12">
-                                    <label for="sliderMouseoverHandleColor" class="form-label"
+                                    <label for="sliderHandleBorderColor" class="form-label"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="top"
-                                            data-bs-title="Choose a handle color when hovering over the slider."
+                                            data-bs-title="Set the handle border color that appears on hover only."
                                         >
-                                        <strong>Mouseover Handle Color</strong>
+                                        <strong>Handle Border Color</strong>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
                                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                                             <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
@@ -452,9 +462,10 @@
                                     </label><br>
                                     <input
                                         type="color"
-                                        id="handle"
-                                        name="head"
-                                        value="#FFA500"
+                                        id="sliderHandleBorderColor"
+                                        name="sliderHandleBorderColor"
+                                        value="{{handle_border_color}}"
+                                        onchange="updateBaieExtension( this )"
                                         {% if is_free == True %}
                                             disabled
                                         {% endif %}
@@ -659,6 +670,9 @@
             var imageType = element.dataset.type;
             var thumbnailImage = element.querySelector( '.img-thumbnail' );
 
+            // Show loading icon.
+            jQuery( ".spinner-grow" ).show();
+
             // openMediaDialog(mediaType, multiSelect, onSuccess, \[onCancel\])
             // https://dev.wix.com/api/iframe-sdk/sdk/wix.settings#sdk_wix.settings_openmediadialog
             Wix.Settings.openMediaDialog(
@@ -677,8 +691,17 @@
                     // Update the thumbnail with the selected image URL.
                     thumbnailImage.src = thumbnailURL;
 
+                    // Hide loading icon.
+                    jQuery( ".spinner-grow" ).hide();
+
                     // Update the extension to reflect the settings changes.
                     updateBaieExtension()
+                },
+                function( data ){
+
+                    // onCancel
+                    // Hide loading icon.
+                    jQuery( ".spinner-grow" ).hide();
                 }
             );
         }
@@ -704,6 +727,7 @@
             var sliderHandleAnimation           = document.getElementsByName( "sliderHandleAnimation" );
             var sliderMoveOnClickToggle         = document.getElementsByName( "sliderMoveOnClickToggle" );
             var sliderMoveOnClickToggleLabel    = document.getElementById( "sliderMoveOnClickToggleLabel" );
+            var sliderHandleBorderColor         = document.getElementById( "sliderHandleBorderColor" ).value;
 
             // Extract value from Slider Orientation radio options.
             // Iterate over the radio options.
@@ -771,7 +795,8 @@
                 sliderOrientation: sliderOrientation,
                 sliderMouseoverAction: sliderMouseoverAction,
                 sliderHandleAnimation: sliderHandleAnimation,
-                sliderMoveOnClickToggle: sliderMoveOnClickToggle
+                sliderMoveOnClickToggle: sliderMoveOnClickToggle,
+                sliderHandleBorderColor: sliderHandleBorderColor
             };
 
             // Manipulate settings panel.

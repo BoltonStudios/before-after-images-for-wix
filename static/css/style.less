@@ -39,9 +39,20 @@
             }
         }
         .baie-image-select{
-            img:hover{
-                cursor: pointer;
-                opacity: .8;
+            .col{
+                position: relative;
+                img:hover{
+                    cursor: pointer;
+                    opacity: .8;
+                }
+                .spinner-grow,
+                .spinner-border{
+                    position: absolute;
+                    z-index: 10;
+                    top: 53px;
+                    left: 50%;
+                    margin-left: -14px;
+                }
             }
         }
     }
@@ -57,14 +68,6 @@ TwentyTwenty overrides
         }
         .twentytwenty-handle{
             border: none;
-            &:hover{
-                .twentytwenty-up-arrow,
-                .twentytwenty-right-arrow,
-                .twentytwenty-down-arrow,
-                .twentytwenty-left-arrow{
-                    border-color: #FFA500 !important;
-                }
-            }
             .twentytwenty-up-arrow,
             .twentytwenty-right-arrow,
             .twentytwenty-down-arrow,
@@ -72,10 +75,19 @@ TwentyTwenty overrides
                 background-color: #ffffff;
                 background-repeat: no-repeat;
                 display: block;
-                border: 3px solid #dddddd;
+                border-width: 3px;
+                border-style: solid;
                 position: absolute;
                 z-index: 100;
                 animation-delay: 0;
+            }
+            &:not(:hover){
+                .twentytwenty-up-arrow,
+                .twentytwenty-right-arrow,
+                .twentytwenty-down-arrow,
+                .twentytwenty-left-arrow{
+                    border-color: #dddddd !important;
+                }
             }
         }
     }

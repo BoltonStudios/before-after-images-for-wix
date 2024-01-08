@@ -20,6 +20,7 @@
             data-slider-mouseover-action="{{slider_mouseover_action}}"
             data-slider-handle-animation="{{slider_handle_animation}}"
             data-slider-move-on-click-toggle="{{slider_move_on_click_toggle}}"
+            data-slider-handle-border-color="{{slider_handle_border_color}}"
         >
             <!-- The before image is first -->
             {% if before_image != '' %}
@@ -83,8 +84,24 @@
             });
         });
        </script>
+
+        <script>
+         // Do something when the document is ready.
+         jQuery( document ).ready( function(){
+
+            // Initialize variables.
+            var directions = [ 'up', 'down', 'left', 'right' ];
+
+            // For each direction.
+            directions.forEach( function( element ){
+
+                // Apply the user's chosen border color.
+                jQuery( '.twentytwenty-' + element + '-arrow' ).css( "border-color", "{{slider_handle_border_color}}" );
+            });
+        });
+        </script>
        
-        {% if slider_handle_animation == 2 %}
+        {% if ( is_free == False ) and ( slider_handle_animation == 2 ) %}
         <script>
             // Do something when the document is ready.
             jQuery( document ).ready( function(){
@@ -94,8 +111,8 @@
             });
         </script>
         {% endif %}
-
-        {% if slider_move_slider_on_hover == 1 %}
+        is_free is {{ is_free }}
+        {% if ( is_free == False ) and ( slider_move_slider_on_hover == 1 ) %}
         <script>
             // Do something when the document is ready.
             jQuery( document ).ready( function(){
