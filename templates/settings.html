@@ -90,12 +90,12 @@
                             </div>
                         </div>
                         
-                        {% if is_free == False %}
+                        {% if is_free == True %}
                         <div class="container-fluid mt-4 p-3 align-self-end text-center">
                             <hr>
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light">Free trial expires in: {{days}} days</p>
+                                    <p class="fw-light">Free trial expires in: {{trial_days_remaining}} days</p>
                                     <a class="btn btn-purple-1 rounded-pill" 
                                         id="v-pills-upgrade"
                                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"

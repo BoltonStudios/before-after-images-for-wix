@@ -9,7 +9,7 @@ import os
 import json
 import urllib.parse
 import jwt
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
 from dotenv import load_dotenv
 import base64
@@ -435,6 +435,7 @@ def settings():
     is_move_on_click_enabled = False
     is_vertical = False
     is_free = True # False for dev environmet. Change to True for production.
+    trial_days_remaining = 0
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -467,6 +468,19 @@ def settings():
             is_move_on_click_enabled    = extension_in_db.is_move_on_click_enabled
             is_vertical                 = extension_in_db.is_vertical
 
+            # Calculate the trial days elapsed by subtracting the instance creation date
+            # from today's date.
+            trial_days_elapsed = datetime.now( timezone.utc ) - extension_in_db.instance.created_at
+
+            # Calculate the trial days remaining by subtracting trial days elapsed
+            # from the trial days offered, i.e. 10 days.
+            trial_days_remaining = timedelta( days = 10 ) - trial_days_elapsed
+
+            # If the trial days remaining is negative...
+            if trial_days_remaining < timedelta( days = 0 ) :
+
+                # Set a floor of 0 days
+                trial_days_remaining = timedelta( days = 0 )
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
@@ -488,7 +502,8 @@ def settings():
         mouseover_action = mouseover_action,
         handle_animation = handle_animation,
         handle_border_color = handle_border_color,
-        is_move_on_click_enabled = is_move_on_click_enabled
+        is_move_on_click_enabled = is_move_on_click_enabled,
+        trial_days_remaining = trial_days_remaining.days
     )
 
 # Widget Slider
