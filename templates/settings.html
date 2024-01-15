@@ -25,6 +25,24 @@
                         aria-selected="false">
                         Images
                     </button>
+                    <button class="nav-link rounded-pill" id="v-pills-layout-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#v-pills-layout"
+                        type="button"
+                        role="tab"
+                        aria-controls="v-pills-layout"
+                        aria-selected="false">
+                        Layout
+                    </button>
+                    <button class="nav-link rounded-pill" id="v-pills-animations-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#v-pills-animations"
+                        type="button"
+                        role="tab"
+                        aria-controls="v-pills-animations"
+                        aria-selected="false">
+                        Animations
+                    </button>
                     <button class="nav-link rounded-pill" id="v-pills-options-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-options"
@@ -32,7 +50,7 @@
                         role="tab"
                         aria-controls="v-pills-options"
                         aria-selected="false">
-                        Options
+                        More
                     </button>
                     <hr>
                     <button class="nav-link rounded-pill" id="v-pills-support-tab"
@@ -71,6 +89,22 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        {% if is_free == False %}
+                        <div class="container-fluid mt-4 p-3 align-self-end text-center">
+                            <hr>
+                            <div class="row">
+                                <div class="col">
+                                    <p class="fw-light">Free trial expires in: {{days}} days</p>
+                                    <a class="btn btn-purple-1 rounded-pill" 
+                                        id="v-pills-upgrade"
+                                        href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
+                                        target="_blank">Upgrade App</a>                            
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <script>
                             // Select the given tab by its trigger and shows its associated pane
                             // Source: https://getbootstrap.com/docs/5.0/components/navs-tabs/#show
@@ -213,12 +247,14 @@
                         </div>
                     </div>
                     
-                    <!--Options-->
-                    <div class="tab-pane fade" id="v-pills-options" role="tabpanel" aria-labelledby="v-pills-options-tab">
+                    <!--Layout-->
+                    <div class="tab-pane fade" id="v-pills-layout" role="tabpanel" aria-labelledby="v-pills-layout-tab">
+
+                        <!--Tab Header-->
                         <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light">Slider Options</h5>
+                                    <h5 class="fw-light">Layout Options</h5>
                                 </div>
                             </div>
                         </div>
@@ -297,24 +333,19 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!--Animations-->
+                    <div class="tab-pane fade" id="v-pills-animations" role="tabpanel" aria-labelledby="v-pills-animations-tab">
 
-                        {% if is_free == True %}
-                        <div class="container-fluid text-bg-light mt-3 mb-2 px-4 pt-3 pb-2 border-top border-bottom">
+                        <!--Tab Header-->
+                        <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light">
-                                        <img src="{{ url_for('static', filename='images/upgrade.svg') }}"
-                                            alt="upgrade symbol"
-                                            width="12px"
-                                            height="12px"
-                                            style="margin: 0 4px 4px 0;"
-                                            />
-                                        Upgrade Options
-                                    </h5>
+                                    <h5 class="fw-light">Animations</h5>
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
 
                         <!--Animation-->
                         <div class="container px-4 py-2">
@@ -325,7 +356,7 @@
                                             data-bs-placement="top"
                                             data-bs-title="Animate the slider handle."
                                         >
-                                        <strong>Animation</strong>
+                                        <strong>Handle</strong>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
                                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                                             <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
@@ -444,6 +475,36 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!--Options-->
+                    <div class="tab-pane fade" id="v-pills-options" role="tabpanel" aria-labelledby="v-pills-options-tab">
+                        <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="fw-light">More Options</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if is_free == True %}
+                        <div class="container-fluid text-bg-light mt-3 mb-2 px-4 pt-3 pb-2 border-top border-bottom">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="fw-light">
+                                        <img src="{{ url_for('static', filename='images/upgrade.svg') }}"
+                                            alt="upgrade symbol"
+                                            width="12px"
+                                            height="12px"
+                                            style="margin: 0 4px 4px 0;"
+                                            />
+                                        Upgrade Options
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
 
                         <!--Hover Accent Color-->
                         <div class="container px-4 py-2">

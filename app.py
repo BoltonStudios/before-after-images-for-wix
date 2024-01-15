@@ -40,10 +40,6 @@ app.config[ 'SQLALCHEMY_TRACK_MODIFICATIONS' ] = False
 # Disable strict slashes.
 app.url_map.strict_slashes = False
 
-#
-#app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
-#jwt = JWTManager(app)
-
 # Create a database object.
 db.init_app( app )
 
