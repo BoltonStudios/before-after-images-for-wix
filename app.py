@@ -52,6 +52,7 @@ APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
+TRIAL_DAYS = 10
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -419,6 +420,9 @@ def settings():
     instance_id = None
     requested_extension_id = None
     extension_in_db = None
+    is_free = True # Change to True for production.
+    trial_days = timedelta( days = TRIAL_DAYS )
+    trial_days_remaining = 0
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -434,8 +438,6 @@ def settings():
     handle_border_color = '#BBBBBB'
     is_move_on_click_enabled = False
     is_vertical = False
-    is_free = True # False for dev environmet. Change to True for production.
-    trial_days_remaining = 0
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -474,7 +476,7 @@ def settings():
 
             # Calculate the trial days remaining by subtracting trial days elapsed
             # from the trial days offered, i.e. 10 days.
-            trial_days_remaining = timedelta( days = 10 ) - trial_days_elapsed
+            trial_days_remaining = trial_days - trial_days_elapsed
 
             # If the trial days remaining is negative...
             if trial_days_remaining < timedelta( days = 0 ) :
@@ -526,7 +528,9 @@ def widget():
     # Initialize variables.
     requested_extension_id = None
     extension_in_db = None
-    is_free = True
+    is_free = True # Change to True for production.
+    trial_days = timedelta( days = TRIAL_DAYS )
+    trial_days_remaining = 0
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -715,8 +719,22 @@ def widget():
                 # Update the local variable for use in the widget template.
                 slider_orientation  = 'vertical'
 
-            # If the user is on a paid plan.
-            if is_free is False :
+            # Calculate the trial days elapsed by subtracting the instance creation date
+            # from today's date.
+            trial_days_elapsed = datetime.now( timezone.utc ) - extension_in_db.instance.created_at
+
+            # Calculate the trial days remaining by subtracting trial days elapsed
+            # from the trial days offered, i.e. 10 days.
+            trial_days_remaining = trial_days - trial_days_elapsed
+
+            # If the trial days remaining is negative...
+            if trial_days_remaining < timedelta( days = 0 ) :
+
+                # Set a floor of 0 days
+                trial_days_remaining = timedelta( days = 0 )
+
+            # If the user is within the free trial or on a paid plan.
+            if trial_days_remaining > timedelta( days = 0 ) or is_free is False :
 
                 # Update the paid local variables.
                 mouseover_action = extension_in_db.mouseover_action
@@ -739,6 +757,7 @@ def widget():
     return render_template( 'widget.html',
         page_id = "widget",
         is_free = is_free,
+        trial_days_remaining = trial_days_remaining.days,
         extension_id = requested_extension_id,
         before_image = before_image,
         before_image_thumbnail = before_image_thumbnail,

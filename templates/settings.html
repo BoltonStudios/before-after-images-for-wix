@@ -7,51 +7,118 @@
             <div class="d-flex align-items-start vh-100">
                 <!--Settings Navigation-->
                 <div class="nav flex-column nav-pills p-3 vh-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button class="nav-link active rounded-pill" id="v-pills-main-tab" 
+
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    {% endif %}
+
+                    <button class="nav-link active rounded-pill w-100" id="v-pills-main-tab" 
                         data-bs-toggle="pill" 
                         data-bs-target="#v-pills-main" 
                         type="button" 
                         role="tab" 
                         aria-controls="v-pills-main" 
-                        aria-selected="true">
+                        aria-selected="true"
+                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                            disabled
+                        {% endif %}
+                        >
                         Main
                     </button>
-                    <button class="nav-link rounded-pill" id="v-pills-images-tab"
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    </div>
+                    {% endif %}
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    {% endif %}
+
+                    <button class="nav-link rounded-pill w-100" id="v-pills-images-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-images"
                         type="button"
                         role="tab"
                         aria-controls="v-pills-images"
-                        aria-selected="false">
+                        aria-selected="false"
+                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                            disabled
+                        {% endif %}
+                        >
                         Images
                     </button>
-                    <button class="nav-link rounded-pill" id="v-pills-layout-tab"
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    </div>
+                    {% endif %}
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    {% endif %}
+
+                    <button class="nav-link rounded-pill w-100" id="v-pills-layout-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-layout"
                         type="button"
                         role="tab"
                         aria-controls="v-pills-layout"
-                        aria-selected="false">
+                        aria-selected="false"
+                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                            disabled
+                        {% endif %}
+                        >
                         Layout
                     </button>
-                    <button class="nav-link rounded-pill" id="v-pills-animations-tab"
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    </div>
+                    {% endif %}
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    {% endif %}
+
+                    <button class="nav-link rounded-pill w-100" id="v-pills-animations-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-animations"
                         type="button"
                         role="tab"
                         aria-controls="v-pills-animations"
-                        aria-selected="false">
+                        aria-selected="false"
+                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                            disabled
+                        {% endif %}
+                        >
                         Animations
                     </button>
-                    <button class="nav-link rounded-pill" id="v-pills-options-tab"
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    </div>
+                    {% endif %}
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    {% endif %}
+
+                    <button class="nav-link rounded-pill w-100" id="v-pills-options-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-options"
                         type="button"
                         role="tab"
                         aria-controls="v-pills-options"
-                        aria-selected="false">
+                        aria-selected="false"
+                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                            disabled
+                        {% endif %}
+                        >
                         More
                     </button>
+
+                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    </div>
+                    {% endif %}
+
                     <hr>
                     <button class="nav-link rounded-pill" id="v-pills-support-tab"
                         data-bs-toggle="pill"
@@ -65,7 +132,7 @@
 
                     {% if is_free == True %}
                     <hr>
-                    <a class="nav-link rounded-pill" 
+                    <a class="nav-link rounded-pill text-center" 
                         id="v-pills-upgrade"
                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
                         target="_blank">
@@ -84,22 +151,46 @@
                             <div class="row">
                                 <div class="col">
                                     <p><img src="{{ url_for('static', filename='images/baie-logo.svg') }}" style="border-radius: 70px;" alt="Before + After Images for Wix logo" width="70" height="70"/></p>
+                                    
+                                    {% if ( trial_days_remaining > 0 ) or ( is_free == False ) %}
+
+                                    <!-- Call to Action -->
                                     <p class="fw-light">Easily compare two images with before-and-after image sliders.</p>
                                     <button class="btn btn-primary rounded-pill" type="button" role="button" onclick="changeBaieSettingsTab( trigger = '#v-pills-images-tab' )">Add Images</button>                            
+                                    
+                                    {% else %}
+
+                                     <!-- Upgrade App -->
+                                    <p class="fw-light"><strong>The free trial is over.</strong> Upgrade now<br> to keep using Before & After Images.</p>
+                                    <a class="btn btn-purple-2 rounded-pill" 
+                                        id="v-pills-upgrade"
+                                        href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
+                                        target="_blank">
+                                        <img src="{{ url_for('static', filename='images/upgrade-white.svg') }}"
+                                            alt="upgrade symbol"
+                                            width="12px"
+                                            height="12px"
+                                            style="margin: 2px 4px 4px 0;"
+                                            />
+                                        Upgrade App</a>
+
+                                    {%endif%}
                                 </div>
                             </div>
                         </div>
                         
-                        {% if is_free == True %}
+                        {% if trial_days_remaining > 0 and ( is_free == True ) %}
                         <div class="container-fluid mt-4 p-3 align-self-end text-center">
                             <hr>
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light">Free trial expires in: {{trial_days_remaining}} days</p>
-                                    <a class="btn btn-purple-1 rounded-pill" 
+                                    <p class="fw-light">Free trial ends in <strong>{{trial_days_remaining}} days</strong>.</p>
+                                    <a class="btn btn-purple-1 upgrade-btn rounded-pill" 
                                         id="v-pills-upgrade"
                                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
-                                        target="_blank">Upgrade App</a>                            
+                                        target="_blank">
+                                        Upgrade App
+                                    </a>     
                                 </div>
                             </div>
                         </div>
@@ -254,7 +345,7 @@
                         <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light">Layout Options</h5>
+                                    <h5 class="fw-light">Layout</h5>
                                 </div>
                             </div>
                         </div>
@@ -373,7 +464,7 @@
                                             {% if handle_animation == 0 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -395,7 +486,7 @@
                                             {% if handle_animation == 1 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -417,7 +508,7 @@
                                             {% if handle_animation == 2 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -439,7 +530,7 @@
                                             {% if handle_animation == 3 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -461,7 +552,7 @@
                                             {% if handle_animation == 4 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -487,25 +578,6 @@
                             </div>
                         </div>
 
-                        {% if is_free == True %}
-                        <div class="container-fluid text-bg-light mt-3 mb-2 px-4 pt-3 pb-2 border-top border-bottom">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="fw-light">
-                                        <img src="{{ url_for('static', filename='images/upgrade.svg') }}"
-                                            alt="upgrade symbol"
-                                            width="12px"
-                                            height="12px"
-                                            style="margin: 0 4px 4px 0;"
-                                            />
-                                        Upgrade Options
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-
                         <!--Hover Accent Color-->
                         <div class="container px-4 py-2">
                             <div class="row">
@@ -527,7 +599,7 @@
                                         name="sliderHandleBorderColor"
                                         value="{{handle_border_color}}"
                                         onchange="updateBaieExtension( this )"
-                                        {% if is_free == True %}
+                                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                             disabled
                                         {% endif %}
                                         />
@@ -561,7 +633,7 @@
                                             {% if mouseover_action == 0 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -583,7 +655,7 @@
                                             {% if mouseover_action == 1 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -608,7 +680,7 @@
                                             {% if mouseover_action == 2 %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True %}
+                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -657,7 +729,7 @@
                                             {% if is_move_on_click_enabled == True %}
                                                 checked
                                             {% endif %}
-                                            {% if is_free == True or mouseover_action == 2 %}
+                                            {% if ( ( trial_days_remaining <= 0 ) and ( is_free == True ) ) or mouseover_action == 2 %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -726,7 +798,7 @@
 
             console.log( "updateBaieImages() called." );
 
-            // Declare variables.
+            // Initialize variables.
             var imageURL = '';
             var imageType = element.dataset.type;
             var thumbnailImage = element.querySelector( '.img-thumbnail' );

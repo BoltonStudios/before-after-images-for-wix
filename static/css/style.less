@@ -6,10 +6,29 @@
     &.btn-purple-1{
         background: #eedbf4;
         color: #aa4dc8;
+        &:hover{
+            background: #aa4dc8;
+            color: #ffffff;
+        }
+        &.upgrade-btn{
+            background-image: url('/static/images/upgrade-purple.svg');
+            background-position: 8px center;
+            background-repeat: no-repeat;
+            background-size: 12px;
+            padding-left: 26px;
+            &:hover{
+                background-image: url('/static/images/upgrade-white.svg');
+            }
+        }
     }
     &.btn-purple-2{
         background: #aa4dc8;
         color: #ffffff;
+        &:hover{
+            background: #aa4dc8;
+            color: #ffffff;
+            opacity: .8;
+        }
     }
 }
 #settings{
