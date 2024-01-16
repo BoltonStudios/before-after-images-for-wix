@@ -52,7 +52,7 @@ APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
-TRIAL_DAYS = 10
+TRIAL_DAYS = 1
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -185,6 +185,12 @@ def redirect_wix():
             db.session.add( instance )
             db.session.commit()
 
+        # Return feedback to the console.
+        print( "Instance #" + instance_id + " installed." )
+
+        # Mark the installation complete.
+        logic.finish_app_installation( access_token )
+
         # Close the consent window by redirecting the user to the following URL
         # with the user's access token.
         # Always return an HttpResponseRedirect after successfully dealing
@@ -250,12 +256,7 @@ def uninstall():
         # If the instance exists...
         if instance is not None:
 
-            # Delete the instance.
-            db.session.delete( instance )
-
-            # Return feedback to the console.
-            print( "Deleted instance #" + instance_id )
-
+            # Iterate over extensions.
             for extension in extensions:
 
                 # Delete the instance.
@@ -422,7 +423,6 @@ def settings():
     extension_in_db = None
     is_free = True # Change to True for production.
     trial_days = timedelta( days = TRIAL_DAYS )
-    trial_days_remaining = 0
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -476,13 +476,13 @@ def settings():
 
             # Calculate the trial days remaining by subtracting trial days elapsed
             # from the trial days offered, i.e. 10 days.
-            trial_days_remaining = trial_days - trial_days_elapsed
+            trial_days = trial_days - trial_days_elapsed
 
             # If the trial days remaining is negative...
-            if trial_days_remaining < timedelta( days = 0 ) :
+            if trial_days < timedelta( days = 0 ) :
 
                 # Set a floor of 0 days
-                trial_days_remaining = timedelta( days = 0 )
+                trial_days = timedelta( days = 0 )
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
@@ -505,7 +505,7 @@ def settings():
         handle_animation = handle_animation,
         handle_border_color = handle_border_color,
         is_move_on_click_enabled = is_move_on_click_enabled,
-        trial_days_remaining = trial_days_remaining.days
+        trial_days = trial_days.days
     )
 
 # Widget Slider
@@ -530,7 +530,6 @@ def widget():
     extension_in_db = None
     is_free = True # Change to True for production.
     trial_days = timedelta( days = TRIAL_DAYS )
-    trial_days_remaining = 0
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -725,16 +724,16 @@ def widget():
 
             # Calculate the trial days remaining by subtracting trial days elapsed
             # from the trial days offered, i.e. 10 days.
-            trial_days_remaining = trial_days - trial_days_elapsed
+            trial_days = trial_days - trial_days_elapsed
 
             # If the trial days remaining is negative...
-            if trial_days_remaining < timedelta( days = 0 ) :
+            if trial_days < timedelta( days = 0 ) :
 
                 # Set a floor of 0 days
-                trial_days_remaining = timedelta( days = 0 )
+                trial_days = timedelta( days = 0 )
 
             # If the user is within the free trial or on a paid plan.
-            if trial_days_remaining > timedelta( days = 0 ) or is_free is False :
+            if trial_days > timedelta( days = 0 ) or is_free is False :
 
                 # Update the paid local variables.
                 mouseover_action = extension_in_db.mouseover_action
@@ -757,7 +756,7 @@ def widget():
     return render_template( 'widget.html',
         page_id = "widget",
         is_free = is_free,
-        trial_days_remaining = trial_days_remaining.days,
+        trial_days = trial_days.days,
         extension_id = requested_extension_id,
         before_image = before_image,
         before_image_thumbnail = before_image_thumbnail,

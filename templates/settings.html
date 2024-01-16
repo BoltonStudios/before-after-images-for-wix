@@ -8,11 +8,6 @@
                 <!--Settings Navigation-->
                 <div class="nav flex-column nav-pills p-3 vh-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 
-
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
-                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
-                    {% endif %}
-
                     <button class="nav-link active rounded-pill w-100" id="v-pills-main-tab" 
                         data-bs-toggle="pill" 
                         data-bs-target="#v-pills-main" 
@@ -20,18 +15,11 @@
                         role="tab" 
                         aria-controls="v-pills-main" 
                         aria-selected="true"
-                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
-                            disabled
-                        {% endif %}
                         >
                         Main
                     </button>
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
-                    </div>
-                    {% endif %}
-
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
@@ -42,18 +30,18 @@
                         role="tab"
                         aria-controls="v-pills-images"
                         aria-selected="false"
-                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                             disabled
                         {% endif %}
                         >
                         Images
                     </button>
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     </div>
                     {% endif %}
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
@@ -64,18 +52,18 @@
                         role="tab"
                         aria-controls="v-pills-layout"
                         aria-selected="false"
-                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                             disabled
                         {% endif %}
                         >
                         Layout
                     </button>
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     </div>
                     {% endif %}
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
@@ -86,18 +74,18 @@
                         role="tab"
                         aria-controls="v-pills-animations"
                         aria-selected="false"
-                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                             disabled
                         {% endif %}
                         >
                         Animations
                     </button>
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     </div>
                     {% endif %}
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
@@ -108,14 +96,14 @@
                         role="tab"
                         aria-controls="v-pills-options"
                         aria-selected="false"
-                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                             disabled
                         {% endif %}
                         >
                         More
                     </button>
 
-                    {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                     </div>
                     {% endif %}
 
@@ -152,7 +140,7 @@
                                 <div class="col">
                                     <p><img src="{{ url_for('static', filename='images/baie-logo.svg') }}" style="border-radius: 70px;" alt="Before + After Images for Wix logo" width="70" height="70"/></p>
                                     
-                                    {% if ( trial_days_remaining > 0 ) or ( is_free == False ) %}
+                                    {% if ( trial_days > 0 ) or ( is_free == False ) %}
 
                                     <!-- Call to Action -->
                                     <p class="fw-light">Easily compare two images with before-and-after image sliders.</p>
@@ -179,12 +167,12 @@
                             </div>
                         </div>
                         
-                        {% if trial_days_remaining > 0 and ( is_free == True ) %}
+                        {% if trial_days > 0 and ( is_free == True ) %}
                         <div class="container-fluid mt-4 p-3 align-self-end text-center">
                             <hr>
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light">Free trial ends in <strong>{{trial_days_remaining}} days</strong>.</p>
+                                    <p class="fw-light">Free trial ends in <strong>{{trial_days}} days</strong>.</p>
                                     <a class="btn btn-purple-1 upgrade-btn rounded-pill" 
                                         id="v-pills-upgrade"
                                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
@@ -464,7 +452,7 @@
                                             {% if handle_animation == 0 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -486,7 +474,7 @@
                                             {% if handle_animation == 1 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -508,7 +496,7 @@
                                             {% if handle_animation == 2 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -530,7 +518,7 @@
                                             {% if handle_animation == 3 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -552,7 +540,7 @@
                                             {% if handle_animation == 4 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -599,7 +587,7 @@
                                         name="sliderHandleBorderColor"
                                         value="{{handle_border_color}}"
                                         onchange="updateBaieExtension( this )"
-                                        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                             disabled
                                         {% endif %}
                                         />
@@ -633,7 +621,7 @@
                                             {% if mouseover_action == 0 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -655,7 +643,7 @@
                                             {% if mouseover_action == 1 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -680,7 +668,7 @@
                                             {% if mouseover_action == 2 %}
                                                 checked
                                             {% endif %}
-                                            {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+                                            {% if ( trial_days <= 0 ) and ( is_free == True ) %}
                                                 disabled
                                             {% endif %}
                                         >
@@ -729,7 +717,7 @@
                                             {% if is_move_on_click_enabled == True %}
                                                 checked
                                             {% endif %}
-                                            {% if ( ( trial_days_remaining <= 0 ) and ( is_free == True ) ) or mouseover_action == 2 %}
+                                            {% if ( ( trial_days <= 0 ) and ( is_free == True ) ) or mouseover_action == 2 %}
                                                 disabled
                                             {% endif %}
                                         >

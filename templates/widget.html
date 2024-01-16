@@ -2,8 +2,7 @@
 {% block content %}
     <!-- start content -->
     <div class="content">
-        
-        {% if ( trial_days_remaining <= 0 ) and ( is_free == True ) %}
+        {% if ( trial_days <= 0 ) and ( is_free == True ) %}
         <!--Free Trial Expired-->
         <div class="alert alert-warning fixed-top w-90 mx-3 my-3" role="alert">
             <img src="{{ url_for('static', filename='images/upgrade-warning.svg') }}"
@@ -12,7 +11,7 @@
                 height="12px"
                 style="margin: 2px 4px 4px 0;"
                 />
-            Upgrade now to keep using this App.
+            Please upgrade to keep using this App.
         </div>
         {% endif %}
 
@@ -114,7 +113,7 @@
         });
         </script>
 
-        {% if ( ( trial_days_remaining > 0 ) or ( is_free == False ) ) and ( slider_handle_animation == 2 ) %}
+        {% if ( ( trial_days > 0 ) or ( is_free == False ) ) and ( slider_handle_animation == 2 ) %}
         <script>
             // Do something when the document is ready.
             jQuery( document ).ready( function(){
@@ -125,7 +124,7 @@
         </script>
         {% endif %}
         
-        {% if ( ( trial_days_remaining > 0 ) or ( is_free == False ) ) and ( slider_move_slider_on_hover == 1 ) %}
+        {% if ( ( trial_days > 0 ) or ( is_free == False ) ) and ( slider_move_slider_on_hover == 1 ) %}
         <script>
             // Do something when the document is ready.
             jQuery( document ).ready( function(){
