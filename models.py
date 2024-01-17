@@ -49,6 +49,7 @@ class Extension( db.Model ):
     offset: db.Column                       = db.Column( db.Integer )
     offset_float: db.Column                 = db.Column( db.Float )
     is_vertical: db.Column                  = db.Column( db.Boolean, default = False )
+    is_dark: db.Column                      = db.Column( db.Boolean, default = False )
     mouseover_action: db.Column             = db.Column( db.Integer, default = 1 )
     handle_animation: db.Column             = db.Column( db.Integer, default = 0 )
     handle_border_color: db.Column          = db.Column( db.String( 20 ), default = '#BBBBBB' )

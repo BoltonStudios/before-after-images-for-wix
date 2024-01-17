@@ -115,6 +115,25 @@ TwentyTwenty overrides
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-left-arrow {
   border-color: #dddddd !important;
 }
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle {
+  background: #666666 !important;
+}
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:before,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:after {
+  background: #000000;
+}
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-up-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-right-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-down-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-left-arrow {
+  background-color: #000000;
+}
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-up-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-right-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-down-arrow,
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-left-arrow {
+  border-color: #666666 !important;
+}
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle {
   width: 50px;
   height: 52px;
@@ -210,6 +229,15 @@ TwentyTwenty overrides
   animation-name: fade;
   animation-delay: 1s;
 }
+.twentytwenty-vertical .twentytwenty-container.dark .twentytwenty-handle .pulser {
+  background: #000000;
+}
+.twentytwenty-vertical .twentytwenty-container.dark .twentytwenty-handle:before {
+  box-shadow: 3px 0 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
+}
+.twentytwenty-vertical .twentytwenty-container.dark .twentytwenty-handle:after {
+  box-shadow: -3px 0 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
+}
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle {
   width: 52px;
   height: 50px;
@@ -304,6 +332,15 @@ TwentyTwenty overrides
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-right-arrow {
   animation-name: fade;
   animation-delay: 1s;
+}
+.twentytwenty-horizontal .twentytwenty-container.dark .twentytwenty-handle .pulser {
+  background: #000000;
+}
+.twentytwenty-horizontal .twentytwenty-container.dark .twentytwenty-handle:before {
+  box-shadow: 0 3px 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
+}
+.twentytwenty-horizontal .twentytwenty-container.dark .twentytwenty-handle:after {
+  box-shadow: 0 -3px 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
 }
 @keyframes fade {
   33% {

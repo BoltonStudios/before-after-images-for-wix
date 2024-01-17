@@ -52,7 +52,7 @@ APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
-TRIAL_DAYS = 1
+TRIAL_DAYS = 10
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -438,6 +438,7 @@ def settings():
     handle_border_color = '#BBBBBB'
     is_move_on_click_enabled = False
     is_vertical = False
+    is_dark = False
 
     # If the user submitted a GET request...
     if request.method == 'GET':
@@ -469,6 +470,7 @@ def settings():
             handle_border_color         = extension_in_db.handle_border_color
             is_move_on_click_enabled    = extension_in_db.is_move_on_click_enabled
             is_vertical                 = extension_in_db.is_vertical
+            is_dark                     = extension_in_db.is_dark
 
             # Calculate the trial days elapsed by subtracting the instance creation date
             # from today's date.
@@ -501,6 +503,7 @@ def settings():
         slider_offset = slider_offset,
         slider_offset_float = slider_offset_float,
         is_vertical = is_vertical,
+        is_dark = is_dark,
         mouseover_action = mouseover_action,
         handle_animation = handle_animation,
         handle_border_color = handle_border_color,
@@ -542,6 +545,8 @@ def widget():
     slider_offset_float = 0.5
     slider_orientation = 'horizontal'
     is_vertical = False
+    slider_dark_mode = ''
+    is_dark = False
     mouseover_action = 1
     handle_animation = 0
     handle_border_color = '#BBBBBB'
@@ -579,6 +584,12 @@ def widget():
 
                     # Update the variable.
                     is_vertical = True
+
+                # If the user selected dark mode...
+                if request_data[ 'sliderDarkMode' ] == 'dark' :
+
+                    # Update the variable.
+                    is_dark = True
                     
                 # If the user selected the move on click option...
                 if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
@@ -610,6 +621,7 @@ def widget():
                 extension_in_db.offset = request_data[ 'sliderOffset' ]
                 extension_in_db.offset_float = request_data[ 'sliderOffsetFloat' ]
                 extension_in_db.is_vertical = is_vertical
+                extension_in_db.is_dark = is_dark
                 extension_in_db.mouseover_action = request_data[ 'sliderMouseoverAction' ]
                 extension_in_db.handle_animation = request_data[ 'sliderHandleAnimation' ]
                 extension_in_db.handle_border_color = request_data[ 'sliderHandleBorderColor' ]
@@ -643,6 +655,12 @@ def widget():
 
                     # Update the variable.
                     is_vertical = True
+
+                # If the user selected dark mode...
+                if request_data[ 'sliderDarkMode' ] == 'dark' :
+
+                    # Update the variable.
+                    is_dark = True
                     
                 # If the user selected the move on click option...
                 if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
@@ -665,6 +683,7 @@ def widget():
                     offset = request_data[ 'sliderOffset' ],
                     offset_float = request_data[ 'sliderOffsetFloat' ],
                     is_vertical = is_vertical,
+                    is_dark = is_dark,
                     mouseover_action = request_data[ 'sliderMouseoverAction' ],
                     handle_animation = request_data[ 'sliderHandleAnimation' ],
                     handle_border_color = request_data[ 'sliderHandleBorderColor' ],
@@ -717,6 +736,12 @@ def widget():
 
                 # Update the local variable for use in the widget template.
                 slider_orientation  = 'vertical'
+
+            # If the user selected dark mode...
+            if extension_in_db.is_dark is True :
+
+                # Update the local variable for use in the widget template.
+                slider_dark_mode  = 'dark'
 
             # Calculate the trial days elapsed by subtracting the instance creation date
             # from today's date.
@@ -774,7 +799,8 @@ def widget():
         slider_handle_border_color = handle_border_color,
         slider_no_overlay = int( slider_no_overlay ),
         slider_move_slider_on_hover = int( slider_move_slider_on_hover ),
-        slider_move_on_click_toggle = int( is_move_on_click_enabled )
+        slider_move_on_click_toggle = int( is_move_on_click_enabled ),
+        slider_dark_mode = slider_dark_mode
     )
 
 # Dashboard

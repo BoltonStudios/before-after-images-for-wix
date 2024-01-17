@@ -16,7 +16,7 @@
         {% endif %}
 
         <div id="{{extension_id}}-twentytwenty"
-            class="twentytwenty-container"
+            class="twentytwenty-container {{slider_dark_mode}}"
             data-slider-id="{{extension_id}}"
             data-before-image="{{before_image}}"
             data-before-image-thumbnail="{{before_image_thumbnail}}"
@@ -33,6 +33,7 @@
             data-slider-handle-animation="{{slider_handle_animation}}"
             data-slider-move-on-click-toggle="{{slider_move_on_click_toggle}}"
             data-slider-handle-border-color="{{slider_handle_border_color}}"
+            data-slider-dark-mode="{{slider_dark_mode}}"
         >
             <!-- The before image is first -->
             {% if before_image != '' %}

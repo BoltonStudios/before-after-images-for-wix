@@ -54,6 +54,7 @@ function updateWidgetExtension( e ){
     slider.dataset.sliderHandleAnimation = e.sliderHandleAnimation;
     slider.dataset.sliderMoveOnClickToggle = e.sliderMoveOnClickToggle;
     slider.dataset.sliderHandleBorderColor = e.sliderHandleBorderColor;
+    slider.dataset.sliderDarkMode = e.sliderDarkMode;
 
     // Update image attributes.
     beforeImage.src = e.beforeImage;
@@ -79,6 +80,22 @@ function updateWidgetExtension( e ){
             break;
     }
 
+    // If the user selected dark mode...
+    if( e.sliderDarkMode == "dark" ){
+
+        // If the extension does not already have the dark mode class...
+        if( jQuery( slider ).hasClass( "dark" ) == false ){
+            
+            // Add the dark mode class.
+            jQuery( slider ).addClass( "dark" );
+
+        }
+    } else{
+
+        // Remove the dark mode class.
+        jQuery( slider ).removeClass( "dark" );
+    }
+
     // Reset TwentyTwenty elements.
     jQuery("#" + extension_id + "-twentytwenty").unwrap();
     jQuery(".twentytwenty-overlay").remove();
@@ -99,7 +116,7 @@ function updateWidgetExtension( e ){
     });
 
     // Pulse animation
-    if( e.sliderHandleAnimation == 2 && e.isFree == false ){
+    if( e.sliderHandleAnimation == 2 ){
         
         // Add the pulser element to the handle.
         jQuery( '.twentytwenty-handle' ).prepend( '<span class="pulser"></span>' );
@@ -164,7 +181,8 @@ function publishWidgetExtension( e ){
             sliderMouseoverAction: slider.dataset.sliderMouseoverAction,
             sliderHandleAnimation: slider.dataset.sliderHandleAnimation,
             sliderMoveOnClickToggle: slider.dataset.sliderMoveOnClickToggle,
-            sliderHandleBorderColor: slider.dataset.sliderHandleBorderColor
+            sliderHandleBorderColor: slider.dataset.sliderHandleBorderColor,
+            sliderDarkMode: slider.dataset.sliderDarkMode
         }),
         headers: {
         "Content-type": "application/json; charset=UTF-8"
