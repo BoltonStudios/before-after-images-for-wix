@@ -8,6 +8,7 @@ import requests
 import hmac
 import hashlib
 import base64
+from datetime import datetime, timedelta, timezone
 
 # Dump variable values to the terminal.
 def dump( item, name ):
@@ -42,6 +43,28 @@ def verify_hmac_signature( payload, signature, secret ):
 
     # Compare signatures.
     return expected_signature == signature
+
+# Calculate trial days
+def calculate_trial_days( start_date ):
+
+    # Initialize variables.
+    trial_days = timedelta( days = 10 )
+
+    # Calculate the trial days elapsed by subtracting the instance creation date
+    # from today's date.
+    trial_days_elapsed = datetime.now( timezone.utc ) - start_date
+
+    # Calculate the trial days remaining by subtracting trial days elapsed
+    # from the trial days offered, i.e. 10 days.
+    trial_days = trial_days - trial_days_elapsed
+
+    # If the trial days remaining is negative...
+    if trial_days < timedelta( days = 0 ) :
+
+        # Set a floor of 0 days
+        trial_days = timedelta( days = 0 )
+
+    return trial_days
 
 # Define functions.
 def get_tokens_from_wix( auth_code, auth_provider_base_url, app_secret, app_id ):
@@ -91,14 +114,25 @@ def get_access_token( refresh_token, auth_provider_base_url, app_secret, app_id 
         'grant_type': "refresh_token"
     }
 
-    # Request an access token.
-    token_request = requests.post( url, json = body_parameters, timeout = 2.50 ).json()
+    try:
 
-    # Extract the access token from response.
-    access_token = token_request[ 'access_token' ]
+        # Request an access token.
+        token_request = requests.post( url, json = body_parameters, timeout = 2.50 ).json()
 
-    # Return the access token.
-    return access_token
+        # Extract the access token from response.
+        access_token = token_request[ 'access_token' ]
+
+        # Return the access token.
+        return access_token
+    
+    except Exception as err :
+
+        # Provide feedback for the user.
+        print( 'error in get_access_token' )
+        print( err )
+
+        # Exit the function.
+        return err
 
 def get_app_instance( refresh_token, instance_api_url, auth_provider_base_url, app_secret, app_id ):
 
@@ -108,7 +142,7 @@ def get_app_instance( refresh_token, instance_api_url, auth_provider_base_url, a
     """
 
     try:
-        print( 'getAppInstance with refreshToken = ' + refresh_token )
+        print( 'get_app_instance with refreshToken = ' + refresh_token )
         print( "==============================" )
         access_token = get_access_token( refresh_token, auth_provider_base_url, app_secret, app_id )
 
@@ -122,7 +156,7 @@ def get_app_instance( refresh_token, instance_api_url, auth_provider_base_url, a
     except Exception as err :
 
         # Provide feedback for the user.
-        print( 'error in getAppInstance' )
+        print( 'error in get_app_instance' )
         print( err )
 
         # Exit the function.

@@ -52,7 +52,6 @@ APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
-TRIAL_DAYS = 10
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -181,9 +180,16 @@ def redirect_wix():
                 refresh_token = refresh_token
             )
 
-            # Add the new or updated instance record to the Instance table.
+            # Add the new instance record to the Instance table.
             db.session.add( instance )
-            db.session.commit()
+        
+        else:
+            
+            # Update the instance record to the Instance table.
+            instance_in_db.refresh_token = refresh_token
+            
+        # Add the new or updated instance record to the Instance table.
+        db.session.commit()
 
         # Return feedback to the console.
         print( "Instance #" + instance_id + " installed." )
@@ -325,6 +331,7 @@ def upgrade():
 
             # Change the user to a paid user.
             instance.is_free = False
+            instance.did_cancel = False
 
             # Add the new or updated instance record to the Instance table.
             db.session.commit()
@@ -373,13 +380,12 @@ def downgrade():
 
         # Extract the instance ID
         instance_id = request_data[ 'instanceId' ]
-        logic.dump( instance_id, "instance_id" )
 
         instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c' # REMOVE FOR PRODUCTION
-        logic.dump( instance_id, "instance_id" ) # REMOVE FOR PRODUCTION
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
+        print( product_data )
 
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
@@ -387,8 +393,8 @@ def downgrade():
         # If the instance exists and the product_id is not null.
         if instance and product_id:
 
-            # Delete the instance.
-            instance.is_free = True
+            # Flag the user cancellation.
+            instance.did_cancel = True
 
             # Add the new or updated instance record to the Instance table.
             db.session.commit()
@@ -422,7 +428,7 @@ def settings():
     requested_extension_id = None
     extension_in_db = None
     is_free = True # Change to True for production.
-    trial_days = timedelta( days = TRIAL_DAYS )
+    did_cancel = False
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -455,6 +461,8 @@ def settings():
             # Update the local variables with the requested_extension values.
             instance_id                 = extension_in_db.instance.instance_id
             is_free                     = extension_in_db.instance.is_free
+            did_cancel                  = extension_in_db.instance.did_cancel
+            trial_days                  = logic.calculate_trial_days( extension_in_db.instance.created_at )
             before_image                = extension_in_db.before_image
             before_image_thumbnail      = extension_in_db.before_image_thumbnail
             before_label_text           = extension_in_db.before_label_text
@@ -471,20 +479,6 @@ def settings():
             is_move_on_click_enabled    = extension_in_db.is_move_on_click_enabled
             is_vertical                 = extension_in_db.is_vertical
             is_dark                     = extension_in_db.is_dark
-
-            # Calculate the trial days elapsed by subtracting the instance creation date
-            # from today's date.
-            trial_days_elapsed = datetime.now( timezone.utc ) - extension_in_db.instance.created_at
-
-            # Calculate the trial days remaining by subtracting trial days elapsed
-            # from the trial days offered, i.e. 10 days.
-            trial_days = trial_days - trial_days_elapsed
-
-            # If the trial days remaining is negative...
-            if trial_days < timedelta( days = 0 ) :
-
-                # Set a floor of 0 days
-                trial_days = timedelta( days = 0 )
 
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
@@ -532,7 +526,7 @@ def widget():
     requested_extension_id = None
     extension_in_db = None
     is_free = True # Change to True for production.
-    trial_days = timedelta( days = TRIAL_DAYS )
+    did_cancel = False
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -719,8 +713,10 @@ def widget():
         # Extension found.
         if extension_in_db is not None:
 
-            # Update the free local variables.
+            # Update the local variables with stored values from the database.
             is_free = extension_in_db.instance.is_free
+            trial_days = logic.calculate_trial_days( extension_in_db.instance.created_at )
+            did_cancel = extension_in_db.instance.did_cancel
             before_image = extension_in_db.before_image
             before_image_thumbnail = extension_in_db.before_image_thumbnail
             before_label_text = extension_in_db.before_label_text
@@ -731,6 +727,22 @@ def widget():
             after_alt_text = extension_in_db.after_alt_text
             slider_offset = extension_in_db.offset
             slider_offset_float = extension_in_db.offset_float
+            mouseover_action = extension_in_db.mouseover_action
+            handle_animation = extension_in_db.handle_animation
+            handle_border_color = extension_in_db.handle_border_color
+            encoded_handle_border_color = handle_border_color.replace( "#", "%23" )
+            is_move_on_click_enabled = extension_in_db.is_move_on_click_enabled
+
+            # Mouseover action logic.
+            # Move slider on mouseover.
+            if mouseover_action == 2:
+                slider_no_overlay = False
+                slider_move_slider_on_hover = True
+
+            # Do nothing on mouseover.
+            if mouseover_action == 0:
+                slider_no_overlay = True
+                slider_move_slider_on_hover = False
 
             # If the user selected the vertical orientation...
             if extension_in_db.is_vertical is True :
@@ -744,42 +756,37 @@ def widget():
                 # Update the local variable for use in the widget template.
                 slider_dark_mode  = 'dark'
 
-            # Calculate the trial days elapsed by subtracting the instance creation date
-            # from today's date.
-            trial_days_elapsed = datetime.now( timezone.utc ) - extension_in_db.instance.created_at
+            # If the user cancelled their plan, but the app database still counts them as a paid user...
+            if did_cancel is True and is_free is False:
 
-            # Calculate the trial days remaining by subtracting trial days elapsed
-            # from the trial days offered, i.e. 10 days.
-            trial_days = trial_days - trial_days_elapsed
+                try:
 
-            # If the trial days remaining is negative...
-            if trial_days < timedelta( days = 0 ) :
+                    # Check with Wix for the current instance data.
+                    # Get data about the installation of this app on the user's website.
+                    app_instance = logic.get_app_instance(
+                        extension_in_db.instance.refresh_token,
+                        INSTANCE_API_URL,
+                        AUTH_PROVIDER_BASE_URL,
+                        APP_SECRET,
+                        APP_ID
+                    )
 
-                # Set a floor of 0 days
-                trial_days = timedelta( days = 0 )
+                    # Extract the isFree status.
+                    is_free = app_instance['instance']['isFree']
 
-            # If the user is within the free trial or on a paid plan.
-            if trial_days > timedelta( days = 0 ) or is_free is False :
+                    # Update the record in the database.
+                    extension_in_db.instance.is_free = is_free
 
-                # Update the paid local variables.
-                mouseover_action = extension_in_db.mouseover_action
-                handle_animation = extension_in_db.handle_animation
-                handle_border_color = extension_in_db.handle_border_color
-                encoded_handle_border_color = handle_border_color.replace( "#", "%23" )
-                is_move_on_click_enabled = extension_in_db.is_move_on_click_enabled
+                    # Save changes.
+                    db.session.commit()
 
-                # Mouseover action logic.
-                # Move slider on mouseover.
-                if mouseover_action == 2:
-                    slider_no_overlay = False
-                    slider_move_slider_on_hover = True
+                except Exception as err :
 
-                # Do nothing on mouseover.
-                if mouseover_action == 0:
-                    slider_no_overlay = True
-                    slider_move_slider_on_hover = False
+                    # Provide feedback for the user.
+                    print( 'Unable to resolve isFree status. Error:' )
+                    print( err )
 
-    # Pass local variables to Django and render the template.
+    # Pass local variables and render the template.
     return render_template( 'widget.html',
         page_id = "widget",
         is_free = is_free,
