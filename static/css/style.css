@@ -109,14 +109,14 @@ TwentyTwenty overrides
   z-index: 100;
   animation-delay: 0;
 }
+.twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) {
+  background: #dddddd;
+}
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-up-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-right-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-down-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-left-arrow {
   border-color: #dddddd !important;
-}
-.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle {
-  background: #666666 !important;
 }
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:before,
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:after {
@@ -127,6 +127,9 @@ TwentyTwenty overrides
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-down-arrow,
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle .twentytwenty-left-arrow {
   background-color: #000000;
+}
+.twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) {
+  background: #666666 !important;
 }
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-up-arrow,
 .twentytwenty-wrapper .twentytwenty-container.dark .twentytwenty-handle:not(:hover) .twentytwenty-right-arrow,

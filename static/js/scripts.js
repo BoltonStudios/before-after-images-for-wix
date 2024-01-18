@@ -9,13 +9,22 @@ function resizeComponentWindow(){
         // Initialize variables.
         var container = jQuery("#" + extension_id + "-twentytwenty");
         var beforeImg = container.find("img:first");
-        var beforeWidth = beforeImg.width();
-        var beforeHeight = beforeImg.height();
+        var afterImg = container.find("img:last");
+        var w = beforeImg.width();
+        var h = beforeImg.height();
 
-        // Resize the window to the before image dimensions to match TwentyTwenty.
+        // If the after image is shorter than the before image...
+        if( afterImg.height() < beforeImg.height() ){
+
+            // Use the shorter image dimensions.
+            w = afterImg.width();
+            h = afterImg.height();
+        }
+
+        // Resize the window to the shortest image dimensions to match TwentyTwenty.
         Wix.resizeComponent({
-                width: beforeWidth,
-                height: beforeHeight
+                width: w,
+                height: h
             },
             // Success
             jQuery( window ).trigger( "resize.twentytwenty" )
@@ -162,7 +171,7 @@ function publishWidgetExtension( e ){
     fetch( url_for_widget, {
         method: "POST",
         body: JSON.stringify({
-            action: "publish",
+            action: "save",
             extensionId: slider.dataset.sliderId,
             siteId: Wix.Utils.getSiteOwnerId(),
             userId: Wix.Utils.getUid(),

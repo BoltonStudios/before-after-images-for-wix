@@ -550,6 +550,7 @@ def widget():
     mouseover_action = 1
     handle_animation = 0
     handle_border_color = '#BBBBBB'
+    encoded_handle_border_color = '%23BBBBBB'
     slider_no_overlay = False
     slider_move_slider_on_hover = False
     is_move_on_click_enabled = False
@@ -764,6 +765,7 @@ def widget():
                 mouseover_action = extension_in_db.mouseover_action
                 handle_animation = extension_in_db.handle_animation
                 handle_border_color = extension_in_db.handle_border_color
+                encoded_handle_border_color = handle_border_color.replace( "#", "%23" )
                 is_move_on_click_enabled = extension_in_db.is_move_on_click_enabled
 
                 # Mouseover action logic.
@@ -797,6 +799,7 @@ def widget():
         slider_mouseover_action = int( mouseover_action ),
         slider_handle_animation = int( handle_animation ),
         slider_handle_border_color = handle_border_color,
+        slider_encoded_handle_border_color = encoded_handle_border_color,
         slider_no_overlay = int( slider_no_overlay ),
         slider_move_slider_on_hover = int( slider_move_slider_on_hover ),
         slider_move_on_click_toggle = int( is_move_on_click_enabled ),

@@ -41,6 +41,14 @@
       var calcOffset = function(dimensionPct) {
         var w = beforeImg.width();
         var h = beforeImg.height();
+
+        // Override: If the after image is shorter than the before image...
+        if( afterImg.height() < beforeImg.height() ){
+
+            // Use the shorter image dimensions.
+            w = afterImg.width();
+            h = afterImg.height();
+        }
         
         return {
           w: w+"px",
