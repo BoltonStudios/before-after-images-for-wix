@@ -40,16 +40,12 @@
   <body id="{{page_id}}">
 
     <!-- start wrapper -->
-    <div id="wrapper">
-        {% if admin%}
-            {% include 'site-header.html' %}
-            {% include 'page-header.html' %}
-        {% endif %}
+    <div id="wrapper" class="{% if admin%}bg-light pb-4{% endif %}">
         {% block content %}{% endblock %}
-        </div><!-- end wrapper -->
-        {% if admin%}
-            {% include 'site-footer.html' %}
-        {% endif %}
+    </div><!-- end wrapper -->
+    {% if admin%}
+        {% include 'site-footer.html' %}
+    {% endif %}
    
     <script>
         Wix.onReady( () => {

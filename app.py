@@ -824,6 +824,7 @@ def dashboard():
     print( "=============================" )
     
     # Initialize variables.
+    admin = True
     instance_id = ''
     instance = ''
     extensions = ''
@@ -889,6 +890,7 @@ def dashboard():
             extension_count = len( extensions )
 
     return render_template( 'dashboard.html',
+        admin = admin,
         instance = instance,
         extensions = extensions,
         extension_count = extension_count

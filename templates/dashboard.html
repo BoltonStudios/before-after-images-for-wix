@@ -3,17 +3,24 @@
 {% block content %}
 <!--Header-->
 <div class="container-fluid text-bg-dark mb-4 px-4 py-3 border-bottom">
-    <div class="row  align-items-center">
-        <div class="col">
+    <div class="d-flex">
+        <div class="flex-shrink-1 px-4">
             
             <img src="{{ url_for('static', filename='images/baie-logo.svg') }}"
-                class="float-start me-4"
+                class="float-end mt-2"
                 style="border: 2px solid #555555; border-radius: 48px; float: left;"
                 alt="Before + After Images for Wix logo"
                 width="48"
                 height="48"
             />       
+        </div>
+        <div>
             <h1 class="fw-light">Before & After Images</h1>
+            <p>Running in Instance ID <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#999999" class="bi bi-person-circle" viewBox="0 0 16 16" style="margin-top: -3px;">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            </svg>
+            {{ instance.instance_id }}</p>
         </div>
     </div>
 </div>
@@ -32,10 +39,6 @@
 
 <div class="container mb-4">
     <div class="row">
-        <div class="col">
-            <p><strong>Your Instance ID</strong></p>
-            {{ instance.instance_id }}
-        </div>
         <div class="col">
             <p><strong>Subscription</strong></p>
             Free Trial
@@ -65,50 +68,68 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ extension.extension_id }}" aria-expanded="true" aria-controls="collapse{{ extension.extension_id }}">
-                            <b>ID:</b> &nbsp;{{ extension.extension_id }} <b class="ms-3">Created:</b> &nbsp;{{ extension.created_at.year }}-{{ extension.created_at.month }}-{{ extension.created_at.day }}
+                            
+                            <span class="row w-100">
+
+                                <span class="col col-10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#999999" class="bi bi-calendar" viewBox="0 0 16 16" style="margin-top: -1px;">
+                                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                                    </svg> 
+                                    &nbsp;{{ extension.created_at.year }}-{{ extension.created_at.month }}-{{ extension.created_at.day }}
+                                    &nbsp;&nbsp;
+                                    <strong>ID:</strong> &nbsp;{{ extension.extension_id }}
+                                </span>
+
+                                <span class="col col-2 d-flex align-self-end pe-5" style="height: 60px;">
+                                    <span class="col border border-2 border-end-0 rounded-start-2" style="background-image: url('{{ extension.before_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
+                                    <span class="col border border-2 border-start-0 rounded-end-2" style="background-image: url('{{ extension.after_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
+                                </span>
+                            </span>
                         </button>
                     </h2>
                     <div id="collapse{{ extension.extension_id }}" class="accordion-collapse collapse" data-bs-parent="#accordionComponents">
                         <div class="accordion-body">
-                            <div class="col-6">
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <p><b>Instance ID:</b> {{ extension.instance_id }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>Before Image URL:</strong> {{ extension.before_image }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>Before Label Text:</strong> {{ extension.before_label_text }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>Before Alt Text:</strong> {{ extension.before_alt_text }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>After Image URL:</strong> {{ extension.after_image }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>After Label Text:</strong> {{ extension.after_label_text }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>After Alt Text:</strong> {{ extension.after_alt_text }}</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p><strong>Offset Percentage:</strong> {{ extension.offset_float }}%</p>
-                                </li>
-                                <li class="list-group-item">
-                                    <p>
-                                        <strong>Orientation:</strong>
-                                        {% if extension.is_vertical %}
-                                            Vertical
-                                        {% else %}
-                                            Horizontal
-                                        {% endif %}
-                                    </p>
-                                </li>
-                            </ul>
+                            <div class="row">
+                                <div class="col-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <p><strong>Before Image URL:</strong> {{ extension.before_image }}</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p><strong>Before Label Text:</strong> {{ extension.before_label_text }}</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p><strong>Before Alt Text:</strong> {{ extension.before_alt_text }}</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p><strong>After Image URL:</strong> {{ extension.after_image }}</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p><strong>After Label Text:</strong> {{ extension.after_label_text }}</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p><strong>After Alt Text:</strong> {{ extension.after_alt_text }}</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <p><strong>Offset Percentage:</strong> {{ extension.offset_float }}%</p>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <p>
+                                                <strong>Orientation:</strong>
+                                                {% if extension.is_vertical %}
+                                                    Vertical
+                                                {% else %}
+                                                    Horizontal
+                                                {% endif %}
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
@@ -116,56 +137,15 @@
             </div>
         </div>
     </div>
-    <div class="row">
-
-
-        {% for extension in extensions %}
-        <!--Widget-->
-        <div class="col-4 my-4">
-            <p><strong>Slider ID:</strong> {{extension.extension_id}}</p>
-            <div id="{{extension.extension_id}}-twentytwenty"
-                class="twentytwenty-container {% if extension.is_dark %}dark{% endif %}"
-            >
-                <!-- The before image is first -->
-                {% if extension.before_image != '' %}
-                    <img id="{{extension.extension_id}}-before-image" src="{{ extension.before_image }}" width="637" height="328" alt="{{extension.before_alt_text}}" />
-                {% else %}
-                    <img id="{{extension.extension_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" width="637" height="328" alt="placeholder" />
-                {% endif %}
-                <!-- The after image is last -->
-                {% if extension.after_image != '' %}
-                    <img id="{{extension.extension_id}}-after-image" src="{{ extension.after_image }}" width="637" height="328" alt="{{extension.after_alt_text}}" />
-                {% else %}
-                    <img id="{{extension.extension_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" width="637" height="328" alt="placeholder" />
-                {% endif %}
-            </div>
-        </div>
-        
-        <script>
-            // Initialize TwentyTwenty
-            $(function(){
-                $("#{{extension.extension_id}}-twentytwenty").twentytwenty({
-                    before_label: "{{extension.before_label_text}}", // Set a custom before label.
-                    after_label: "{{extension.after_label_text}}", // Set a custom after label.
-                    default_offset_pct: Number( "{{extension.offset_float}}" ), // How much of the before image is visible when the page loads
-                    {% if extension.is_vertical %}
-                    orientation: "vertical", // Orientation of the before and after images ('horizontal' or 'vertical')
-                    {% endif %}
-                });
-            });
-        </script>
-        {% endfor %}
-
-        <!--Navigation-->
-        <nav aria-label="Page navigation example" class="mt-4">
-            <ul class="pagination justify-content-start">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-        </nav>
-    </div>
+    <!--Navigation-->
+    <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination justify-content-start">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
 </div>
 {% endblock %}
