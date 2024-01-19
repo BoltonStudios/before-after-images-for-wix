@@ -429,6 +429,7 @@ def settings():
     extension_in_db = None
     is_free = True # Change to True for production.
     did_cancel = False
+    trial_days = timedelta( days = 10 )
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -462,7 +463,7 @@ def settings():
             instance_id                 = extension_in_db.instance.instance_id
             is_free                     = extension_in_db.instance.is_free
             did_cancel                  = extension_in_db.instance.did_cancel
-            trial_days                  = logic.calculate_trial_days( extension_in_db.instance.created_at )
+            trial_days                  = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
             before_image                = extension_in_db.before_image
             before_image_thumbnail      = extension_in_db.before_image_thumbnail
             before_label_text           = extension_in_db.before_label_text
@@ -527,6 +528,7 @@ def widget():
     extension_in_db = None
     is_free = True # Change to True for production.
     did_cancel = False
+    trial_days = timedelta( days = 10 )
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -715,7 +717,7 @@ def widget():
 
             # Update the local variables with stored values from the database.
             is_free = extension_in_db.instance.is_free
-            trial_days = logic.calculate_trial_days( extension_in_db.instance.created_at )
+            trial_days = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
             did_cancel = extension_in_db.instance.did_cancel
             before_image = extension_in_db.before_image
             before_image_thumbnail = extension_in_db.before_image_thumbnail
@@ -823,6 +825,9 @@ def dashboard():
     
     # Initialize variables.
     instance_id = ''
+    instance = ''
+    extensions = ''
+    extension_count = 0
 
     # If the user submitted a POST request...
     if request.method == 'GET':
@@ -873,9 +878,20 @@ def dashboard():
             # Extract the instance ID
             instance_id = data[ 'instanceId' ]
             logic.dump( instance_id, "instance_id" )# Pass the data to the template.
+        
+            # Update the extensions variable.
+            extensions = Extension.query.filter_by( instance_id = instance_id ).all()
+
+            #
+            instance = extensions[0].instance
+
+            #
+            extension_count = len( extensions )
 
     return render_template( 'dashboard.html',
-        instance_id = instance_id
+        instance = instance,
+        extensions = extensions,
+        extension_count = extension_count
     )
 
 # Database

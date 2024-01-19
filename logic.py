@@ -45,10 +45,7 @@ def verify_hmac_signature( payload, signature, secret ):
     return expected_signature == signature
 
 # Calculate trial days
-def calculate_trial_days( start_date ):
-
-    # Initialize variables.
-    trial_days = timedelta( days = 10 )
+def calculate_trial_days( trial_days, start_date ):
 
     # Calculate the trial days elapsed by subtracting the instance creation date
     # from today's date.

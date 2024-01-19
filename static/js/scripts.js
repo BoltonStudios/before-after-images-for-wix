@@ -21,14 +21,18 @@ function resizeComponentWindow(){
             h = afterImg.height();
         }
 
-        // Resize the window to the shortest image dimensions to match TwentyTwenty.
-        Wix.resizeComponent({
-                width: w,
-                height: h
-            },
-            // Success
-            jQuery( window ).trigger( "resize.twentytwenty" )
-            );
+        // Ensure we are in editor mode...
+        if( Wix.Utils.getViewMode() == 'editor' ){
+
+            // Resize the window to the shortest image dimensions to match TwentyTwenty.
+            Wix.resizeComponent({
+                    width: w,
+                    height: h
+                },
+                // Success
+                jQuery( window ).trigger( "resize.twentytwenty" )
+                );
+        }
 
     }, 250 );
 }
