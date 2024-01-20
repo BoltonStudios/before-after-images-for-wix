@@ -55,20 +55,20 @@
         </div>
     </div>
     {% endif %}
-    <div class="row">
-        <div class="col">
+    <div class="d-flex justify-content-between">
+        <div>
             <p><strong>Subscription</strong></p>
             {% if is_free %}
             <p>Free Trial: <strong>{{trial_days}} days</strong> remaining. <a href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}">Upgrade App</a></p>
             {% else %}
-            <p><span class="badge text-bg-success">Active</span></p>
+            <p><span class="badge text-bg-success">Active</span> 
+                {% if expiration_date %}
+                <small class="text-body-secondary">Expires {{ expiration_date.strftime('%b %d, %Y') }}</small>
+                {% endif %}
+            </p>
             {% endif %}
         </div>
-        <div class="col">
-            <p><strong>Joined</strong></p>
-            <p>{{ instance.created_at.year }}-{{ instance.created_at.month }}-{{ instance.created_at.day }}</p>
-        </div>
-        <div class="col">
+        <div>
             <p><strong>Sliders</strong></p>
             <p>
                 <strong>{{ extensions.total }}</strong> <small class="text-body-secondary">of 499 available.</small>

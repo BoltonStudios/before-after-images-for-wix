@@ -323,6 +323,9 @@ def upgrade():
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
+        
+        # Extract the expiration date
+        expiration_date = product_data[ 'expiresOn' ]
 
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
@@ -333,6 +336,7 @@ def upgrade():
             # Change the user to a paid user.
             instance.is_free = False
             instance.did_cancel = False
+            instance.expires_on = datetime.strptime( expiration_date, '%Y-%m-%dT%H:%M:%SZ' )
 
             # Add the new or updated instance record to the Instance table.
             db.session.commit()
@@ -831,6 +835,7 @@ def dashboard( instance_id = '', page = 1):
     trial_days = TRIAL_DAYS
     instance = None
     extensions = None
+    expiration_date = datetime.utcnow()
 
     # If the user submitted a POST request...
     if request.method == 'GET':
@@ -898,11 +903,13 @@ def dashboard( instance_id = '', page = 1):
             # Update the local variables with stored values from the database.
             is_free = instance.is_free
             trial_days = logic.calculate_trial_days( trial_days, instance.created_at )
+            expiration_date = instance.expires_on
 
     return render_template( 'dashboard.html',
         admin = admin,
         is_free = is_free,
         trial_days = trial_days.days,
+        expiration_date = expiration_date,
         instance = instance,
         extensions = extensions
     )

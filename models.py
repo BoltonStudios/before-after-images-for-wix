@@ -22,6 +22,7 @@ class Instance( db.Model ):
     refresh_token: db.Column    = db.Column( db.String( 2000 ), unique = True )
     is_free: db.Column          = db.Column( db.Boolean, default = True )
     did_cancel: db.Column       = db.Column( db.Boolean, default = False )
+    expires_on: db.Column       = db.Column( db.DateTime )
     created_at: db.Column       = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
