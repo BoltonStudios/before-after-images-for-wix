@@ -1,61 +1,97 @@
 {% extends 'site-layout.html' %}
 
 {% block content %}
+
 <!--Header-->
-<div class="container-fluid text-bg-dark mb-4 px-4 py-3 border-bottom">
-    <div class="d-flex">
-        <div class="flex-shrink-1 px-4">
-            
-            <img src="{{ url_for('static', filename='images/baie-logo.svg') }}"
-                class="float-end mt-2"
-                style="border: 2px solid #555555; border-radius: 48px; float: left;"
-                alt="Before + After Images for Wix logo"
-                width="48"
-                height="48"
-            />       
-        </div>
-        <div>
-            <h1 class="fw-light">Before & After Images</h1>
-            <p>Running in Instance ID <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#999999" class="bi bi-person-circle" viewBox="0 0 16 16" style="margin-top: -3px;">
-                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-            </svg>
-            {{ instance.instance_id }}</p>
-        </div>
-    </div>
-</div>
-
-<div class="container mb-3">
-    <div class="row">
-        <div class="alert alert-secondary" role="alert">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-              </svg>
-            Please use the Site Editor to edit individual sliders.
+<div class="container-fluid text-bg-dark px-4 py-4">
+    <div class="container px-5">
+        <div class="row align-items-center">
+            <div class="col">
+                <img src="{{ url_for('static', filename='images/baie-logo.svg') }}"
+                    class="me-2"
+                    style="border: 2px solid #555555; border-radius: 48px; float: left;"
+                    alt="Before & After Images for Wix logo"
+                    width="48"
+                    height="48"
+                />   
+                <h1>Before & After Images</h1>
+            </div>
+            <div class="col">
+                <div class="btn-group-vertical float-end" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Get Support
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item border-bottom" href="https://www.boltonstudios.com/wix-support">Support Contact Form</a></li>
+                        <li><a class="dropdown-item" href="mailto:support@boltonstudios.com">Email the Developer</a></li>
+                      </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container mb-4">
-    <div class="row">
-        <div class="col">
-            <p><strong>Subscription</strong></p>
-            Free Trial
-        </div>
-        <div class="col">
-            <p><strong>Joined</strong></p>
-            {{ instance.created_at.year }}-{{ instance.created_at.month }}-{{ instance.created_at.day }}
-        </div>
-        <div class="col">
-            <p><strong>Sliders</strong></p>
-            {{extension_count}} of 999 available.
+<!--Info-->
+<div class="container-fluid text-bg-secondary mb-4 px-4 py-2">
+    <div class="container px-5">
+        <div class="row">
+            <div class="col">
+                <small class="text-light">View information about your app installation below. Please use the</small> 
+                <a href="https://support.wix.com/en/article/wix-editor-getting-started-with-the-wix-editor" class="link-light"><small>Wix Editor</small></a> 
+                <small class="text-light">to edit individual sliders.</small>
+            </div>
         </div>
     </div>
 </div>
 
 <!--Body-->
-<div class="container">
+<div class="container px-5 mb-3">
+    {% if ( trial_days <= 0 ) and ( is_free == True ) %}
+    <div class="row">
+        <div class="col">
+            {% include 'alert-trial-expired.html' %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            <p><strong>Subscription</strong></p>
+            {% if is_free %}
+            <p>Free Trial: <strong>{{trial_days}} days</strong> remaining. <a href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}">Upgrade App</a></p>
+            {% else %}
+            <p><span class="badge text-bg-success">Active</span></p>
+            {% endif %}
+        </div>
+        <div class="col">
+            <p><strong>Joined</strong></p>
+            <p>{{ instance.created_at.year }}-{{ instance.created_at.month }}-{{ instance.created_at.day }}</p>
+        </div>
+        <div class="col">
+            <p><strong>Sliders</strong></p>
+            <p>
+                <strong>{{ extensions.total }}</strong> <small class="text-body-secondary">of 499 available.</small>
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    width="12" 
+                    height="12" 
+                    fill="currentColor" 
+                    class="bi bi-info-circle-fill link-primary" 
+                    viewBox="0 0 16 16" 
+                    style="margin-top: -2px"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Contact Support to request more sliders."
+                >
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!--Body-->
+<div class="container px-5">
     <div class="row">
         <div class="col">
             <div class="row align-items-end">
@@ -64,23 +100,24 @@
                 </div>
             </div>
             <div class="accordion pt-2" id="accordionComponents">
-                {% for extension in extensions %}
+                {% for extension in extensions.items %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ extension.extension_id }}" aria-expanded="true" aria-controls="collapse{{ extension.extension_id }}">
                             
                             <span class="row w-100">
 
-                                <span class="col col-10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#999999" class="bi bi-calendar" viewBox="0 0 16 16" style="margin-top: -1px;">
-                                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
-                                    </svg> 
-                                    &nbsp;{{ extension.created_at.year }}-{{ extension.created_at.month }}-{{ extension.created_at.day }}
-                                    &nbsp;&nbsp;
-                                    <strong>ID:</strong> &nbsp;{{ extension.extension_id }}
+                                <span class="col-xl-10 col-lg-9 col-md-8 col-sm-7 col-xs-12">
+                                    <strong>ID</strong>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#999999" class="bi bi-hash" viewBox="0 0 16 16" style="margin-top: -3px;">
+                                        <path d="M8.39 12.648a1 1 0 0 0-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304a1 1 0 0 0 .016-.164.51.51 0 0 0-.516-.516.54.54 0 0 0-.539.43l-.523 2.554H7.617l.477-2.304c.008-.04.015-.118.015-.164a.51.51 0 0 0-.523-.516.54.54 0 0 0-.531.43L6.53 5.484H5.414c-.43 0-.617.22-.617.532s.187.539.617.539h.906l-.515 2.523H4.609c-.421 0-.609.219-.609.531s.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242zm-1-6.109h2.266l-.515 2.563H6.859l.532-2.563z"/>
+                                    </svg>
+                                    <strong>{{ extension.extension_id }}</strong><br/>
+
+                                    <small class="text-body-secondary">Created {{ extension.created_at.year }}-{{ extension.created_at.month }}-{{ extension.created_at.day }}</small>
                                 </span>
 
-                                <span class="col col-2 d-flex align-self-end pe-5" style="height: 60px;">
+                                <span class="col-xl-2 col-lg-3 col-md-4 col-sm-5 col-xs-12 d-flex align-self-end pe-5" style="height: 52px;">
                                     <span class="col border border-2 border-end-0 rounded-start-2" style="background-image: url('{{ extension.before_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
                                     <span class="col border border-2 border-start-0 rounded-end-2" style="background-image: url('{{ extension.after_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
                                 </span>
@@ -92,7 +129,7 @@
                             <div class="row">
                                 <div class="col-6">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">
+                                        <li class="list-group-item overflow-x-scroll">
                                             <p><strong>Before Image URL:</strong> {{ extension.before_image }}</p>
                                         </li>
                                         <li class="list-group-item">
@@ -101,7 +138,7 @@
                                         <li class="list-group-item">
                                             <p><strong>Before Alt Text:</strong> {{ extension.before_alt_text }}</p>
                                         </li>
-                                        <li class="list-group-item">
+                                        <li class="list-group-item overflow-x-scroll">
                                             <p><strong>After Image URL:</strong> {{ extension.after_image }}</p>
                                         </li>
                                         <li class="list-group-item">
@@ -115,7 +152,7 @@
                                 <div class="col-6">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item">
-                                            <p><strong>Offset Percentage:</strong> {{ extension.offset_float }}%</p>
+                                            <p><strong>Offset Percentage:</strong> {{ "%.0f"|format( extension.offset_float * 100 ) }}%</p>
                                         </li>
                                         <li class="list-group-item">
                                             <p>
@@ -138,14 +175,29 @@
         </div>
     </div>
     <!--Navigation-->
-    <nav aria-label="Page navigation example" class="mt-4">
+    <nav aria-label="Dashboard slider list navigation" class="mt-4">
         <ul class="pagination justify-content-start">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        {% for number in extensions.iter_pages() %}
+            {% if number %}
+            
+                {% if number != extensions.page %}
+                <li class="page-item"><a class="page-link" href="{{ url_for( 'dashboard', page=number, instance_id=instance.instance_id ) }}">{{ number }}</a></li>
+                {% else %}
+                <li class="page-item disabled"><a class="page-link">{{ number }}</a></li>
+                {% endif %}
+                
+            {% else %}
+                <span class=ellipsis>…</span>
+            {% endif %}
+        {% endfor %}
         </ul>
     </nav>
 </div>
+
+<script>
+    // Initialize Boostrap tooltips.
+    // Source: https://getbootstrap.com/docs/5.3/components/tooltips/
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
 {% endblock %}

@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import base64
 
 # Flask imports
-from flask import Flask, Response, redirect, render_template, request, url_for
+from flask import Flask, Response, abort, redirect, render_template, request, url_for
 
 # Local imports
 from database import db, db_uri, migrate
@@ -46,12 +46,13 @@ db.init_app( app )
 # Create a Migrate object.
 migrate.init_app( app, db )
 
-# Wix Constants
+# Define constants.
 WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
 APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
+TRIAL_DAYS = timedelta( days = 10 )
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -429,7 +430,7 @@ def settings():
     extension_in_db = None
     is_free = True # Change to True for production.
     did_cancel = False
-    trial_days = timedelta( days = 10 )
+    trial_days = TRIAL_DAYS
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -528,7 +529,7 @@ def widget():
     extension_in_db = None
     is_free = True # Change to True for production.
     did_cancel = False
-    trial_days = timedelta( days = 10 )
+    trial_days = TRIAL_DAYS
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
     before_label_text = 'Before'
@@ -816,8 +817,9 @@ def widget():
     )
 
 # Dashboard
-@app.route( '/dashboard/', methods=['GET','POST'] )
-def dashboard():
+@app.route( '/dashboard/', methods=['GET'] )
+@app.route( '/dashboard/<string:instance_id>/<int:page>', methods=['GET'] )
+def dashboard( instance_id = '', page = 1):
 
     """Return database contents."""
     print( "Got a call from Wix for /dashboard/" )
@@ -825,75 +827,84 @@ def dashboard():
     
     # Initialize variables.
     admin = True
-    instance_id = ''
-    instance = ''
-    extensions = ''
-    extension_count = 0
+    is_free = True # Change to True for production.
+    trial_days = TRIAL_DAYS
+    instance = None
+    extensions = None
 
     # If the user submitted a POST request...
     if request.method == 'GET':
+
+        if instance_id == '' :
         
-        # Get app instance.
-        # Extract signature and data.
-        # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-        wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
-        payload = encoded_json.encode("UTF-8")
-        signature = wix_signature
-        secret = APP_SECRET.encode("UTF-8")
+            # Get app instance.
+            # Extract signature and data.
+            # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+            wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
+            payload = encoded_json.encode("UTF-8")
+            signature = wix_signature
+            secret = APP_SECRET.encode("UTF-8")
 
-        # Compare the signatures and verify a match.
-        signatures_did_match = logic.verify_hmac_signature( payload, signature, secret )
+            # Compare the signatures and verify a match.
+            signatures_did_match = logic.verify_hmac_signature( payload, signature, secret )
 
-        # If the signatures match...
-        if signatures_did_match is True :
+            # If the signatures match...
+            if signatures_did_match is True :
+                
+                print( "SUCCESS: Signatures match." )
             
-            print( "SUCCESS: Signatures match." )
-        
-        else:
+            else:
 
-            print( "ERROR: Signatures do not match." )
+                print( "ERROR: Signatures do not match." )
 
-        # Decode data from Wix.
-        # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
-        # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-        # Retrieved 12/31/2023
-        #
-        # The '=' below is sufficient padding.
-        # Source: https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
-        # Retrieved 12/31/2023
-        decoded_data = encoded_json + ( "=" * ((4 - len( encoded_json ) % 4) % 4) )
-
-        # Load data from Wix.
-        data = json.loads( base64.b64decode( decoded_data ) )
-        logic.dump( data, "data" )
-
-        # Check if aid is returned in the instance parameter.
-        # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-        if 'aid' in data:
-             
-             # Block user.
-             return 200, ""
-        
-        if 'instanceId' in data:
-
-            # Extract the instance ID
-            instance_id = data[ 'instanceId' ]
-            logic.dump( instance_id, "instance_id" )# Pass the data to the template.
-        
-            # Update the extensions variable.
-            extensions = Extension.query.filter_by( instance_id = instance_id ).all()
-
+            # Decode data from Wix.
+            # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
+            # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+            # Retrieved 12/31/2023
             #
-            instance = extensions[0].instance
+            # The '=' below is sufficient padding.
+            # Source: https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
+            # Retrieved 12/31/2023
+            decoded_data = encoded_json + ( "=" * ((4 - len( encoded_json ) % 4) % 4) )
 
-            #
-            extension_count = len( extensions )
+            # Load data from Wix.
+            data = json.loads( base64.b64decode( decoded_data ) )
+            logic.dump( data, "data" )
+
+            # Check if aid is returned in the instance parameter.
+            # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+            if 'aid' in data:
+                
+                # Block user.
+                abort( 403 )
+            
+            if 'instanceId' in data:
+                
+                # Extract the instance ID
+                instance_id = data[ 'instanceId' ]
+            
+            else:
+
+                # Block user.
+                abort( 403 )
+    
+        # Update the local variables.
+        instance = Instance.query.filter_by( instance_id = instance_id ).first()
+        extensions = Extension.query.filter_by( instance_id = instance_id ).paginate( page = page, per_page = 20 )
+
+        # Instance found.
+        if instance is not None:
+
+            # Update the local variables with stored values from the database.
+            is_free = instance.is_free
+            trial_days = logic.calculate_trial_days( trial_days, instance.created_at )
 
     return render_template( 'dashboard.html',
         admin = admin,
+        is_free = is_free,
+        trial_days = trial_days.days,
         instance = instance,
-        extensions = extensions,
-        extension_count = extension_count
+        extensions = extensions
     )
 
 # Database
