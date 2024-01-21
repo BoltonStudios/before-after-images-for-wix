@@ -316,10 +316,6 @@ def upgrade():
 
         # Extract the instance ID
         instance_id = request_data[ 'instanceId' ]
-        logic.dump( instance_id, "instance_id" )
-
-        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c' # REMOVE FOR PRODUCTION
-        logic.dump( instance_id, "instance_id" ) # REMOVE FOR PRODUCTION
 
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
@@ -381,16 +377,11 @@ def downgrade():
         request_data = json.loads( data['data'] )
         product_data = json.loads( request_data['data'] )
 
-        logic.dump( request_data, "request_data" )
-
         # Extract the instance ID
         instance_id = request_data[ 'instanceId' ]
 
-        instance_id = 'ae63e2fa-b772-4f0f-9c79-bf4da2f97a8c' # REMOVE FOR PRODUCTION
-
         # Extract the product ID
         product_id = product_data[ 'vendorProductId' ]
-        print( product_data )
 
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
@@ -426,14 +417,11 @@ def settings():
     https://devforum.wix.com/kb/en/article/build-an-app-settings-panel-for-website-iframe-components
     """
 
-    print("Settings route called.")
-
     # Initialize variables.
     instance_id = None
     requested_extension_id = None
     extension_in_db = None
     is_free = True # Change to True for production.
-    did_cancel = False
     trial_days = TRIAL_DAYS
     before_image = url_for( 'static', filename='images/placeholder-1.svg' )
     before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
@@ -467,7 +455,6 @@ def settings():
             # Update the local variables with the requested_extension values.
             instance_id                 = extension_in_db.instance.instance_id
             is_free                     = extension_in_db.instance.is_free
-            did_cancel                  = extension_in_db.instance.did_cancel
             trial_days                  = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
             before_image                = extension_in_db.before_image
             before_image_thumbnail      = extension_in_db.before_image_thumbnail
@@ -514,11 +501,6 @@ def settings():
 # Widget Slider
 @app.route('/widget/', methods=['POST','GET'])
 def widget():
-
-    """
-    Build the widget iframe extension containing a before-and-after slider.
-    """
-
  
     # pylint: disable=too-many-locals
     # pylint: disable=too-many-statements
@@ -560,10 +542,7 @@ def widget():
     # If the user submitted a POST request...
     if request.method == 'POST':
 
-        print( "Widget POST request" )
-
         # Get the data received.
-        logic.dump( request.data, "request.data" )
         request_data = json.loads( request.data )
         requested_extension_id = request_data[ "extensionId" ]
 
@@ -636,22 +615,15 @@ def widget():
         else:
 
             # Create new extension.
-            print( "Create new EXTENSION" )
-
-            logic.dump( request_data, "request_data" )
 
             # Extract the instance ID
             instance_id = request_data[ 'instanceId' ] 
 
             # If the request contains an instance ID...
             if instance_id:
-                
-                logic.dump( instance_id, "instance_id")
 
                 # Get the associated Instance instance.
                 instance_in_db = Instance.query.get( instance_id )
-
-                logic.dump( instance_in_db, "instance_in_db")
 
                 # If the user selected the vertical orientation...
                 if request_data[ 'sliderOrientation' ] == 'vertical' :
@@ -725,6 +697,7 @@ def widget():
             is_free = extension_in_db.instance.is_free
             trial_days = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
             did_cancel = extension_in_db.instance.did_cancel
+            expiration_date = extension_in_db.instance.expires_on
             before_image = extension_in_db.before_image
             before_image_thumbnail = extension_in_db.before_image_thumbnail
             before_label_text = extension_in_db.before_label_text
@@ -764,8 +737,10 @@ def widget():
                 # Update the local variable for use in the widget template.
                 slider_dark_mode  = 'dark'
 
-            # If the user cancelled their plan, but the app database still counts them as a paid user...
-            if expiration_date < datetime.utcnow() and is_free is False:
+            # If the user cancelled auto-renew (did_cancel is True) and...
+            # If the expiration date is in the past (expiration_date < datetime.utcnow()) and...
+            # If the app counts the user as a paid user (is_free is False)...
+            if did_cancel is True and expiration_date < datetime.utcnow() and is_free is False:
 
                 try:
 
@@ -782,8 +757,23 @@ def widget():
                     # Extract the isFree status.
                     is_free = app_instance['instance']['isFree']
 
-                    # Update the record in the database.
+                     # Update the record in the database.
                     extension_in_db.instance.is_free = is_free
+                    
+                    # If the billing key is present...
+                    if 'billing' in app_instance:
+
+                        # Extract the billing data.
+                        billing = app_instance['billing']
+
+                        # If the 'expirationDate key is present...
+                        if 'expirationDate' in billing:
+
+                            # Get the new renewal date.
+                            renewal_date = datetime.strptime( billing['expirationDate'], '%Y-%m-%dT%H:%M:%SZ' )
+
+                            # Update the record in the database.
+                            extension_in_db.instance.expiration_date = renewal_date
 
                     # Save changes.
                     db.session.commit()
@@ -843,51 +833,57 @@ def dashboard( instance_id = '', page = 1):
 
         if instance_id == '' :
         
-            # Get app instance.
-            # Extract signature and data.
-            # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-            wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
-            payload = encoded_json.encode("UTF-8")
-            signature = wix_signature
-            secret = APP_SECRET.encode("UTF-8")
+            if 'instance' in request.args :
+                # Get app instance.
+                # Extract signature and data.
+                # https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+                wix_signature, encoded_json = request.args.get( 'instance' ).split('.', 1)
+                payload = encoded_json.encode("UTF-8")
+                signature = wix_signature
+                secret = APP_SECRET.encode("UTF-8")
 
-            # Compare the signatures and verify a match.
-            signatures_did_match = logic.verify_hmac_signature( payload, signature, secret )
+                # Compare the signatures and verify a match.
+                signatures_did_match = logic.verify_hmac_signature( payload, signature, secret )
 
-            # If the signatures match...
-            if signatures_did_match is True :
+                # If the signatures match...
+                if signatures_did_match is True :
+                    
+                    print( "SUCCESS: Signatures match." )
                 
-                print( "SUCCESS: Signatures match." )
+                else:
+
+                    print( "ERROR: Signatures do not match." )
+
+                # Decode data from Wix.
+                # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
+                # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+                # Retrieved 12/31/2023
+                #
+                # The '=' below is sufficient padding.
+                # Source: https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
+                # Retrieved 12/31/2023
+                decoded_data = encoded_json + ( "=" * ((4 - len( encoded_json ) % 4) % 4) )
+
+                # Load data from Wix.
+                data = json.loads( base64.b64decode( decoded_data ) )
+                logic.dump( data, "data" )
+
+                # Check if aid is returned in the instance parameter.
+                # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
+                if 'aid' in data:
+                    
+                    # Block user.
+                    abort( 403 )
+                
+                if 'instanceId' in data:
+                    
+                    # Extract the instance ID
+                    instance_id = data[ 'instanceId' ]
             
-            else:
+                else:
 
-                print( "ERROR: Signatures do not match." )
-
-            # Decode data from Wix.
-            # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
-            # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-            # Retrieved 12/31/2023
-            #
-            # The '=' below is sufficient padding.
-            # Source: https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
-            # Retrieved 12/31/2023
-            decoded_data = encoded_json + ( "=" * ((4 - len( encoded_json ) % 4) % 4) )
-
-            # Load data from Wix.
-            data = json.loads( base64.b64decode( decoded_data ) )
-            logic.dump( data, "data" )
-
-            # Check if aid is returned in the instance parameter.
-            # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
-            if 'aid' in data:
-                
-                # Block user.
-                abort( 403 )
-            
-            if 'instanceId' in data:
-                
-                # Extract the instance ID
-                instance_id = data[ 'instanceId' ]
+                    # Block user.
+                    abort( 403 )
             
             else:
 
@@ -913,43 +909,4 @@ def dashboard( instance_id = '', page = 1):
         expiration_date = expiration_date,
         instance = instance,
         extensions = extensions
-    )
-
-# Database
-@app.route( '/browse-db/' )
-@app.route( '/browse-db/<string:instance_id>', methods=['GET','POST'] )
-def browse_db( instance_id = None ):
-
-    """Return database contents."""
-
-    # Initialize variables.
-    admin = True
-    instances = Instance.query.all()
-    extensions = Extension.query.all()
-
-    # If the user posted data...
-    if request.method == 'POST':
-
-        # Update the instance_id variable.
-        instance_id = request.form['instance_id']
-        
-        # Update the extensions variable.
-        extensions = Extension.query.filter_by( instance_id = instance_id ).all()
-
-    # Pass the data to the template.
-    return render_template( 'browse-db.html',
-        admin = admin,
-        instances = instances,
-        extensions = extensions,
-        instance_id = instance_id
-    )
-
-#
-@app.route( '/<int:extension_id>/' )
-def instance_extension( extension_id ):
-
-    """Return database contents."""
-    extension_record = Extension.query.get_or_404( extension_id )
-    return render_template( 'extension.html',
-        extension = extension_record
     )

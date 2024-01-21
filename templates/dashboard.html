@@ -23,8 +23,8 @@
                         Get Support
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item border-bottom" href="https://www.boltonstudios.com/wix-support">Support Contact Form</a></li>
-                        <li><a class="dropdown-item" href="mailto:support@boltonstudios.com">Email the Developer</a></li>
+                        <li><a class="dropdown-item border-bottom" href="https://www.boltonstudios.com/wix-support/?instance_id={{instance.instance_id}}">Support Contact Form</a></li>
+                        <li><a class="dropdown-item" href="mailto:support@boltonstudios.com?subject=Wix Support for Instance ID {{instance.instance_id}}">Email the Developer</a></li>
                       </ul>
                     </div>
                 </div>
@@ -41,6 +41,12 @@
                 <small class="text-light">View information about your app installation below. Please use the</small> 
                 <a href="https://support.wix.com/en/article/wix-editor-getting-started-with-the-wix-editor" class="link-light"><small>Wix Editor</small></a> 
                 <small class="text-light">to edit individual sliders.</small>
+                <small class="text-light">Instance ID</small>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                </svg>
+                <small class="text-light">{{instance.instance_id}}</small>
             </div>
         </div>
     </div>
