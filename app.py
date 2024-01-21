@@ -555,6 +555,7 @@ def widget():
     slider_no_overlay = False
     slider_move_slider_on_hover = False
     is_move_on_click_enabled = False
+    expiration_date = datetime.utcnow()
 
     # If the user submitted a POST request...
     if request.method == 'POST':
@@ -764,7 +765,7 @@ def widget():
                 slider_dark_mode  = 'dark'
 
             # If the user cancelled their plan, but the app database still counts them as a paid user...
-            if did_cancel is True and is_free is False:
+            if expiration_date < datetime.utcnow() and is_free is False:
 
                 try:
 

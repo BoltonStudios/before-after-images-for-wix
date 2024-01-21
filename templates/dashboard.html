@@ -94,9 +94,15 @@
 <div class="container px-5">
     <div class="row">
         <div class="col">
-            <div class="row align-items-end">
-                <div class="col-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
                     <h4 class="title">Sliders</h4>
+                </div>
+                <div>
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                      </form>
                 </div>
             </div>
             <div class="accordion pt-2" id="accordionComponents">
@@ -105,7 +111,7 @@
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ extension.extension_id }}" aria-expanded="true" aria-controls="collapse{{ extension.extension_id }}">
                             
-                            <span class="row w-100">
+                            <span class="row w-100 align-items-center">
 
                                 <span class="col-xl-10 col-lg-9 col-md-8 col-sm-7 col-xs-12">
                                     <strong>ID</strong>
@@ -118,7 +124,7 @@
                                 </span>
 
                                 <span class="col-xl-2 col-lg-3 col-md-4 col-sm-5 col-xs-12 d-flex align-self-end pe-5" style="height: 52px;">
-                                    <span class="col border border-2 border-end-0 rounded-start-2" style="background-image: url('{{ extension.before_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
+                                    <span class="col border border-2 rounded-start-2" style="border-right: 1px solid #ffffff !important; background-image: url('{{ extension.before_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
                                     <span class="col border border-2 border-start-0 rounded-end-2" style="background-image: url('{{ extension.after_image_thumbnail }}'); background-size: cover; background-position: center center;"></span>
                                 </span>
                             </span>
