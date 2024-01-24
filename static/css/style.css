@@ -138,9 +138,9 @@ TwentyTwenty overrides
   border-color: #666666 !important;
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle {
-  width: 50px;
-  height: 52px;
-  margin-top: -25px;
+  width: 46px;
+  height: 48px;
+  margin-top: -23px;
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle:before,
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle:after {
@@ -155,21 +155,21 @@ TwentyTwenty overrides
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle .twentytwenty-up-arrow,
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle .twentytwenty-down-arrow {
-  width: 44px;
-  height: 22px;
+  width: 40px;
+  height: 20px;
   margin: 0;
   cursor: ns-resize;
   left: 0;
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle .twentytwenty-up-arrow {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999999' class='bi bi-caret-up-fill' viewBox='0 0 16 16'%3E%3Cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999999' class='bi bi-caret-up-fill' viewBox='0 0 16 16'%3E%3Cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3E%3C/svg%3E");
   background-position: center center;
   border-bottom: 0;
   border-radius: 28px 28px 0 0;
   top: 0;
 }
 .twentytwenty-vertical .twentytwenty-container .twentytwenty-handle .twentytwenty-down-arrow {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999999' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999999' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
   background-position: center center;
   border-top: 0;
   border-radius: 0 0 28px 28px;
@@ -189,11 +189,11 @@ TwentyTwenty overrides
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="2"]:not( .clicked ) .pulser {
   background: #ffffff;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   display: block;
   margin: 0 auto;
-  border-radius: 50px;
+  border-radius: 46px;
   animation-duration: 4s;
   animation-iteration-count: infinite;
   opacity: 0;
@@ -242,9 +242,9 @@ TwentyTwenty overrides
   box-shadow: -3px 0 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
 }
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle {
-  width: 52px;
-  height: 50px;
-  margin-left: -26px;
+  width: 48px;
+  height: 46px;
+  margin-left: -24px;
 }
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle:before,
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle:after {
@@ -259,13 +259,13 @@ TwentyTwenty overrides
 }
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle .twentytwenty-right-arrow,
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle .twentytwenty-left-arrow {
-  width: 22px;
-  height: 44px;
-  margin-top: -25px;
+  width: 20px;
+  height: 40px;
+  margin-top: -23px;
   cursor: ew-resize;
 }
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle .twentytwenty-left-arrow {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23999999' class='bi bi-caret-left-fill' viewBox='0 0 16 16'%3E%3Cpath d='m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999999' class='bi bi-caret-left-fill' viewBox='0 0 16 16'%3E%3Cpath d='m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z'/%3E%3C/svg%3E");
   background-position: center center;
   margin-left: 0px;
   border-right: 0;
@@ -273,7 +273,7 @@ TwentyTwenty overrides
   left: 0;
 }
 .twentytwenty-horizontal .twentytwenty-container .twentytwenty-handle .twentytwenty-right-arrow {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23999999' class='bi bi-caret-right-fill' viewBox='0 0 16 16'%3E%3Cpath d='m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999999' class='bi bi-caret-right-fill' viewBox='0 0 16 16'%3E%3Cpath d='m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z'/%3E%3C/svg%3E");
   background-position: center center;
   margin-right: 0px;
   border-left: 0;
@@ -294,10 +294,10 @@ TwentyTwenty overrides
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="2"]:not( .clicked ) .pulser {
   background: #ffffff;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   display: block;
-  border-radius: 50px;
+  border-radius: 46px;
   animation-duration: 4s;
   animation-iteration-count: infinite;
   opacity: 0;
@@ -402,75 +402,75 @@ TwentyTwenty overrides
 }
 @keyframes horizontal-pulse {
   0% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 0;
     translate: 0 0;
   }
   25% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 1;
     translate: 0 0;
   }
   65% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 1;
     translate: 0 0;
   }
   100% {
-    width: 70px;
-    height: 70px;
+    width: 66px;
+    height: 66px;
     opacity: 0;
     translate: -9px -10px;
   }
 }
 @keyframes vertical-pulse {
   0% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 0;
     translate: 0 0;
   }
   25% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 1;
     translate: 0 0;
   }
   65% {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     opacity: 1;
     translate: 0 0;
   }
   100% {
-    width: 70px;
-    height: 70px;
+    width: 66px;
+    height: 66px;
     opacity: 0;
     translate: -10px -9px;
   }
 }
 @keyframes see-saw-left {
   33% {
-    width: 22px;
-    height: 44px;
+    width: 20px;
+    height: 40px;
     opacity: 1;
     translate: 0 0;
     left: 0;
   }
   50% {
-    width: 26px;
-    height: 49px;
+    width: 24px;
+    height: 45px;
     opacity: 1;
     translate: -4px -2px;
     border-radius: 28px 0 0 28px;
     left: 0;
   }
   66% {
-    width: 22px;
-    height: 44px;
+    width: 20px;
+    height: 40px;
     opacity: 1;
     translate: 0 0;
     left: 0;
@@ -478,23 +478,23 @@ TwentyTwenty overrides
 }
 @keyframes see-saw-right {
   33% {
-    width: 22px;
-    height: 44px;
+    width: 20px;
+    height: 40px;
     opacity: 1;
     translate: 0 0;
     right: 0;
   }
   50% {
-    width: 26px;
-    height: 49px;
+    width: 24px;
+    height: 45px;
     opacity: 1;
     translate: 4px -2px;
     border-radius: 0 28px 28px 0;
     right: 0;
   }
   66% {
-    width: 22px;
-    height: 44px;
+    width: 20px;
+    height: 40px;
     opacity: 1;
     translate: 0 0;
     right: 0;
@@ -502,40 +502,40 @@ TwentyTwenty overrides
 }
 @keyframes see-saw-up {
   33% {
-    width: 44px;
-    height: 22px;
+    width: 40px;
+    height: 20px;
     opacity: 1;
     translate: 0 0;
   }
   50% {
-    width: 49px;
-    height: 26px;
+    width: 45px;
+    height: 24px;
     opacity: 1;
     translate: -2px -4px;
   }
   66% {
-    width: 44px;
-    height: 22px;
+    width: 40px;
+    height: 20px;
     opacity: 1;
     translate: 0 0;
   }
 }
 @keyframes see-saw-down {
   33% {
-    width: 44px;
-    height: 22px;
+    width: 40px;
+    height: 20px;
     opacity: 1;
     translate: 0 0;
   }
   50% {
-    width: 49px;
-    height: 26px;
+    width: 45px;
+    height: 24px;
     opacity: 1;
     translate: -2px 4px;
   }
   66% {
-    width: 44px;
-    height: 22px;
+    width: 40px;
+    height: 20px;
     opacity: 1;
     translate: 0 0;
   }
