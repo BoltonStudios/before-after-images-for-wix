@@ -7,25 +7,25 @@ from sqlalchemy.sql import func
 # Local imports.
 from database import db
 
-# Define the user table class.
+# Define the Instance table class.
 class Instance( db.Model ):
 
     # pylint: disable=too-many-instance-attributes
     # Eight is reasonable in this case.
 
     """
-    Class to define the User table.
+    Class to define the Instance table.
     """
-    instance_id: db.Column              = db.Column( db.String( 255 ), primary_key = True, unique = True )
-    site_id: db.Column                  = db.Column( db.String( 255 ), unique = True )
-    extensions                          = db.relationship( 'Extension', backref = 'instance' )
-    refresh_token: db.Column            = db.Column( db.String( 2000 ), unique = True )
-    is_free: db.Column                  = db.Column( db.Boolean, default = True )
-    did_cancel: db.Column               = db.Column( db.Boolean, default = False )
-    expires_on: db.Column               = db.Column( db.DateTime )
-    extension_count: db.Column          = db.Column( db.Integer )
-    extension_count_limit: db.Column    = db.Column( db.Integer, default = 499 )
-    created_at: db.Column               = db.Column( db.DateTime( timezone = True ),
+    instance_id: db.Column          = db.Column( db.String( 255 ), primary_key = True, unique = True )
+    site_id: db.Column              = db.Column( db.String( 255 ), unique = True )
+    extensions                      = db.relationship( 'Extension', backref = 'instance' )
+    refresh_token: db.Column        = db.Column( db.String( 2000 ), unique = True )
+    is_free: db.Column              = db.Column( db.Boolean, default = True )
+    did_cancel: db.Column           = db.Column( db.Boolean, default = False )
+    expires_on: db.Column           = db.Column( db.DateTime )
+    extension_count: db.Column      = db.Column( db.Integer, default = 0 )
+    extension_limit: db.Column      = db.Column( db.Integer, default = 999 )
+    created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
 
     def __repr__( self ):
@@ -38,7 +38,7 @@ class Extension( db.Model ):
     # Eight is reasonable in this case.
 
     """
-    Class to define the Slider extension table.
+    Class to define the Extension table.
     """
     extension_id: db.Column                 = db.Column( db.String( 255 ), primary_key = True, unique = True )
     instance_id: db.Column                  = db.Column( db.String( 255 ), db.ForeignKey( Instance.instance_id ) )

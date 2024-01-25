@@ -110,7 +110,7 @@ TwentyTwenty overrides
   animation-delay: 0;
 }
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) {
-  background: #dddddd;
+  background-color: #dddddd;
 }
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-up-arrow,
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle:not(:hover) .twentytwenty-right-arrow,
@@ -175,6 +175,9 @@ TwentyTwenty overrides
   border-radius: 0 0 28px 28px;
   bottom: 0;
 }
+.twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-handle {
+  background-color: transparent;
+}
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-up-arrow,
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-down-arrow {
   animation-duration: 5s;
@@ -188,7 +191,7 @@ TwentyTwenty overrides
   animation-name: stretch-down;
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="2"]:not( .clicked ) .pulser {
-  background: #ffffff;
+  background-color: #ffffff;
   width: 46px;
   height: 46px;
   display: block;
@@ -201,7 +204,7 @@ TwentyTwenty overrides
   animation-name: vertical-pulse;
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-handle {
-  background: #ffffff;
+  background-color: #ffffff;
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-up-arrow,
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-down-arrow {
@@ -217,7 +220,7 @@ TwentyTwenty overrides
   animation-delay: 1s;
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-handle {
-  background: #ffffff;
+  background-color: #ffffff;
 }
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-up-arrow,
 .twentytwenty-vertical .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-down-arrow {
@@ -233,7 +236,7 @@ TwentyTwenty overrides
   animation-delay: 1s;
 }
 .twentytwenty-vertical .twentytwenty-container.dark .twentytwenty-handle .pulser {
-  background: #000000;
+  background-color: #000000;
 }
 .twentytwenty-vertical .twentytwenty-container.dark .twentytwenty-handle:before {
   box-shadow: 3px 0 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);
@@ -280,6 +283,9 @@ TwentyTwenty overrides
   border-radius: 0 28px 28px 0;
   right: 0;
 }
+.twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-handle {
+  background-color: transparent;
+}
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-right-arrow,
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="1"]:not( .clicked ) .twentytwenty-left-arrow {
   animation-duration: 5s;
@@ -293,7 +299,7 @@ TwentyTwenty overrides
   animation-name: stretch-right;
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="2"]:not( .clicked ) .pulser {
-  background: #ffffff;
+  background-color: #ffffff;
   width: 46px;
   height: 46px;
   display: block;
@@ -305,7 +311,7 @@ TwentyTwenty overrides
   animation-name: horizontal-pulse;
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-handle {
-  background: #ffffff;
+  background-color: #ffffff;
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-right-arrow,
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="3"]:not( .clicked ) .twentytwenty-left-arrow {
@@ -321,7 +327,7 @@ TwentyTwenty overrides
   animation-delay: 1s;
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-handle {
-  background: #ffffff;
+  background-color: #ffffff;
 }
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-right-arrow,
 .twentytwenty-horizontal .twentytwenty-container[data-slider-handle-animation="4"]:not( .clicked ) .twentytwenty-left-arrow {
@@ -337,7 +343,7 @@ TwentyTwenty overrides
   animation-delay: 1s;
 }
 .twentytwenty-horizontal .twentytwenty-container.dark .twentytwenty-handle .pulser {
-  background: #000000;
+  background-color: #000000;
 }
 .twentytwenty-horizontal .twentytwenty-container.dark .twentytwenty-handle:before {
   box-shadow: 0 3px 0 #000000, 0px 0px 12px rgba(51, 51, 51, 0.5);

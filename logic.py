@@ -20,6 +20,11 @@ def dump( item, name ):
     print( item )
     print( "===========================" )
 
+def log_call( route ):
+
+    print( "Got a call from Wix for /" + route + "/" )
+    print( "=============================" )
+
 def verify_hmac_signature( payload, signature, secret ):
     """Verify an HMAC signature.
 
@@ -134,7 +139,7 @@ def get_access_token( refresh_token, auth_provider_base_url, app_secret, app_id 
 def get_app_instance( refresh_token, instance_api_url, auth_provider_base_url, app_secret, app_id ):
 
     """
-    This is sample call to Wix instance API - you can find it here: 
+    This is a call to Wix instance API - you can find it here: 
     https://dev.wix.com/api/rest/app-management/apps/app-instance/get-app-instance
     """
 
