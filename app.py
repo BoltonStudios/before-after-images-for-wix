@@ -53,6 +53,9 @@ APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
 TRIAL_DAYS = timedelta( days = 10 )
+DEFAULT_SLIDER_LIMIT = 499
+BEFORE_PLACEHOLDER_THUMBNAIL = 'images/placeholder-6.svg'
+AFTER_PLACEHOLDER_THUMBNAIL = 'images/placeholder-6.svg'
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621
@@ -423,12 +426,12 @@ def settings():
     extension_in_db = None
     is_free = True # Change to True for production.
     trial_days = TRIAL_DAYS
-    before_image = url_for( 'static', filename='images/placeholder-1.svg' )
-    before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
+    before_image = url_for( 'static', filename = BEFORE_PLACEHOLDER_THUMBNAIL )
+    before_image_thumbnail = url_for( 'static', filename = BEFORE_PLACEHOLDER_THUMBNAIL )
     before_label_text = 'Before'
     before_alt_text = ''
-    after_image = url_for( 'static', filename='images/placeholder-3.svg' )
-    after_image_thumbnail = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_image = url_for( 'static', filename = AFTER_PLACEHOLDER_THUMBNAIL )
+    after_image_thumbnail = url_for( 'static', filename = AFTER_PLACEHOLDER_THUMBNAIL )
     after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
@@ -516,12 +519,14 @@ def widget():
     is_free = True # Change to True for production.
     did_cancel = False
     trial_days = TRIAL_DAYS
-    before_image = url_for( 'static', filename='images/placeholder-1.svg' )
-    before_image_thumbnail = url_for( 'static', filename='images/placeholder-1.svg' )
+    slider_count = 0
+    slider_limit = DEFAULT_SLIDER_LIMIT
+    before_image = url_for( 'static', filename = BEFORE_PLACEHOLDER_THUMBNAIL )
+    before_image_thumbnail = url_for( 'static', filename = BEFORE_PLACEHOLDER_THUMBNAIL )
     before_label_text = 'Before'
     before_alt_text = ''
-    after_image = url_for( 'static', filename='images/placeholder-3.svg' )
-    after_image_thumbnail = url_for( 'static', filename='images/placeholder-3.svg' )
+    after_image = url_for( 'static', filename = AFTER_PLACEHOLDER_THUMBNAIL )
+    after_image_thumbnail = url_for( 'static', filename = AFTER_PLACEHOLDER_THUMBNAIL )
     after_label_text = 'After'
     after_alt_text = ''
     slider_offset = 50
@@ -827,6 +832,7 @@ def dashboard( instance_id = '', page = 1):
     instance = None
     extensions = None
     expiration_date = datetime.utcnow()
+    slider_limit = DEFAULT_SLIDER_LIMIT
 
     # If the user submitted a POST request...
     if request.method == 'GET':
@@ -907,6 +913,7 @@ def dashboard( instance_id = '', page = 1):
         is_free = is_free,
         trial_days = trial_days.days,
         expiration_date = expiration_date,
+        slider_limit = slider_limit,
         instance = instance,
         extensions = extensions
     )
