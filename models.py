@@ -1,6 +1,8 @@
 """
 Models for my Flask app for Wix.
 """
+# pylint: disable=not-callable
+
 # Flask imports
 from sqlalchemy.sql import func
 
@@ -16,8 +18,11 @@ class Instance( db.Model ):
     """
     Class to define the Instance table.
     """
-    instance_id: db.Column          = db.Column( db.String( 255 ), primary_key = True, unique = True )
+    instance_id: db.Column          = db.Column( db.String( 255 ),
+                                                primary_key = True,
+                                                unique = True )
     site_id: db.Column              = db.Column( db.String( 255 ), unique = True )
+    site_url: db.Column             = db.Column( db.String( 1000 ) )
     extensions                      = db.relationship( 'Extension', backref = 'instance' )
     refresh_token: db.Column        = db.Column( db.String( 2000 ), unique = True )
     is_free: db.Column              = db.Column( db.Boolean, default = True )
@@ -40,8 +45,11 @@ class Extension( db.Model ):
     """
     Class to define the Extension table.
     """
-    extension_id: db.Column                 = db.Column( db.String( 255 ), primary_key = True, unique = True )
-    instance_id: db.Column                  = db.Column( db.String( 255 ), db.ForeignKey( Instance.instance_id ) )
+    extension_id: db.Column                 = db.Column( db.String( 255 ),
+                                                        primary_key = True,
+                                                        unique = True )
+    instance_id: db.Column                  = db.Column( db.String( 255 ),
+                                                        db.ForeignKey( Instance.instance_id ) )
     before_image: db.Column                 = db.Column( db.String( 1000 ) )
     before_image_thumbnail: db.Column       = db.Column( db.String( 1000 ) )
     before_label_text: db.Column            = db.Column( db.String( 30 ) )

@@ -4,28 +4,40 @@ Helper functions mostly to handle Wix authorization.
 # pylint: disable=broad-exception-caught
 
 # Import dependencies.
-import requests
 import hmac
 import hashlib
 import base64
 from datetime import datetime, timedelta, timezone
+import requests
 
 # Dump variable values to the terminal.
 def dump( item, name ):
-    '''
+
+    """
     Print the item contents to the terminal.
-    '''
+    """
+
     print( type( item ) )
     print( name + "=" )
     print( item )
     print( "===========================" )
 
-def log_call( route ):
+def log_call( route, instance_id = None ):
+
+    """
+    Log an event to the terminal.
+    """
 
     print( "Got a call from Wix for /" + route + "/" )
+
+    if instance_id is not None :
+
+        print( "Instance ID: " + instance_id )
+
     print( "=============================" )
 
 def verify_hmac_signature( payload, signature, secret ):
+
     """Verify an HMAC signature.
 
     Args:
@@ -52,7 +64,11 @@ def verify_hmac_signature( payload, signature, secret ):
 # Calculate trial days
 def calculate_trial_days( trial_days, start_date ):
 
-    # Calculate the trial days elapsed by subtracting the instance creation date
+    """
+    Calculate the trial days elapsed in the Free Trial.
+    """
+
+    # Subtract the instance creation date
     # from today's date.
     trial_days_elapsed = datetime.now( timezone.utc ) - start_date
 
@@ -126,7 +142,7 @@ def get_access_token( refresh_token, auth_provider_base_url, app_secret, app_id 
 
         # Return the access token.
         return access_token
-    
+
     except Exception as err :
 
         # Provide feedback for the user.

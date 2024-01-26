@@ -2,17 +2,17 @@
 A Flask app for Wix.
 """
 # pylint: disable=broad-exception-caught
-# pylint: disable=not-callable
+# pylint: disable=too-many-lines
 
 # Python imports
 import os
 import json
 import urllib.parse
-import jwt
+import base64
 from datetime import datetime, timedelta
+import jwt
 import requests
 from dotenv import load_dotenv
-import base64
 
 # Flask imports
 from flask import Flask, Response, abort, redirect, render_template, request, url_for
@@ -62,6 +62,10 @@ AFTER_PLACEHOLDER_THUMBNAIL = 'images/placeholder-6.svg'
 # Source: https://stackoverflow.com/a/41231621
 @app.context_processor
 def inject_now():
+
+    """
+    Pass the current date to every template.
+    """
     return {'now': datetime.utcnow()}
 
 # Define Flask routes.
@@ -129,12 +133,12 @@ def redirect_wix():
     retrieved in June 2023.
     """
 
-    # Log event.
-    logic.log_call( "redirect-wix" )
-
     # Get the authorization code from Wix.
     instance_id = request.args.get( 'instanceId' )
     authorization_code = request.args.get( 'code' )
+
+    # Log event.
+    logic.log_call( "redirect-wix", instance_id )
 
     try:
 
@@ -152,7 +156,8 @@ def redirect_wix():
         }
 
         # Request an access token from Wix.
-        token_request = requests.post( auth_provider_base_url + "/access", json = request_body_parameters, timeout=2.50 ).text
+        token_request = requests.post( auth_provider_base_url + "/access",
+                                      json = request_body_parameters, timeout=2.50 ).text
 
         # Parse response as JSON.
         tokens = json.loads( token_request )
@@ -180,12 +185,29 @@ def redirect_wix():
 
             # Add the new instance record to the Instance table.
             db.session.add( instance )
-        
+
         else:
-            
+
             # Update the instance record to the Instance table.
             instance_in_db.refresh_token = refresh_token
-            
+
+        # Check with Wix for the current instance data.
+        # Get data about the installation of this app on the user's website.
+        app_instance = logic.get_app_instance(
+            refresh_token,
+            INSTANCE_API_URL,
+            AUTH_PROVIDER_BASE_URL,
+            APP_SECRET,
+            APP_ID
+        )
+
+        # If the app instance API call returned site info...
+        if 'site' in app_instance :
+
+            # Extract extra info about the site.
+            instance_in_db.site_url = app_instance['site']['url']
+            instance_in_db.site_id = app_instance['site']['siteId']
+
         # Add the new or updated instance record to the Instance table.
         db.session.commit()
 
@@ -248,7 +270,7 @@ def uninstall():
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
         extensions = Extension.query.filter_by( instance_id = instance_id )
-        
+
         # Wix will repeatedly call this route if we return an error code.
         # Prevent that from happening by proceeding only if the instance exists.
 
@@ -294,7 +316,7 @@ def upgrade():
     # Initialize variables.
     instance_id = ''
     secret = WEBHOOK_PUBLIC_KEY
-    now = datetime.utcnow() 
+    now = datetime.utcnow()
     one_month_from_now = now + timedelta( 1 * 30 )
 
     # If the user submitted a POST request...
@@ -302,7 +324,7 @@ def upgrade():
 
         # Get the encoded data received.
         encoded_jwt = request.data
-        
+
         # Decode the data using our secret.
         data = jwt.decode( encoded_jwt, secret, algorithms=["RS256"] )
 
@@ -329,7 +351,8 @@ def upgrade():
             # Extract the expiration date
             if 'expiresOn' in product_data :
 
-                instance.expires_on = datetime.strptime( product_data[ 'expiresOn' ], '%Y-%m-%dT%H:%M:%SZ' )
+                instance.expires_on = datetime.strptime( product_data[ 'expiresOn' ],
+                                                        '%Y-%m-%dT%H:%M:%SZ' )
 
             else :
 
@@ -356,7 +379,8 @@ def upgrade():
 def downgrade():
 
     """
-    Take action when the application recieves a POST request from the Paid Plan Auto Renewal Cancelled webhook.
+    Take action when the application recieves a POST request from 
+    the Paid Plan Auto Renewal Cancelled webhook.
     
     See documentation:
     https://dev.wix.com/docs/rest/api-reference/app-management/apps/app-instance/instance-app-installed
@@ -410,7 +434,7 @@ def downgrade():
 # App Settings Panel
 @app.route('/settings/', methods=['POST','GET'])
 def settings():
-    
+
     # pylint: disable=too-many-locals
     # pylint: disable=too-many-statements
     # Our variables are reasonable in this case.
@@ -463,7 +487,10 @@ def settings():
             # Update the local variables with the requested_extension values.
             instance_id                 = extension_in_db.instance.instance_id
             is_free                     = extension_in_db.instance.is_free
-            trial_days                  = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
+            trial_days                  = logic.calculate_trial_days(
+                                                trial_days,
+                                                extension_in_db.instance.created_at
+                                            )
             before_image                = extension_in_db.before_image
             before_image_thumbnail      = extension_in_db.before_image_thumbnail
             before_label_text           = extension_in_db.before_label_text
@@ -510,7 +537,7 @@ def settings():
 # Widget Slider
 @app.route('/widget/', methods=['POST','GET'])
 def widget():
- 
+
     # pylint: disable=too-many-locals
     # pylint: disable=too-many-statements
     # Our variables are reasonable in this case.
@@ -576,7 +603,8 @@ def widget():
                 db.session.commit()
 
                 # Log event.
-                print( 'Instance #' + extension_in_db.instance.instance_id + ' deleted extension #' + requested_extension_id )
+                print( 'Instance #' + extension_in_db.instance.instance_id +
+                      ' deleted extension #' + requested_extension_id )
 
             else:
 
@@ -593,7 +621,7 @@ def widget():
 
                     # Update the variable.
                     is_dark = True
-                    
+
                 # If the user selected the move on click option...
                 if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
 
@@ -634,7 +662,8 @@ def widget():
                 db.session.commit()
 
                 # Log event.
-                print( 'Instance #' + extension_in_db.instance.instance_id + ' edited extension #' + requested_extension_id )
+                print( 'Instance #' + extension_in_db.instance.instance_id +
+                      ' edited extension #' + requested_extension_id )
 
         else:
 
@@ -649,7 +678,7 @@ def widget():
             if request_data[ "action" ] == "save" :
 
                 # Extract the instance ID
-                instance_id = request_data[ 'instanceId' ] 
+                instance_id = request_data[ 'instanceId' ]
 
                 # If the request contains an instance ID...
                 if instance_id:
@@ -668,7 +697,7 @@ def widget():
 
                         # Update the variable.
                         is_dark = True
-                        
+
                     # If the user selected the move on click option...
                     if int( request_data[ 'sliderMoveOnClickToggle' ] ) == 1 :
 
@@ -680,7 +709,8 @@ def widget():
                         extension_id = requested_extension_id,
                         instance_id = instance_in_db.instance_id,
                         before_image = request_data[ 'beforeImage' ],
-                        before_image_thumbnail = before_image_thumbnail, # New extensions will not have thumbnails, so use the default.
+                        # New extensions will not have thumbnails, so use the default.
+                        before_image_thumbnail = before_image_thumbnail,
                         before_label_text = request_data[ 'beforeLabelText' ],
                         before_alt_text = request_data[ 'beforeAltText' ],
                         after_image = request_data[ 'afterImage' ],
@@ -713,7 +743,8 @@ def widget():
                         instance_in_db.extension_count += 1
 
                         # Log event.
-                        print( 'Instance #' + instance_id + ' created new extension #' + requested_extension_id )
+                        print( 'Instance #' + instance_id +
+                              ' created new extension #' + requested_extension_id )
 
                     # Save changes to the database.
                     db.session.commit()
@@ -744,7 +775,8 @@ def widget():
 
             # Update the local variables with stored values from the database.
             is_free = extension_in_db.instance.is_free
-            trial_days = logic.calculate_trial_days( trial_days, extension_in_db.instance.created_at )
+            trial_days = logic.calculate_trial_days( trial_days,
+                                                    extension_in_db.instance.created_at )
             did_cancel = extension_in_db.instance.did_cancel
             expiration_date = extension_in_db.instance.expires_on
             before_image = extension_in_db.before_image
@@ -808,7 +840,7 @@ def widget():
 
                     # Update the record in the database.
                     extension_in_db.instance.is_free = is_free
-                    
+
                     # If the billing key is present...
                     if 'billing' in app_instance:
 
@@ -819,7 +851,8 @@ def widget():
                         if 'expirationDate' in billing:
 
                             # Get the new renewal date.
-                            renewal_date = datetime.strptime( billing['expirationDate'], '%Y-%m-%dT%H:%M:%SZ' )
+                            renewal_date = datetime.strptime( billing['expirationDate'],
+                                                             '%Y-%m-%dT%H:%M:%SZ' )
 
                             # Update the record in the database.
                             extension_in_db.instance.expiration_date = renewal_date
@@ -830,7 +863,8 @@ def widget():
                 except Exception as err :
 
                     # Provide feedback for the user.
-                    print( 'Unable to resolve isFree status for Instance #' + extension_in_db.instance.instance_id + '. Error:' )
+                    print( 'Unable to resolve isFree status for Instance #' +
+                          extension_in_db.instance.instance_id + '. Error:' )
                     print( err )
 
     # Pass local variables and render the template.
@@ -869,7 +903,7 @@ def dashboard( instance_id = '', page = 1 ):
 
     # Log event.
     logic.log_call( "dashboard" )
-    
+
     # Initialize variables.
     admin = True
     is_free = True # Change to True for production.
@@ -884,7 +918,7 @@ def dashboard( instance_id = '', page = 1 ):
     if request.method == 'GET':
 
         if instance_id == '' :
-        
+
             if 'instance' in request.args :
                 # Get app instance.
                 # Extract signature and data.
@@ -901,7 +935,8 @@ def dashboard( instance_id = '', page = 1 ):
                 if signatures_did_match :
 
                     # Decode data from Wix.
-                    # Wix says, "In Ruby or Python, you should add the padding to the Base64 encoded values that you get from Wix."
+                    # Wix says, "In Ruby or Python, you should add the padding to the
+                    # Base64 encoded values that you get from Wix."
                     # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
                     # Retrieved 12/31/2023
                     #
@@ -916,31 +951,32 @@ def dashboard( instance_id = '', page = 1 ):
                     # Check if aid is returned in the instance parameter.
                     # Source: https://dev.wix.com/docs/build-apps/build-your-app/app-instance/app-instance-client-side
                     if 'aid' in data:
-                        
+
                         # Block user.
                         abort( 403 )
-                    
+
                     if 'instanceId' in data:
-                        
+
                         # Extract the instance ID
                         instance_id = data[ 'instanceId' ]
 
                         # Log event.
                         print( "Signatures match. Instance ID is " + instance_id )
-                
+
                     else:
 
                         # Block user.
                         abort( 403 )
-            
+
             else:
 
                 # Block user.
                 abort( 403 )
-    
+
         # Update the local variables.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
-        extensions = Extension.query.filter_by( instance_id = instance_id ).paginate( page = page, per_page = 20 )
+        extensions = Extension.query.filter_by( instance_id = instance_id ).paginate( page = page,
+                                                                                     per_page = 20 )
 
         # Instance found.
         if instance is not None:
@@ -954,7 +990,7 @@ def dashboard( instance_id = '', page = 1 ):
 
             # If the extension count exceeds the extension limit.
             if extension_count >= extension_limit :
-                    
+
                 # Update the limit-reached flag.
                 extension_limit_reached = True
 
