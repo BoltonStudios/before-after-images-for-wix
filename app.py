@@ -146,6 +146,8 @@ def redirect_wix():
         auth_provider_base_url = AUTH_PROVIDER_BASE_URL
         app_secret = APP_SECRET
         app_id = APP_ID
+        site_url = ''
+        site_id = ''
 
         # Prepare request.
         request_body_parameters = {
@@ -166,31 +168,6 @@ def redirect_wix():
         access_token = tokens[ 'access_token' ]
         refresh_token = tokens[ 'refresh_token' ]
 
-        # Construct the URL to Completes the OAuth flow.
-        # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
-        complete_oauth_redirect_url = "https://www.wix.com/installer/close-window?access_token="
-        complete_oauth_redirect_url += access_token
-
-        # Search the Instance table for the instance ID (primary key)
-        instance_in_db = Instance.query.get( instance_id )
-
-        # If the instance does not exist in the table...
-        if instance_in_db is None:
-
-            # Construct a new Instance record.
-            instance = Instance(
-                instance_id = instance_id,
-                refresh_token = refresh_token
-            )
-
-            # Add the new instance record to the Instance table.
-            db.session.add( instance )
-
-        else:
-
-            # Update the instance record to the Instance table.
-            instance_in_db.refresh_token = refresh_token
-
         # Check with Wix for the current instance data.
         # Get data about the installation of this app on the user's website.
         app_instance = logic.get_app_instance(
@@ -205,8 +182,37 @@ def redirect_wix():
         if 'site' in app_instance :
 
             # Extract extra info about the site.
-            instance_in_db.site_url = app_instance['site']['url']
-            instance_in_db.site_id = app_instance['site']['siteId']
+            site_url = app_instance['site']['url']
+            site_id = app_instance['site']['siteId']
+
+        # Construct the URL to Completes the OAuth flow.
+        # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
+        complete_oauth_redirect_url = "https://www.wix.com/installer/close-window?access_token="
+        complete_oauth_redirect_url += access_token
+
+        # Search the Instance table for the instance ID (primary key)
+        instance_in_db = Instance.query.get( instance_id )
+
+        # If the instance does not exist in the table...
+        if instance_in_db is None:
+
+            # Construct a new Instance record.
+            instance = Instance(
+                instance_id = instance_id,
+                refresh_token = refresh_token,
+                site_url = site_url,
+                site_id = site_id
+            )
+
+            # Add the new instance record to the Instance table.
+            db.session.add( instance )
+
+        else:
+
+            # Update the instance record to the Instance table.
+            instance_in_db.refresh_token = refresh_token
+            instance_in_db.site_url = site_url,
+            instance_in_db.site_id = site_id
 
         # Add the new or updated instance record to the Instance table.
         db.session.commit()
