@@ -11,7 +11,7 @@
     <link href="{{ url_for('static', filename='images/baie-logo.svg') }}" rel="icon" type="image/svg" />
     
     <!-- CSS Includes -->
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='css/style.css') }}{% if app_version %}?v={{app_version}}{% endif %}" rel="stylesheet" type="text/css" />
     <link href="{{ url_for('static', filename='css/twentytwenty.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- Bootstrap CSS -->
