@@ -1,5 +1,5 @@
 """
-A Flask app for Wix.
+A before-and-after slider app for Wix.
 """
 # pylint: disable=broad-exception-caught
 # pylint: disable=too-many-lines
