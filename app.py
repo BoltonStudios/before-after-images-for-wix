@@ -876,6 +876,7 @@ def widget():
     # Pass local variables and render the template.
     return render_template( 'widget.html',
         page_id = "widget",
+        app_version = APP_VERSION,
         is_free = is_free,
         trial_days = trial_days.days,
         extension_id = requested_extension_id,
