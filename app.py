@@ -47,7 +47,7 @@ db.init_app( app )
 migrate.init_app( app, db )
 
 # Define constants.
-APP_VERSION = '1.0.1'
+APP_VERSION = '1.0.2'
 WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
 APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
@@ -517,6 +517,7 @@ def settings():
     # Pass local variables to Flask and render the template.
     return render_template('settings.html',
         page_id = 'settings',
+        app_id = APP_ID,
         app_version = APP_VERSION,
         instance_id = instance_id,
         is_free = is_free,

@@ -9,7 +9,7 @@ Create before-and-after image sliders easily with the Before & After Images app 
 * Animations: Delight your website visitors with attractive animations.
 * Customization: Use dark mode, colors, and more to match your site.
 
-Elevate your website by presenting comparisons, renovations, or any visual evolution with this user-friendly slider app. Upload your before and after images, customize the slider's style to match your site's aesthetic, and watch as your audience interacts with the dynamic visual transformation. Whether you're a photographer or designer or showcasing product improvements, this Wix app adds a captivating element to your storytelling. Upgrade your website's visual impact now with the Before & After Images app for Wix.
+Elevate your website by presenting comparisons, renovations, or any visual evolution with this user-friendly slider app. Upload your before and after images, customize the slider's style to match your site's aesthetic, and watch as your audience interacts with the dynamic visual transformation. Whether you're a photographer or designer or showcasing product improvements, this app adds a captivating element to your storytelling. Upgrade your website's visual impact now with the Before & After Images app.
 
 ## Getting Started
 
@@ -23,6 +23,9 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+
+* 1.0.2
+    * Added a "Write a Review" button to the Settings route.
 
 * 1.0.1
     * Initial Release
