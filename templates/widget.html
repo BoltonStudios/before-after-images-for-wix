@@ -31,15 +31,15 @@
         >
             <!-- The before image is first -->
             {% if before_image != '' %}
-                <img id="{{extension_id}}-before-image" src="{{ before_image }}" width="637" height="328" alt="{{before_alt_text}}" />
+                <img id="{{extension_id}}-before-image" src="{{ before_image }}" alt="{{before_alt_text}}" />
             {% else %}
-                <img id="{{extension_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" alt="placeholder" />
+                <img id="{{extension_id}}-before-image" src="{{ url_for('static', filename='images/placeholder-1.svg')}}" width="637" height="328" alt="placeholder" />
             {% endif %}
             <!-- The after image is last -->
             {% if after_image != '' %}
-                <img id="{{extension_id}}-after-image" src="{{ after_image }}" width="637" height="328" alt="{{after_alt_text}}" />
+                <img id="{{extension_id}}-after-image" src="{{ after_image }}" alt="{{after_alt_text}}" />
             {% else %}
-                <img id="{{extension_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" alt="placeholder" />
+                <img id="{{extension_id}}-after-image" src="{{ url_for('static', filename='images/placeholder-3.svg')}}" width="637" height="328" alt="placeholder" />
             {% endif %}
         </div>
 
