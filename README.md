@@ -23,6 +23,8 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+* 1.0.3
+    * Removed hardcoded image dimensions from Widget template.
 
 * 1.0.2
     * Added a "Write a Review" button to the Settings route.
