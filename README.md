@@ -23,11 +23,14 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+* 1.0.4
+    * Bug fix: Added images 'on load' dependency to TwentyTwenty initialization call in Widget template.
+
 * 1.0.3
-    * Removed hardcoded image dimensions from Widget template.
+    * Bug fix: Removed hardcoded image dimensions from Widget template.
 
 * 1.0.2
-    * Added a "Write a Review" button to the Settings route.
+    * New Feature: Added a "Write a Review" button to the Settings route.
 
 * 1.0.1
     * Initial Release

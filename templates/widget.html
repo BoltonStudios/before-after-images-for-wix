@@ -61,8 +61,32 @@
        </script>
 
        <script>
-            // Initialize TwentyTwenty
-            $(function(){
+        // Check that images have loaded before initializing TwentyTwenty.
+        //
+        // Source: Max Meloni (Jul 12, 2021) Comment - Not all images are showing - the ones missing have a height of 0px. #112
+        // Github
+        // Retrieved February 19, 2024
+        // From: https://github.com/zurb/twentytwenty/issues/112#issuecomment-878415235
+        //
+        var imagesLoaded = 0;
+
+        // Before image loaded.
+        $('#{{extension_id}}-before-image')
+        .on('load', function() { ++imagesLoaded; checkAndRun( imagesLoaded ); })
+        .on('error', function() { console.log("error loading Before image"); })
+
+        // After image loaded.
+        $('#{{extension_id}}-after-image')
+        .on('load', function() { ++imagesLoaded; checkAndRun( imagesLoaded ); })
+        .on('error', function() { console.log("error loading After image"); })
+
+        // Wrapper for TwentyTwenty call.
+        function checkAndRun( imagesLoaded ) {
+
+            // If two images have loaded...
+            if( imagesLoaded == 2 ){
+
+                // Initialize TwentyTwenty
                 $("#{{extension_id}}-twentytwenty").twentytwenty({
                     before_label: "{{before_label_text}}", // Set a custom before label.
                     after_label: "{{after_label_text}}", // Set a custom after label.
@@ -72,10 +96,11 @@
                     move_slider_on_hover: Number( "{{slider_move_slider_on_hover}}" ), // Move slider on mouse hover?
                     click_to_move: Number( "{{slider_move_on_click_toggle}}" ) // Allow a user to click (or tap) anywhere on the image to move the slider to that location.
                 });
-            });
+            }
+        }
 
-            // Ensure the component window sizes appropriately for the images.
-            resizeComponentWindow();
+        // Ensure the component window sizes appropriately for the images.
+        resizeComponentWindow();
        </script>
 
        <script>
