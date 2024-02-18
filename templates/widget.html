@@ -73,12 +73,12 @@
         // Before image loaded.
         $('#{{extension_id}}-before-image')
         .on('load', function() { ++imagesLoaded; checkAndRun( imagesLoaded ); })
-        .on('error', function() { console.log("error loading Before image"); })
+        .on('error', function() { console.log("Error loading Before image,"); })
 
         // After image loaded.
         $('#{{extension_id}}-after-image')
         .on('load', function() { ++imagesLoaded; checkAndRun( imagesLoaded ); })
-        .on('error', function() { console.log("error loading After image"); })
+        .on('error', function() { console.log("Error loading After image."); })
 
         // Wrapper for TwentyTwenty call.
         function checkAndRun( imagesLoaded ) {
