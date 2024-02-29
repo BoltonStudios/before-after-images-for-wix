@@ -29,7 +29,10 @@
       no_overlay: false,
       move_slider_on_hover: false,
       move_with_handle_only: true,
-      click_to_move: false
+      click_to_move: false,
+      stretched: false,
+      fullWidth: 637,
+      fullHeight: 328
     }, options);
 
     return this.each(function() {
@@ -68,6 +71,18 @@
             // Use the shorter image dimensions.
             w = afterImg.width();
             h = afterImg.height();
+        }
+
+        // Override: If the width is stretched to full width...
+        if( options.stretched == true ){
+
+            // Use the full width container dimensions.
+            w = options.fullWidth;
+            h = options.fullHeight;
+
+            console.log("options.stretched == true " );
+            console.log("w is " + w );
+            console.log("h is " + h );
         }
         
         return {
@@ -112,7 +127,15 @@
       };
 
 
-      $(window).on("resize.twentytwenty", function(e) {
+      $(window).on("resize.twentytwenty", function( event, stretched = false, fullWidth = 637, fullHeight = 328 ) {
+        console.log( ' $(window).on("resize.twentytwenty"") called...' ); 
+        console.log("stretched is " + stretched );
+        console.log("fullWidth is " + fullWidth );
+        console.log("fullHeight is " + fullHeight );
+        options.stretched = stretched;
+        options.fullWidth = fullWidth;
+        options.fullHeight = fullHeight;
+
         adjustSlider(sliderPct);
       });
 

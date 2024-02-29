@@ -24,14 +24,45 @@ function resizeComponentWindow(){
         // Ensure we are in editor mode...
         if( Wix.Utils.getViewMode() == 'editor' ){
 
-            // Resize the window to the shortest image dimensions to match TwentyTwenty.
-            Wix.resizeComponent({
-                    width: w,
-                    height: h
-                },
-                // Success
-                jQuery( window ).trigger( "resize.twentytwenty" )
-                );
+            // Check if Widget is full width.
+            Wix.getBoundingRectAndOffsets( function( data ){
+
+                var fullWidth = data.offsets.x + data.rect.width;
+                var fullHeight = data.rect.height;
+
+                // If the width of the shorter image is full width...
+                if( w == fullWidth ){
+
+                    console.log( "STRETCHED" );
+                    console.log( "fullWidth is " + fullWidth );
+                    console.log( "fullHeight is " + fullHeight );
+                    jQuery( window ).trigger( "resize.twentytwenty", [ true, fullWidth, fullHeight ] )
+
+                } else{
+                     // Resize the window to the shortest image dimensions to match TwentyTwenty.
+                    Wix.resizeComponent({
+                        width: w,
+                        height: h
+                    },
+                    // Success
+                    jQuery( window ).trigger( "resize.twentytwenty" )
+                    );
+                }
+
+                
+                console.log( "offsets.x is " + data.offsets.x );
+                console.log( "offsets.y is " + data.offsets.y );
+                console.log( "rect.width is " + data.rect.width );
+                console.log( "rect.height is " + data.rect.height );
+                console.log( "rect.top is " + data.rect.top );
+                console.log( "rect.bottom is " + data.rect.bottom );
+                console.log( "rect.left is " + data.rect.left );
+                console.log( "rect.right is " + data.rect.right );
+                console.log( "getBoundingRectAndOffsets called. fullWidth is " + fullWidth + ". fullHeight is " + fullHeight );
+                
+                
+             });
+           
         }
 
     }, 250 );
