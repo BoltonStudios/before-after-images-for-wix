@@ -190,6 +190,7 @@ def redirect_wix():
 
                 # Extract site url.
                 site_url = app_instance['site']['url']
+                print( "Site URL: " + site_url )
 
         # Construct the URL to Completes the OAuth flow.
         # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
