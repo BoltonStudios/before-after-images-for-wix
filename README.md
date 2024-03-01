@@ -23,16 +23,19 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
-* 1.0.4
+* 1.0.5 - 03/01/2024
+    * Bug fix: Added conditional test for reading the site URL to prevent error with unpublished sites.
+
+* 1.0.4 - 02/18/2024
     * Bug fix: Added images 'on load' dependency to TwentyTwenty initialization call in Widget template.
 
-* 1.0.3
+* 1.0.3 - 02/18/2024
     * Bug fix: Removed hardcoded image dimensions from Widget template.
 
-* 1.0.2
+* 1.0.2 - 02/12/2024
     * New Feature: Added a "Write a Review" button to the Settings route.
 
-* 1.0.1
+* 1.0.1 - 02/12/2024
     * Initial Release
 
 ## Dependencies
