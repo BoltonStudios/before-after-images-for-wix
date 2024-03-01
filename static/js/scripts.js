@@ -33,12 +33,15 @@ function resizeComponentWindow(){
                 // If the width of the shorter image is full width...
                 if( w == fullWidth ){
 
-                    console.log( "STRETCHED" );
+                    console.log( "FULL WIDTH ON" );
                     console.log( "fullWidth is " + fullWidth );
                     console.log( "fullHeight is " + fullHeight );
                     jQuery( window ).trigger( "resize.twentytwenty", [ true, fullWidth, fullHeight ] )
 
                 } else{
+
+                    console.log( "FULL WIDTH OFF" );
+
                      // Resize the window to the shortest image dimensions to match TwentyTwenty.
                     Wix.resizeComponent({
                         width: w,
