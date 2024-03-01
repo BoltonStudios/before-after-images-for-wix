@@ -182,8 +182,14 @@ def redirect_wix():
         if 'site' in app_instance :
 
             # Extract extra info about the site.
-            site_url = app_instance['site']['url']
-            site_id = app_instance['site']['siteId']
+            site = app_instance['site']
+            site_id = site['siteId']
+
+            # Site URL (empty if site is not published).
+            if 'url' in site :
+
+                # Extract site url.
+                site_url = app_instance['site']['url']
 
         # Construct the URL to Completes the OAuth flow.
         # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
