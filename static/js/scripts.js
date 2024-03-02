@@ -1,7 +1,7 @@
 // Update the widget iframe dimensions, as described here:
 // https://dev.wix.com/docs/build-apps/developer-tools/extensions/iframes/set-your-app-dimensions
 function resizeComponentWindow(){
-
+    console.log( "resizeComponentWindow() called." );
     // Source: https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
     clearTimeout( window.resizedFinished );
     window.resizedFinished = setTimeout( function(){
@@ -26,15 +26,22 @@ function resizeComponentWindow(){
         Wix.getBoundingRectAndOffsets( function( data ){
 
             // Calculate the full screen width and margins.
-            var fullWidth = ( data.offsets.x * 2 + data.rect.width );
-            var marginPct = data.offsets.x / fullWidth;
+            const margin = data.offsets.x;
+            const fullWidth = ( margin * 2 + data.rect.width );
+            const marginPct = margin / fullWidth;
 
-            // If the margin between the bounding box and full screen width is 5% or less...
-            if( marginPct <= 0.5 ){
+            // The Wix margin limit is 190px
+            // Source: https://wix.wixanswers.com/apps/widget/v1/wix/30fd5f57-eee2-4b02-a1f5-644e628d3e22/view/en/article/06e5ab00-fed7-495c-8e0d-080907536d75
+            // Date retrieved: 03-02-2024
+            const marginLimitPx = 190
+            const marginLimitPct = 0.15
+
+            // If the margin between the bounding box and full screen width is equal to or less than the limit...
+            if( marginPct <= marginLimitPct && margin <= marginLimitPx ){
 
                 // Set the w and h variables with the bounding box dimensions.
                 w = data.rect.width;
-                h = data.rect.fullHeight;
+                h = data.rect.height;
 
                 // The image is stretched to full width. Resize the TwentyTwenty.
                 jQuery( window ).trigger( "resize.twentytwenty", [ true, w, h ] )

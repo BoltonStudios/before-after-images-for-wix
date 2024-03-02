@@ -30,9 +30,9 @@
       move_slider_on_hover: false,
       move_with_handle_only: true,
       click_to_move: false,
-      stretched: false,
-      fullWidth: 637,
-      fullHeight: 328
+      is_full_width: false,
+      rectangle_w: 0,
+      rectangle_h: 0
     }, options);
 
     return this.each(function() {
@@ -74,13 +74,13 @@
         }
 
         // Override: If the width is stretched to full width...
-        if( options.stretched == true ){
+        if( options.is_full_width == true ){
 
             // Use the full width container dimensions.
-            w = options.fullWidth;
-            h = options.fullHeight;
+            w = options.rectangle_w;
+            h = options.rectangle_h;
         }
-        
+
         return {
           w: w+"px",
           h: h+"px",
@@ -123,12 +123,12 @@
       };
 
 
-      $(window).on("resize.twentytwenty", function( event, stretched = false, fullWidth = 637, fullHeight = 328 ) {
+      $(window).on("resize.twentytwenty", function( event, is_full_width = false, rectangle_w = 0, rectangle_h = 0 ) {
 
         // Update full width flags.
-        options.stretched = stretched;
-        options.fullWidth = fullWidth;
-        options.fullHeight = fullHeight;
+        options.is_full_width = is_full_width;
+        options.rectangle_w = rectangle_w;
+        options.rectangle_h = rectangle_h;
 
         // Proceed to adjust slider.
         adjustSlider(sliderPct);
