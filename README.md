@@ -23,6 +23,9 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+* 1.1.0 - 03/02/2024
+    * New Feature: Enabled option for full-width sliders.
+
 * 1.0.5 - 03/01/2024
     * Bug fix: Added conditional test for reading the site URL to prevent error with unpublished sites.
 

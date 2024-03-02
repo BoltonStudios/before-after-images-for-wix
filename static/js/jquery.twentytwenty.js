@@ -29,7 +29,10 @@
       no_overlay: false,
       move_slider_on_hover: false,
       move_with_handle_only: true,
-      click_to_move: false
+      click_to_move: false,
+      is_full_width: false,
+      rectangle_w: 0,
+      rectangle_h: 0
     }, options);
 
     return this.each(function() {
@@ -69,7 +72,15 @@
             w = afterImg.width();
             h = afterImg.height();
         }
-        
+
+        // Override: If the width is stretched to full width...
+        if( options.is_full_width == true ){
+
+            // Use the container rectangle dimensions instead of the image dimensions.
+            w = options.rectangle_w;
+            h = options.rectangle_h;
+        }
+
         return {
           w: w+"px",
           h: h+"px",
@@ -112,7 +123,14 @@
       };
 
 
-      $(window).on("resize.twentytwenty", function(e) {
+      $(window).on("resize.twentytwenty", function( event, is_full_width = false, rectangle_w = 0, rectangle_h = 0 ) {
+
+        // Update full width flags.
+        options.is_full_width = is_full_width;
+        options.rectangle_w = rectangle_w;
+        options.rectangle_h = rectangle_h;
+
+        // Proceed to adjust slider.
         adjustSlider(sliderPct);
       });
 
