@@ -23,11 +23,14 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+* 1.1.1 - 03/02/2024
+    * Bug Fix: Fixed possible mismatch of container and image heights in full-width sliders at small screen sizes.
+
 * 1.1.0 - 03/02/2024
     * New Feature: Enabled option for full-width sliders.
 
 * 1.0.5 - 03/01/2024
-    * Bug fix: Added conditional test for reading the site URL to prevent error with unpublished sites.
+    * Bug fix: Added conditional test for reading the site URL to prevent app installation error on unpublished sites.
 
 * 1.0.4 - 02/18/2024
     * Bug fix: Added images 'on load' dependency to TwentyTwenty initialization call in Widget template.
