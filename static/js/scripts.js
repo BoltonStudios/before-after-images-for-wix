@@ -21,52 +21,40 @@ function resizeComponentWindow(){
             h = afterImg.height();
         }
 
-        // Ensure we are in editor mode...
-        if( Wix.Utils.getViewMode() == 'editor' ){
+        // Check if Widget is full width.
+        // Source: https://dev.wix.com/docs/client/api-reference/deprecated/iframe-sdk-deprecated/wix#getboundingrectandoffsets
+        Wix.getBoundingRectAndOffsets( function( data ){
 
-            // Check if Widget is full width.
-            Wix.getBoundingRectAndOffsets( function( data ){
+            // Calculate the full screen width and margins.
+            var fullWidth = ( data.offsets.x * 2 + data.rect.width );
+            var marginPct = data.offsets.x / fullWidth;
 
-                var fullWidth = data.offsets.x + data.rect.width;
-                var fullHeight = data.rect.height;
+            // If the margin between the bounding box and full screen width is 5% or less...
+            if( marginPct <= 0.5 ){
 
-                // If the width of the shorter image is full width...
-                if( w == fullWidth ){
+                // Set the w and h variables with the bounding box dimensions.
+                w = data.rect.width;
+                h = data.rect.fullHeight;
 
-                    console.log( "FULL WIDTH ON" );
-                    console.log( "fullWidth is " + fullWidth );
-                    console.log( "fullHeight is " + fullHeight );
-                    jQuery( window ).trigger( "resize.twentytwenty", [ true, fullWidth, fullHeight ] )
+                // The image is stretched to full width. Resize the TwentyTwenty.
+                jQuery( window ).trigger( "resize.twentytwenty", [ true, w, h ] )
 
-                } else{
+            } else {
 
-                    console.log( "FULL WIDTH OFF" );
+                // The image is not full width.
 
-                     // Resize the window to the shortest image dimensions to match TwentyTwenty.
+                // If we are in editor mode...
+                if( Wix.Utils.getViewMode() == 'editor' ){
+
+                    // Resize the window to the shortest image dimensions to match TwentyTwenty.
                     Wix.resizeComponent({
                         width: w,
                         height: h
-                    },
-                    // Success
-                    jQuery( window ).trigger( "resize.twentytwenty" )
+                    }, jQuery( window ).trigger( "resize.twentytwenty" ) // Success
                     );
                 }
-
-                
-                console.log( "offsets.x is " + data.offsets.x );
-                console.log( "offsets.y is " + data.offsets.y );
-                console.log( "rect.width is " + data.rect.width );
-                console.log( "rect.height is " + data.rect.height );
-                console.log( "rect.top is " + data.rect.top );
-                console.log( "rect.bottom is " + data.rect.bottom );
-                console.log( "rect.left is " + data.rect.left );
-                console.log( "rect.right is " + data.rect.right );
-                console.log( "getBoundingRectAndOffsets called. fullWidth is " + fullWidth + ". fullHeight is " + fullHeight );
-                
-                
-             });
-           
-        }
+            }
+        });   
 
     }, 250 );
 }

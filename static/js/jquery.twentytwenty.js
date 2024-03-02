@@ -79,10 +79,6 @@
             // Use the full width container dimensions.
             w = options.fullWidth;
             h = options.fullHeight;
-
-            console.log("options.stretched == true " );
-            console.log("w is " + w );
-            console.log("h is " + h );
         }
         
         return {
@@ -128,14 +124,13 @@
 
 
       $(window).on("resize.twentytwenty", function( event, stretched = false, fullWidth = 637, fullHeight = 328 ) {
-        console.log( ' $(window).on("resize.twentytwenty"") called...' ); 
-        console.log("stretched is " + stretched );
-        console.log("fullWidth is " + fullWidth );
-        console.log("fullHeight is " + fullHeight );
+
+        // Update full width flags.
         options.stretched = stretched;
         options.fullWidth = fullWidth;
         options.fullHeight = fullHeight;
 
+        // Proceed to adjust slider.
         adjustSlider(sliderPct);
       });
 
