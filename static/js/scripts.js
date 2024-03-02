@@ -27,8 +27,8 @@ function resizeComponentWindow(){
 
             // Calculate the full screen width and margins.
             const leftMargin = data.offsets.x;
-            const paddedWidth = ( leftMargin * 2 + data.rect.width );
-            const marginPct = leftMargin / paddedWidth;
+            const rectWidth = ( leftMargin * 2 + data.rect.width );
+            const marginPct = leftMargin / rectWidth;
 
             // The Wix margin limit is 190px
             // Source: https://wix.wixanswers.com/apps/widget/v1/wix/30fd5f57-eee2-4b02-a1f5-644e628d3e22/view/en/article/06e5ab00-fed7-495c-8e0d-080907536d75
