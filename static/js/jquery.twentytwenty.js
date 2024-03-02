@@ -76,9 +76,15 @@
         // Override: If the width is stretched to full width...
         if( options.is_full_width == true ){
 
-            // Use the container rectangle dimensions instead of the image dimensions.
+            // Use the container rectangle width instead of the image width.
             w = options.rectangle_w;
-            h = options.rectangle_h;
+
+            // If the container height is less than the shortest image height.
+            if( options.rectangle_h < h ){
+
+                // Use the container rectangle height instead of the image height.
+                h = options.rectangle_h;
+            }
         }
 
         return {

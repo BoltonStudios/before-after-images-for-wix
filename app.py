@@ -47,7 +47,7 @@ db.init_app( app )
 migrate.init_app( app, db )
 
 # Define constants.
-APP_VERSION = '1.1.0'
+APP_VERSION = '1.1.1'
 WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
 APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
