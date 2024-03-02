@@ -26,18 +26,18 @@ function resizeComponentWindow(){
         Wix.getBoundingRectAndOffsets( function( data ){
 
             // Calculate the full screen width and margins.
-            const margin = data.offsets.x;
-            const fullWidth = ( margin * 2 + data.rect.width );
-            const marginPct = margin / fullWidth;
+            const leftMargin = data.offsets.x;
+            const paddedWidth = ( leftMargin * 2 + data.rect.width );
+            const marginPct = leftMargin / paddedWidth;
 
             // The Wix margin limit is 190px
             // Source: https://wix.wixanswers.com/apps/widget/v1/wix/30fd5f57-eee2-4b02-a1f5-644e628d3e22/view/en/article/06e5ab00-fed7-495c-8e0d-080907536d75
             // Date retrieved: 03-02-2024
             const marginLimitPx = 190
-            const marginLimitPct = 0.15
+            const marginLimitPct = 0.18
 
             // If the margin between the bounding box and full screen width is equal to or less than the limit...
-            if( marginPct <= marginLimitPct && margin <= marginLimitPx ){
+            if( marginPct <= marginLimitPct && leftMargin <= marginLimitPx ){
 
                 // Set the w and h variables with the bounding box dimensions.
                 w = data.rect.width;
@@ -61,7 +61,7 @@ function resizeComponentWindow(){
                     );
                 }
             }
-        });   
+        });
 
     }, 250 );
 }
