@@ -1,7 +1,7 @@
 // Update the widget iframe dimensions, as described here:
 // https://dev.wix.com/docs/build-apps/developer-tools/extensions/iframes/set-your-app-dimensions
 function resizeComponentWindow(){
-    console.log( "resizeComponentWindow() called." );
+
     // Source: https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
     clearTimeout( window.resizedFinished );
     window.resizedFinished = setTimeout( function(){

@@ -76,7 +76,7 @@
         // Override: If the width is stretched to full width...
         if( options.is_full_width == true ){
 
-            // Use the full width container dimensions.
+            // Use the container rectangle dimensions instead of the image dimensions.
             w = options.rectangle_w;
             h = options.rectangle_h;
         }
