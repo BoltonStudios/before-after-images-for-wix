@@ -44,7 +44,8 @@ function resizeComponentWindow(){
                 h = data.rect.height;
 
                 // The image is stretched to full width. Resize the TwentyTwenty.
-                jQuery( window ).trigger( "resize.twentytwenty", [ true, w, h ] )
+                //jQuery( window ).trigger( "resize.twentytwenty", [ true, w, h ] )
+                jQuery( window ).trigger( "resize.twentytwenty", [ false, w, h ] ) // Temporarily set to false
 
             } else {
 
