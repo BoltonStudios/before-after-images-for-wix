@@ -47,7 +47,7 @@ db.init_app( app )
 migrate.init_app( app, db )
 
 # Define constants.
-APP_VERSION = '1.1.2'
+APP_VERSION = '1.1.3'
 WEBHOOK_PUBLIC_KEY = os.getenv( "WEBHOOK_PUBLIC_KEY" )
 APP_ID = os.getenv( "APP_ID" )
 APP_SECRET = os.getenv( "APP_SECRET" )
@@ -55,8 +55,8 @@ AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
 TRIAL_DAYS = timedelta( days = 10 )
 DEFAULT_EXTENSION_LIMIT = 999
-BEFORE_PLACEHOLDER_THUMBNAIL = 'images/placeholder-6.svg'
-AFTER_PLACEHOLDER_THUMBNAIL = 'images/placeholder-6.svg'
+BEFORE_PLACEHOLDER_THUMBNAIL = 'images/placeholder-12.svg'
+AFTER_PLACEHOLDER_THUMBNAIL = 'images/placeholder-12.svg'
 
 # Use a template context processor to pass the current date to every template
 # Source: https://stackoverflow.com/a/41231621

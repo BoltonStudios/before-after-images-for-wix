@@ -24,7 +24,8 @@ Bolton Studios LLC
 
 ## Version History
 * 1.1.3 - 03/03/2024
-    * Bug Fix: Retooled container auto-resizing. 
+    * Bug Fix: Reworked container auto-resizing. 
+    * Added new placeholder images for full-width sliders.
     * Reenabled full-width sliders for all users.
 
 * 1.1.2 - 03/02/2024
