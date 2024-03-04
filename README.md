@@ -23,8 +23,13 @@ Bolton Studios LLC
 * [boltonstudios.com](https://www.boltonstudios.com/)
 
 ## Version History
+* 1.1.3 - 03/03/2024
+    * Bug Fix: Reworked container auto-resizing. 
+    * Added new placeholder images for full-width sliders.
+    * Reenabled full-width sliders for all users.
+
 * 1.1.2 - 03/02/2024
-    * Rollback: Temporarily restricting full-width sliders to beta testers.
+    * Rollback: Temporarily restricted full-width sliders to beta testers.
 
 * 1.1.1 - 03/02/2024
     * Bug Fix: Fixed possible mismatch of container and image heights in full-width sliders at small screen sizes.

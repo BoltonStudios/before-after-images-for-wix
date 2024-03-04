@@ -21,19 +21,12 @@ function resizeComponentWindow(){
             h = afterImg.height();
         }
 
-        // Ensure we are in editor mode...
-        if( Wix.Utils.getViewMode() == 'editor' ){
+        // Resize the window to the shortest image dimensions to match TwentyTwenty.
+        Wix.setHeight( h );
 
-            // Resize the window to the shortest image dimensions to match TwentyTwenty.
-            Wix.resizeComponent({
-                    width: w,
-                    height: h
-                },
-                // Success
-                jQuery( window ).trigger( "resize.twentytwenty" )
-                );
-        }
-
+        // Resize TwentyTwenty.
+        jQuery( window ).trigger( "resize.twentytwenty" );
+        
     }, 250 );
 }
 
