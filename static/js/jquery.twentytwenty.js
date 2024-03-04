@@ -71,10 +71,10 @@
                 }
 
                 return {
-                    w: Math.round( w ) + "px",
-                    h: Math.round( h ) + "px",
-                    cw: Math.round(dimensionPct * w) + "px",
-                    ch: Math.round(dimensionPct * h) + "px"
+                    w: w + "px",
+                    h: h + "px",
+                    cw: (dimensionPct * w) + "px",
+                    ch: (dimensionPct * h) + "px"
                 };
             };
 
@@ -87,6 +87,8 @@
                     beforeImg.css("clip", "rect(0," + offset.cw + "," + offset.h + ",0)");
                     afterImg.css("clip", "rect(0," + offset.w + "," + offset.h + "," + offset.cw + ")");
                 }
+
+                // Resize container.
                 container.css("height", offset.h);
 
             };
