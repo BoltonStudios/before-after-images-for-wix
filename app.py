@@ -146,7 +146,7 @@ def redirect_wix():
         auth_provider_base_url = AUTH_PROVIDER_BASE_URL
         app_secret = APP_SECRET
         app_id = APP_ID
-        site_url = ''
+        site_url = 'Not published'
         site_id = ''
 
         # Prepare request.
