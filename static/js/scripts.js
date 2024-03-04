@@ -10,6 +10,13 @@ function resizeComponentWindow(){
         var container = jQuery("#" + extension_id + "-twentytwenty");
         var beforeImg = container.find("img:first");
         var afterImg = container.find("img:last");
+
+        // Temporarily set min-height to auto to allow jQuery to
+        // get the images' natural height.
+        beforeImg.css( {"min-height": "auto"});
+        afterImg.css( {"min-height": "auto"});
+
+        // Get the image dimensions.
         var w = beforeImg.width();
         var h = beforeImg.height();
 
@@ -21,15 +28,17 @@ function resizeComponentWindow(){
             h = afterImg.height();
         }
 
-        // Ensure we are in editor mode...
-        if( Wix.Utils.getViewMode() == 'editor' ){
+        // Resize the window to the shortest image dimensions to match TwentyTwenty.
+        Wix.setHeight( h );
 
-            // Resize the window to the shortest image dimensions to match TwentyTwenty.
-            Wix.setHeight( h );
+        // Resize TwentyTwenty.
+        jQuery( window ).trigger( "resize.twentytwenty" );
 
-            // Resize TwentyTwenty.
-            jQuery( window ).trigger( "resize.twentytwenty" );
-        }
+        // Set to height of each image to 100% to ensure no fractional px.
+        // Otherwise gaps may appear at the bottom of the app, between the images and
+        // the iframe in some layouts.
+        beforeImg.css( {"min-height": "100%"});
+        afterImg.css( {"min-height": "100%"});
 
     }, 250 );
 }

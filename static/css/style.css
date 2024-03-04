@@ -92,6 +92,7 @@ TwentyTwenty overrides
 .twentytwenty-wrapper .twentytwenty-container img {
   width: 100%;
   height: auto;
+  min-height: 100%;
 }
 .twentytwenty-wrapper .twentytwenty-container .twentytwenty-handle {
   border: none;
