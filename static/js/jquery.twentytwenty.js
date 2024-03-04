@@ -87,8 +87,6 @@
                     beforeImg.css("clip", "rect(0," + offset.cw + "," + offset.h + ",0)");
                     afterImg.css("clip", "rect(0," + offset.w + "," + offset.h + "," + offset.cw + ")");
                 }
-
-                // Resize container.
                 container.css("height", offset.h);
 
             };
