@@ -8,7 +8,7 @@
                 <!--Settings Navigation-->
                 <div class="nav flex-column nav-pills p-3 vh-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 
-                    <button class="nav-link active rounded-pill w-100" id="v-pills-main-tab" 
+                    <button class="nav-link active rounded-pill w-100 nav-link-main" id="v-pills-main-tab" 
                         data-bs-toggle="pill" 
                         data-bs-target="#v-pills-main" 
                         type="button" 
@@ -20,10 +20,10 @@
                     </button>
 
                     {% if ( trial_days <= 0 ) and ( is_free == True ) %}
-                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    <div class="upgrade-call-to-action" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
-                    <button class="nav-link rounded-pill w-100" id="v-pills-images-tab"
+                    <button class="nav-link rounded-pill w-100 nav-link-images" id="v-pills-images-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-images"
                         type="button"
@@ -42,10 +42,10 @@
                     {% endif %}
 
                     {% if ( trial_days <= 0 ) and ( is_free == True ) %}
-                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    <div class="upgrade-call-to-action" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
-                    <button class="nav-link rounded-pill w-100" id="v-pills-layout-tab"
+                    <button class="nav-link rounded-pill w-100 nav-link-layout" id="v-pills-layout-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-layout"
                         type="button"
@@ -64,10 +64,10 @@
                     {% endif %}
 
                     {% if ( trial_days <= 0 ) and ( is_free == True ) %}
-                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    <div class="upgrade-call-to-action" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
-                    <button class="nav-link rounded-pill w-100" id="v-pills-animations-tab"
+                    <button class="nav-link rounded-pill w-100 nav-link-animations" id="v-pills-animations-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-animations"
                         type="button"
@@ -86,10 +86,10 @@
                     {% endif %}
 
                     {% if ( trial_days <= 0 ) and ( is_free == True ) %}
-                    <div tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
+                    <div class="upgrade-call-to-action" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Upgrade now to keep using this app.">
                     {% endif %}
 
-                    <button class="nav-link rounded-pill w-100" id="v-pills-options-tab"
+                    <button class="nav-link rounded-pill w-100 nav-link-options" id="v-pills-options-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-options"
                         type="button"
@@ -108,7 +108,7 @@
                     {% endif %}
 
                     <hr>
-                    <button class="nav-link rounded-pill" id="v-pills-support-tab"
+                    <button class="nav-link rounded-pill nav-link-support" id="v-pills-support-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#v-pills-support"
                         type="button"
@@ -120,7 +120,7 @@
 
                     {% if is_free == True %}
                     <hr>
-                    <a class="nav-link rounded-pill text-center" 
+                    <a class="nav-link rounded-pill text-center nav-link-upgrade" 
                         id="v-pills-upgrade"
                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
                         target="_blank">
@@ -143,13 +143,13 @@
                                     {% if ( trial_days > 0 ) or ( is_free == False ) %}
 
                                     <!-- Call to Action -->
-                                    <p class="fw-light">Easily compare two images with before-and-after image sliders.</p>
-                                    <button class="btn btn-primary rounded-pill" type="button" role="button" onclick="changeBaieSettingsTab( trigger = '#v-pills-images-tab' )">Add Images</button>                            
+                                    <p class="fw-light intro">Easily compare two images with before-and-after image sliders.</p>
+                                    <button class="btn btn-primary rounded-pill add-images-button" type="button" role="button" onclick="changeBaieSettingsTab( trigger = '#v-pills-images-tab' )">Add Images</button>                            
                                     
                                     {% else %}
 
                                      <!-- Upgrade App -->
-                                    <p class="fw-light"><strong>The free trial is over.</strong> Upgrade now<br> to keep using Before & After Images.</p>
+                                    <p class="fw-light"><strong class="free-trial-over">The free trial is over.</strong> <span class="call-to-upgrade">Upgrade now to keep using Before & After Images.</span></p>
                                     <a class="btn btn-purple-2 rounded-pill" 
                                         id="v-pills-upgrade"
                                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
@@ -160,7 +160,8 @@
                                             height="12px"
                                             style="margin: 2px 4px 4px 0;"
                                             />
-                                        Upgrade App</a>
+                                        <span class="upgrade-button">Upgrade App</span>
+                                    </a>
 
                                     {%endif%}
                                 </div>
@@ -172,12 +173,12 @@
                             <hr>
                             <div class="row">
                                 <div class="col">
-                                    <p class="fw-light">Free trial ends in <strong>{{trial_days}} days</strong>.</p>
+                                    <p class="fw-light free-trial-count-down">Free trial ends in <strong>{{trial_days}} days</strong>.</p>
                                     <a class="btn btn-purple-1 upgrade-btn rounded-pill" 
                                         id="v-pills-upgrade"
                                         href="https://www.wix.com/apps/upgrade/ace631c7-323b-47c9-969f-7f3421515171?appInstanceId={{instance_id}}"
                                         target="_blank">
-                                        Upgrade App
+                                        <span class="upgrade-button">Upgrade App</span>
                                     </a>     
                                 </div>
                             </div>
@@ -206,7 +207,8 @@
                         <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light"
+                                    <h5 class="images-heading"
+                                    class="fw-light"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     data-bs-title="The the shortest image determines the slider height."
@@ -230,10 +232,10 @@
 
                             <div class="row mb-2">
                                 <div class="col-auto">
-                                    <strong>Before</strong>
+                                    <strong class="before-image-label">Before</strong>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle select-image-button" type="button">Select Image</button>
                                 </div>
                             </div>
 
@@ -251,7 +253,7 @@
                                     
                                     <!--Before Label-->
                                     <div class="input-group mb-2">
-                                        <label for="before_label_text" class="input-group-text">Label:</label>
+                                        <label for="before_label_text" class="input-group-text label-text-label">Label:</label>
                                         <input name="before_label_text"
                                             type="text"
                                             id="before-label-text"
@@ -264,7 +266,7 @@
                                     
                                     <!--Alt Text-->
                                     <div class="input-group">
-                                        <label for="before_alt_text" class="input-group-text">Alt Text:</label>
+                                        <label for="before_alt_text" class="input-group-text alt-text-label">Alt Text:</label>
                                         <input name="before_alt_text"
                                             type="text"
                                             id="before-alt-text"
@@ -290,10 +292,10 @@
 
                             <div class="row mb-2">
                                 <div class="col-auto">
-                                    <strong>After</strong>
+                                    <strong class="after-image-label">After</strong>
                                 </div>
                                 <div class="col" style="text-align: right;">
-                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle" type="button">Select Image</button>
+                                    <button class="btn btn-primary btn-sm rounded-pill update-baie-images-toggle select-image-button" type="button">Select Image</button>
                                 </div>
                             </div>
                             
@@ -311,7 +313,7 @@
                                     
                                     <!--After Label-->
                                     <div class="input-group mb-2">
-                                        <label for="after_label_text" class="input-group-text">Label:</label>
+                                        <label for="after_label_text" class="input-group-text label-text-label">Label:</label>
                                         <input name="after_label_text"
                                             type="text"
                                             id="after-label-text"
@@ -324,7 +326,7 @@
                                     
                                     <!--Alt Text-->
                                     <div class="input-group">
-                                        <label for="after-alt-text" class="input-group-text">Alt Text:</label>
+                                        <label for="after-alt-text" class="input-group-text alt-text-label">Alt Text:</label>
                                         <input name="after-alt-text"
                                             type="text" 
                                             id="after-alt-text" 
@@ -347,7 +349,7 @@
                         <div class="container-fluid text-bg-light mb-2 px-4 py-3 border-bottom">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="fw-light">Layout</h5>
+                                    <h5 class="fw-light layout-heading">Layout</h5>
                                 </div>
                             </div>
                         </div>
@@ -356,7 +358,7 @@
                         <div class="container px-4 pt-2 pb-1">
                             <div class="row">
                                 <div class="col-9">
-                                    <label for="sliderOffsetRange" class="form-label"><strong>Offset</strong></label><br>
+                                    <label for="sliderOffsetRange" class="form-label"><strong class="offset-label">Offset</strong></label><br>
                                     <input type="range" class="form-range" id="sliderOffsetRange" onchange="updateBaieExtension()" value="{{ slider_offset }}">
                                 </div>
                                 <div class="col-3">
@@ -370,7 +372,7 @@
                         <div class="container px-4 pt-1 pb-2">
                             <div class="row">
                                 <div class="col-12">
-                                    <label for="sliderOrientation" class="form-label"><strong>Orientation</strong></label><br>
+                                    <label for="sliderOrientation" class="form-label"><strong class="orientation-label">Orientation</strong></label><br>
                                     <div class="form-check ps-0">
                                         <div class="btn-group" role="group" aria-label="slider orientation radio toggle button group">
                                             <input 
@@ -385,7 +387,7 @@
                                                 {% endif %}
                                             >
                                             <label
-                                                class="btn btn-outline-primary"
+                                                class="btn btn-outline-primary slide-horizontal"
                                                 for="sliderOrientation1"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
@@ -409,7 +411,7 @@
                                                 {% endif %}
                                             >
                                             <label
-                                                class="btn btn-outline-primary"
+                                                class="btn btn-outline-primary slide-vertical"
                                                 for="sliderOrientation2"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
@@ -431,7 +433,7 @@
                         <div class="container px-4 pt-2 pb-2">
                             <div class="row">
                                 <div class="col-12">
-                                    <label for="sliderDarkMode" class="form-label"><strong>Dark Mode</strong></label><br>
+                                    <label for="sliderDarkMode" class="form-label"><strong class="dark-mode-label">Dark Mode</strong></label><br>
                                     <div class="form-check ps-0">
                                         <div class="btn-group" role="group" aria-label="slider dark mode radio toggle button group">
                                             <input 
@@ -446,7 +448,7 @@
                                                 {% endif %}
                                             >
                                             <label
-                                                class="btn btn-outline-primary"
+                                                class="btn btn-outline-primary light-mode-tooltip"
                                                 for="sliderDarkMode1"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
@@ -470,7 +472,7 @@
                                                 {% endif %}
                                             >
                                             <label
-                                                class="btn btn-outline-primary"
+                                                class="btn btn-outline-primary dark-mode-tooltip"
                                                 for="sliderDarkMode2"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"

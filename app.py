@@ -185,14 +185,14 @@ def redirect_wix():
             site = app_instance['site']
             site_id = site['siteId']
 
-            # Site URL (empty if site is not published).
+            # Site URL (unpublished sites do not have URLs).
             if 'url' in site :
 
                 # Extract site url.
                 site_url = app_instance['site']['url']
                 print( "Site URL: " + site_url )
 
-        # Construct the URL to Completes the OAuth flow.
+        # Construct the URL to complete the OAuth flow.
         # https://dev.wix.com/api/rest/getting-started/authentication#getting-started_authentication_step-5a-app-completes-the-oauth-flow
         complete_oauth_redirect_url = "https://www.wix.com/installer/close-window?access_token="
         complete_oauth_redirect_url += access_token
