@@ -354,6 +354,12 @@ def upgrade():
         # Search the tables for records, filtering by instance ID.
         instance = Instance.query.filter_by( instance_id = instance_id ).first()
 
+        # Log the key webhook fields so missed or malformed upgrades are diagnosable.
+        print( "Upgrade webhook received: instanceId=" + str( instance_id ) +
+              ", vendorProductId=" + str( product_id ) +
+              ", expiresOn=" + str( product_data.get( 'expiresOn' ) ) +
+              ", instance_found=" + str( instance is not None ) )
+
         # If the instance exists and the product_id is not null.
         if instance and product_id:
 
@@ -376,12 +382,21 @@ def upgrade():
             db.session.commit()
 
             # Return feedback to the console.
-            print( "Instance #" + instance_id + " upgraded.")
+            print( "Instance #" + instance_id + " upgraded. expires_on=" +
+                  str( instance.expires_on ) )
+
+        elif instance is None:
+
+            # The webhook fired for an instance we have no record of. Without this
+            # the user silently stays on the free tier despite paying.
+            print( "UPGRADE MISS: no Instance record for instanceId=" +
+                  str( instance_id ) + ". Paid user may be stranded on free tier." )
 
         else:
 
             # Return feedback to the console.
-            print( "Instance #" + instance_id + " or vendorProductId not found.")
+            print( "UPGRADE MISS: vendorProductId missing for instanceId=" +
+                  str( instance_id ) + "." )
 
     # The app must return a 200 response upon successful receipt of a webhook.
     # Source: https://dev.wix.com/docs/rest/articles/getting-started/webhooks
@@ -832,10 +847,13 @@ def widget():
                 # Update the local variable for use in the widget template.
                 slider_dark_mode  = 'dark'
 
-            # If the user cancelled auto-renew (did_cancel is True) and...
-            # If the expiration date is in the past (expiration_date < datetime.utcnow()) and...
-            # If the app counts the user as a paid user (is_free is False)...
-            if did_cancel is True and expiration_date < datetime.utcnow() and is_free is False:
+            # Reconcile our records with Wix whenever the stored expiration date
+            # has passed. This covers two cases:
+            #   1. A paid plan expired and our records are stale (is_free still False).
+            #   2. A user resubscribed but the Paid Plan Purchased webhook never
+            #      arrived, which would otherwise leave them stuck on the free tier.
+            # Trial users (expires_on is None) are skipped so we don't call Wix needlessly.
+            if expiration_date is not None and expiration_date < datetime.utcnow():
 
                 try:
 
@@ -869,7 +887,7 @@ def widget():
                                                              '%Y-%m-%dT%H:%M:%SZ' )
 
                             # Update the record in the database.
-                            extension_in_db.instance.expiration_date = renewal_date
+                            extension_in_db.instance.expires_on = renewal_date
 
                     # Save changes.
                     db.session.commit()
