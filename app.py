@@ -9,7 +9,8 @@ import os
 import json
 import urllib.parse
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import click
 import jwt
 import requests
 from dotenv import load_dotenv
@@ -22,7 +23,7 @@ from database import db, db_uri, migrate
 import logic
 
 # Import models.
-from models import Instance, Extension
+from models import Instance, Extension, TrialHistory
 
 # Load environment variables from .env file
 load_dotenv()
@@ -54,6 +55,7 @@ APP_SECRET = os.getenv( "APP_SECRET" )
 AUTH_PROVIDER_BASE_URL = os.getenv( "AUTH_PROVIDER_BASE_URL" )
 INSTANCE_API_URL = os.getenv( "INSTANCE_API_URL" )
 TRIAL_DAYS = timedelta( days = 10 )
+UNINSTALLED_RETENTION = timedelta( days = 30 )
 DEFAULT_EXTENSION_LIMIT = 999
 BEFORE_PLACEHOLDER_THUMBNAIL = 'images/placeholder-12.svg'
 AFTER_PLACEHOLDER_THUMBNAIL = 'images/placeholder-12.svg'
@@ -112,7 +114,8 @@ def app_wix():
     url = permission_request_url + '?token=' + token + '&state=start'
     url += '&appId=' + app_id + '&redirectUrl=' + redirect_url
 
-    print( "redirecting to " + url )
+    # Log without the URL, which contains the Wix installation token.
+    print( "redirecting to Wix installer" )
     print( "=============================" )
 
     # Redirect to the app installation URL.
@@ -211,6 +214,15 @@ def redirect_wix():
                 site_id = site_id
             )
 
+            # If this site's earlier installation was purged, resume its
+            # original free trial instead of starting a new one.
+            site_hash = logic.hash_site_id( site_id )
+            history = db.session.get( TrialHistory, site_hash ) if site_hash else None
+
+            if history is not None:
+
+                instance.created_at = history.trial_started_at
+
             # Add the new instance record to the Instance table.
             db.session.add( instance )
 
@@ -218,8 +230,11 @@ def redirect_wix():
 
             # Update the instance record to the Instance table.
             instance_in_db.refresh_token = refresh_token
-            instance_in_db.site_url = site_url,
+            instance_in_db.site_url = site_url
             instance_in_db.site_id = site_id
+
+            # Reinstalled within the retention period: cancel the pending purge.
+            instance_in_db.uninstalled_at = None
 
         # Add the new or updated instance record to the Instance table.
         db.session.commit()
@@ -236,7 +251,8 @@ def redirect_wix():
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
 
-        print( "redirecting to " + complete_oauth_redirect_url )
+        # Log without the URL, which contains the access token.
+        print( "redirecting to Wix close-window" )
         print( "=============================" )
 
         return redirect( complete_oauth_redirect_url )
@@ -301,6 +317,14 @@ def uninstall():
 
             # Reset the extension count.
             instance.extension_count = 0
+
+            # Discard the Wix refresh token; it is not needed after uninstall
+            # and a fresh one is issued if the site reinstalls the app.
+            instance.refresh_token = None
+
+            # Start the retention clock; `flask purge-uninstalled` deletes the
+            # remaining record once UNINSTALLED_RETENTION has passed.
+            instance.uninstalled_at = datetime.now( timezone.utc )
 
             # Save changes.
             db.session.commit()
@@ -1039,3 +1063,74 @@ def dashboard( instance_id = '', page = 1 ):
         instance = instance,
         extensions = extensions
     )
+
+# Scheduled cleanup (run daily, e.g. as a DigitalOcean App Platform scheduled job):
+#   flask --app app purge-uninstalled
+# Preview without deleting anything:
+#   flask --app app purge-uninstalled --dry-run
+@app.cli.command( 'purge-uninstalled' )
+@click.option( '--dry-run', is_flag = True,
+              help = 'List the records that would be purged without changing anything.' )
+def purge_uninstalled( dry_run ):
+
+    """
+    Delete installation records uninstalled more than UNINSTALLED_RETENTION ago.
+
+    Before deleting, keep only a hashed site ID and the trial start date in
+    TrialHistory so a returning site cannot restart its free trial.
+    """
+
+    cutoff = datetime.now( timezone.utc ) - UNINSTALLED_RETENTION
+
+    stale_instances = Instance.query.filter(
+        Instance.uninstalled_at.isnot( None ),
+        Instance.uninstalled_at < cutoff
+    ).all()
+
+    if dry_run:
+
+        print( "purge-uninstalled DRY RUN: would remove " + str( len( stale_instances ) ) +
+              " installation record(s) uninstalled before " + cutoff.isoformat() )
+
+        for instance in stale_instances:
+
+            remaining_sliders = Extension.query.filter_by(
+                instance_id = instance.instance_id ).count()
+
+            print( "  instance_id=" + str( instance.instance_id ) +
+                  "  site_url=" + str( instance.site_url ) +
+                  "  uninstalled_at=" + str( instance.uninstalled_at ) +
+                  "  remaining_sliders=" + str( remaining_sliders ) )
+
+        print( "No changes made." )
+
+        return
+
+    for instance in stale_instances:
+
+        site_hash = logic.hash_site_id( instance.site_id )
+
+        if site_hash and instance.created_at is not None:
+
+            history = db.session.get( TrialHistory, site_hash )
+
+            if history is None:
+
+                db.session.add( TrialHistory( site_hash = site_hash,
+                                              trial_started_at = instance.created_at ) )
+
+            elif instance.created_at < history.trial_started_at:
+
+                # Always keep the earliest trial start for the site.
+                history.trial_started_at = instance.created_at
+
+        # Sliders are deleted at uninstall; this removes any stragglers.
+        Extension.query.filter_by( instance_id = instance.instance_id ).delete()
+
+        db.session.delete( instance )
+
+    db.session.commit()
+
+    # Log only the count, never identifiers.
+    print( "purge-uninstalled: removed " + str( len( stale_instances ) ) +
+          " installation record(s) uninstalled before " + cutoff.isoformat() )

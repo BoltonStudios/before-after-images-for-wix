@@ -32,9 +32,29 @@ class Instance( db.Model ):
     extension_limit: db.Column      = db.Column( db.Integer, default = 999 )
     created_at: db.Column           = db.Column( db.DateTime( timezone = True ),
                                         server_default = func.now() )
+    # Set by the App Removed webhook; cleared on reinstall. Rows uninstalled
+    # for longer than the retention period are purged by `flask purge-uninstalled`.
+    uninstalled_at: db.Column       = db.Column( db.DateTime( timezone = True ),
+                                                nullable = True )
 
     def __repr__( self ):
         return f'<instance { self.instance_id }>'
+
+# Define the trial history table class.
+class TrialHistory( db.Model ):
+
+    """
+    Minimal record kept after an installation is purged, so a site that
+    reinstalls resumes its original free trial instead of starting a new one.
+
+    Stores only a one-way SHA-256 hash of the Wix site ID and the trial start date.
+    """
+    site_hash: db.Column            = db.Column( db.String( 64 ), primary_key = True )
+    trial_started_at: db.Column     = db.Column( db.DateTime( timezone = True ),
+                                                nullable = False )
+
+    def __repr__( self ):
+        return f'<trial_history { self.site_hash[ :8 ] }>'
 
 # Define the slider extension table class.
 class Extension( db.Model ):

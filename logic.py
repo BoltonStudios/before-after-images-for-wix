@@ -61,6 +61,21 @@ def verify_hmac_signature( payload, signature, secret ):
     # Compare signatures.
     return expected_signature == signature
 
+def hash_site_id( site_id ):
+
+    """
+    Return a one-way SHA-256 hex digest of a Wix site ID, or None if it is empty.
+
+    Wix site IDs are random UUIDs, so an unsalted hash cannot be reversed
+    without already knowing the site ID.
+    """
+
+    if not site_id:
+
+        return None
+
+    return hashlib.sha256( site_id.encode( "UTF-8" ) ).hexdigest()
+
 # Calculate trial days
 def calculate_trial_days( trial_days, start_date ):
 
@@ -107,7 +122,6 @@ def get_tokens_from_wix( auth_code, auth_provider_base_url, app_secret, app_id )
 
     # Request an access token.
     token_request = requests.post( url, json = body_parameters, timeout=2.50 )
-    dump( token_request.text, "token_request.text" )
 
     # Return the resposne with access and refresh tokens.
     return token_request.text
@@ -160,7 +174,7 @@ def get_app_instance( refresh_token, instance_api_url, auth_provider_base_url, a
     """
 
     try:
-        print( 'get_app_instance with refreshToken = ' + refresh_token )
+        print( 'get_app_instance called.' )
         print( "==============================" )
         access_token = get_access_token( refresh_token, auth_provider_base_url, app_secret, app_id )
 
