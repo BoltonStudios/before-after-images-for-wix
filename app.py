@@ -9,6 +9,7 @@ import os
 import json
 import urllib.parse
 import base64
+import threading
 from datetime import datetime, timedelta, timezone
 import click
 import jwt
@@ -1142,20 +1143,16 @@ def dashboard( instance_id = '', page = 1 ):
         extensions = extensions
     )
 
-# Scheduled cleanup (run daily, e.g. as a DigitalOcean App Platform scheduled job):
-#   flask --app app purge-uninstalled
-# Preview without deleting anything:
-#   flask --app app purge-uninstalled --dry-run
-@app.cli.command( 'purge-uninstalled' )
-@click.option( '--dry-run', is_flag = True,
-              help = 'List the records that would be purged without changing anything.' )
-def purge_uninstalled( dry_run ):
+def purge_uninstalled_instances( dry_run = False ):
 
     """
     Delete installation records uninstalled more than UNINSTALLED_RETENTION ago.
 
     Before deleting, keep only a hashed site ID and the trial start date in
     TrialHistory so a returning site cannot restart its free trial.
+
+    Safe to run repeatedly or concurrently: a second run finds nothing left to remove.
+    Must be called inside an application context.
     """
 
     cutoff = datetime.now( timezone.utc ) - UNINSTALLED_RETENTION
@@ -1182,7 +1179,7 @@ def purge_uninstalled( dry_run ):
 
         print( "No changes made." )
 
-        return
+        return len( stale_instances )
 
     for instance in stale_instances:
 
@@ -1212,3 +1209,92 @@ def purge_uninstalled( dry_run ):
     # Log only the count, never identifiers.
     print( "purge-uninstalled: removed " + str( len( stale_instances ) ) +
           " installation record(s) uninstalled before " + cutoff.isoformat() )
+
+    return len( stale_instances )
+
+# Manual run (the app also runs this automatically once a day; see below):
+#   flask --app app purge-uninstalled
+# Preview without deleting anything:
+#   flask --app app purge-uninstalled --dry-run
+@app.cli.command( 'purge-uninstalled' )
+@click.option( '--dry-run', is_flag = True,
+              help = 'List the records that would be purged without changing anything.' )
+def purge_uninstalled( dry_run ):
+
+    """
+    Delete installation records uninstalled more than 30 days ago.
+    """
+
+    purge_uninstalled_instances( dry_run = dry_run )
+
+# Automatic daily purge, run by the web app itself (no separate job needed).
+# On a request, if AUTO_PURGE_INTERVAL has passed since this process last
+# started a purge, start one in a background thread so the request never waits.
+# Each Gunicorn worker keeps its own timer; extra runs are harmless.
+AUTO_PURGE_INTERVAL = timedelta( hours = 24 )
+app.config.setdefault( 'AUTO_PURGE', True )
+_auto_purge_lock = threading.Lock()
+_auto_purge_last_started = None
+
+def _run_auto_purge():
+
+    """
+    Background-thread body: run the purge in its own app context and session.
+    """
+
+    with app.app_context():
+
+        try:
+
+            purge_uninstalled_instances()
+
+        except Exception as err:
+
+            db.session.rollback()
+            print( "auto-purge failed: " + type( err ).__name__ + ": " + str( err )[ :200 ] )
+
+        finally:
+
+            db.session.remove()
+
+@app.before_request
+def maybe_start_auto_purge():
+
+    """
+    Start the daily purge in the background when it is due.
+    """
+
+    global _auto_purge_last_started  # pylint: disable=global-statement
+
+    if not app.config.get( 'AUTO_PURGE' ):
+
+        return
+
+    try:
+
+        now = datetime.now( timezone.utc )
+
+        # Non-blocking: if another request is already deciding, skip.
+        if not _auto_purge_lock.acquire( blocking = False ):
+
+            return
+
+        try:
+
+            if ( _auto_purge_last_started is not None and
+                    now - _auto_purge_last_started < AUTO_PURGE_INTERVAL ):
+
+                return
+
+            _auto_purge_last_started = now
+
+        finally:
+
+            _auto_purge_lock.release()
+
+        threading.Thread( target = _run_auto_purge, name = "auto-purge", daemon = True ).start()
+
+    except Exception as err:
+
+        # Never let the purge trigger affect a request.
+        print( "auto-purge trigger failed: " + type( err ).__name__ )
