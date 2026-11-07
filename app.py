@@ -70,6 +70,84 @@ def inject_now():
     """
     return {'now': datetime.utcnow()}
 
+def _log_safe( value ):
+
+    """
+    Make a request-supplied value safe for a single log line.
+    """
+
+    if value is None:
+
+        return '-'
+
+    return str( value ).replace( '\r', '' ).replace( '\n', '' )[ :100 ]
+
+def _instance_id_from_wix_param( value ):
+
+    """
+    Read only the instanceId from Wix's signed `instance` query parameter.
+
+    The parameter also carries the visitor's anonymous ID (aid) and the site
+    owner's ID; those are deliberately ignored. The signature is not checked
+    because the value is used for logging only.
+    """
+
+    try:
+
+        encoded_json = value.split( '.', 1 )[ 1 ]
+        padded = encoded_json + ( "=" * ( ( 4 - len( encoded_json ) % 4 ) % 4 ) )
+
+        return json.loads( base64.urlsafe_b64decode( padded ) ).get( 'instanceId' )
+
+    except Exception:
+
+        return None
+
+# Log failed requests with site-level identifiers only.
+# The access log omits query strings (see gunicorn.conf.py), so this keeps
+# support tickets traceable without recording anything about visitors.
+@app.after_request
+def log_failed_request( response ):
+
+    """
+    For responses with status 400 or above, log the instance and slider IDs.
+    """
+
+    if response.status_code >= 400:
+
+        try:
+
+            args = request.args
+            comp_id = args.get( 'origCompId' ) or args.get( 'viewerCompId' ) or args.get( 'compId' )
+            instance_id = None
+
+            if 'instance' in args:
+
+                instance_id = _instance_id_from_wix_param( args.get( 'instance' ) )
+
+            if request.view_args and 'instance_id' in request.view_args:
+
+                instance_id = request.view_args[ 'instance_id' ]
+
+            # Slider saves and deletes send their IDs in a JSON body.
+            if request.method == 'POST' and request.path.rstrip( '/' ) == '/widget':
+
+                body = request.get_json( silent = True, force = True ) or {}
+                comp_id = comp_id or body.get( 'extensionId' )
+                instance_id = instance_id or body.get( 'instanceId' )
+
+            print( "Request failed: " + request.method + " " + _log_safe( request.path ) +
+                  " -> " + str( response.status_code ) +
+                  " instance_id=" + _log_safe( instance_id ) +
+                  " slider_id=" + _log_safe( comp_id ) )
+
+        except Exception:
+
+            # Never let logging break a response.
+            pass
+
+    return response
+
 # Define Flask routes.
 # Homepage.
 @app.route('/')
